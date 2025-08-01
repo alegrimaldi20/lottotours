@@ -1,0 +1,36 @@
+Objetivo: 
+Diseñar una DApp basada en tecnología blockchain, orientada al turismo internacional, que fusiona mecánicas de loterías digitales con experiencias reales. La aplicación debe estar gamificada, accesible para todo público y preparada para entregar premios auténticos como viajes, productos o beneficios turísticos.
+
+Visión General del Proyecto
+Una plataforma interactiva y descentralizada que permite a cualquier usuario participar en misiones, apuestas o sorteos temáticos con enfoque turístico. Los usuarios ganan tokens y NFTs que pueden ser canjeados por experiencias reales como paquetes de viaje, entradas exclusivas o descuentos en marcas aliadas.
+
+Especificaciones del Prototipo
+1. Pantallas solicitadas:
+•	Landing Page / Inicio (invitación clara y cálida al juego)
+•	Registro / Login (seguro, con opción Web3 wallet)
+•	Panel del usuario (misiones, tokens, progreso, NFTs)
+•	Marketplace (compra, venta, subasta de premios turísticos)
+•	Sorteos / loterías temáticas (interfaz con countdown y resultados)
+•	Canje de premios (filtro, visualización y confirmación)
+2. Estilo visual:
+•	Moderno, vibrante, accesible
+•	Paleta sugerida: Explore Blue #1E3A8A, Ocean Pulse #22D3EE, Golden Luck #FBBF24, Travel Mint #34D399
+•	Visuales gamificados (tarjetas, cofres, boarding pass)
+•	Elementos turísticos (mapas, íconos de viaje, avatares geolocalizados)
+3. Experiencia de usuario (UX):
+•	Flujo sencillo y emocional desde el primer frame
+•	Microcopy amigable, breve y enfocado en beneficios
+•	Acciones con feedback animado (ganaste, desbloqueaste, canjeaste)
+4. Funciones clave:
+•	Participar en loterías digitales
+•	Completar misiones temáticas (culturales, locales, deportivas)
+•	Ganar tokens/NFTs y visualizarlos en tiempo real
+•	Canjear recompensas auténticas
+•	Invitar amigos para desbloquear misiones exclusivas
+5. Público objetivo:
+•	Personas que deseen viajar y vivir experiencias memorables
+•	Público general con interés en recompensas, sorteos y aventura
+•	No se requiere conocimiento técnico para usar la DApp
+
+Tono y Propósito
+La interfaz debe transmitir una sensación de aventura, transparencia y emoción. El usuario debe sentir que está iniciando un viaje digital que puede terminar en una experiencia física inolvidable. Cada clic debe parecer un paso hacia algo real.

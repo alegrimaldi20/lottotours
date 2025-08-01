@@ -1,118 +1,173 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertAppointmentSchema, insertReviewSchema, insertContactMessageSchema } from "@shared/schema";
+import { 
+  insertUserSchema, 
+  insertLotteryTicketSchema, 
+  insertPrizeRedemptionSchema 
+} from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Services routes
-  app.get("/api/services", async (req, res) => {
+  // Users routes
+  app.get("/api/users", async (req, res) => {
     try {
-      const services = await storage.getServices();
-      res.json(services);
+      const users = await storage.getUsers();
+      res.json(users);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch services" });
+      res.status(500).json({ message: "Failed to fetch users" });
     }
   });
 
-  app.get("/api/services/:id", async (req, res) => {
+  app.get("/api/users/:id", async (req, res) => {
     try {
-      const service = await storage.getService(req.params.id);
-      if (!service) {
-        return res.status(404).json({ message: "Service not found" });
+      const user = await storage.getUser(req.params.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
       }
-      res.json(service);
+      res.json(user);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch service" });
+      res.status(500).json({ message: "Failed to fetch user" });
     }
   });
 
-  // Appointments routes
-  app.get("/api/appointments", async (req, res) => {
+  app.post("/api/users", async (req, res) => {
     try {
-      const appointments = await storage.getAppointments();
-      res.json(appointments);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch appointments" });
-    }
-  });
-
-  app.post("/api/appointments", async (req, res) => {
-    try {
-      const validatedData = insertAppointmentSchema.parse(req.body);
-      const appointment = await storage.createAppointment(validatedData);
-      res.status(201).json(appointment);
+      const validatedData = insertUserSchema.parse(req.body);
+      const user = await storage.createUser(validatedData);
+      res.status(201).json(user);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid appointment data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid user data", errors: error.errors });
       }
-      res.status(500).json({ message: "Failed to create appointment" });
+      res.status(500).json({ message: "Failed to create user" });
     }
   });
 
-  // Available time slots
-  app.get("/api/available-slots/:date", async (req, res) => {
+  app.patch("/api/users/:id/tokens", async (req, res) => {
     try {
-      const { date } = req.params;
-      const slots = await storage.getAvailableTimeSlots(date);
-      res.json(slots);
+      const { tokens } = req.body;
+      if (typeof tokens !== "number") {
+        return res.status(400).json({ message: "Invalid tokens value" });
+      }
+      const user = await storage.updateUserTokens(req.params.id, tokens);
+      res.json(user);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch available slots" });
+      res.status(500).json({ message: "Failed to update user tokens" });
     }
   });
 
-  // Reviews routes
-  app.get("/api/reviews", async (req, res) => {
+  // Missions routes
+  app.get("/api/missions", async (req, res) => {
     try {
-      const reviews = await storage.getReviews();
-      res.json(reviews);
+      const missions = await storage.getActiveMissions();
+      res.json(missions);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch reviews" });
+      res.status(500).json({ message: "Failed to fetch missions" });
     }
   });
 
-  app.get("/api/reviews/service/:serviceId", async (req, res) => {
+  app.get("/api/users/:userId/missions", async (req, res) => {
     try {
-      const reviews = await storage.getReviewsByService(req.params.serviceId);
-      res.json(reviews);
+      const userMissions = await storage.getUserMissions(req.params.userId);
+      res.json(userMissions);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch reviews for service" });
+      res.status(500).json({ message: "Failed to fetch user missions" });
     }
   });
 
-  app.post("/api/reviews", async (req, res) => {
+  app.post("/api/users/:userId/missions/:missionId/complete", async (req, res) => {
     try {
-      const validatedData = insertReviewSchema.parse(req.body);
-      const review = await storage.createReview(validatedData);
-      res.status(201).json(review);
+      const userMission = await storage.completeMission(req.params.userId, req.params.missionId);
+      res.status(201).json(userMission);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to complete mission" });
+    }
+  });
+
+  // Lotteries routes
+  app.get("/api/lotteries", async (req, res) => {
+    try {
+      const lotteries = await storage.getActiveLotteries();
+      res.json(lotteries);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch lotteries" });
+    }
+  });
+
+  app.get("/api/lotteries/:id", async (req, res) => {
+    try {
+      const lottery = await storage.getLottery(req.params.id);
+      if (!lottery) {
+        return res.status(404).json({ message: "Lottery not found" });
+      }
+      res.json(lottery);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch lottery" });
+    }
+  });
+
+  app.post("/api/lottery-tickets", async (req, res) => {
+    try {
+      const validatedData = insertLotteryTicketSchema.parse(req.body);
+      const ticket = await storage.purchaseLotteryTicket(validatedData);
+      res.status(201).json(ticket);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid review data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid ticket data", errors: error.errors });
       }
-      res.status(500).json({ message: "Failed to create review" });
+      res.status(500).json({ message: "Failed to purchase ticket" });
     }
   });
 
-  // Contact messages routes
-  app.get("/api/contact-messages", async (req, res) => {
+  app.get("/api/users/:userId/tickets", async (req, res) => {
     try {
-      const messages = await storage.getContactMessages();
-      res.json(messages);
+      const tickets = await storage.getUserLotteryTickets(req.params.userId);
+      res.json(tickets);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch contact messages" });
+      res.status(500).json({ message: "Failed to fetch user tickets" });
     }
   });
 
-  app.post("/api/contact-messages", async (req, res) => {
+  // NFTs routes
+  app.get("/api/users/:userId/nfts", async (req, res) => {
     try {
-      const validatedData = insertContactMessageSchema.parse(req.body);
-      const message = await storage.createContactMessage(validatedData);
-      res.status(201).json(message);
+      const nfts = await storage.getUserNFTs(req.params.userId);
+      res.json(nfts);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user NFTs" });
+    }
+  });
+
+  // Prizes routes
+  app.get("/api/prizes", async (req, res) => {
+    try {
+      const prizes = await storage.getActivePrizes();
+      res.json(prizes);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch prizes" });
+    }
+  });
+
+  app.post("/api/prize-redemptions", async (req, res) => {
+    try {
+      const validatedData = insertPrizeRedemptionSchema.parse(req.body);
+      const redemption = await storage.redeemPrize(validatedData);
+      res.status(201).json(redemption);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid contact message data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid redemption data", errors: error.errors });
       }
-      res.status(500).json({ message: "Failed to send contact message" });
+      res.status(500).json({ message: "Failed to redeem prize" });
+    }
+  });
+
+  app.get("/api/users/:userId/redemptions", async (req, res) => {
+    try {
+      const redemptions = await storage.getUserRedemptions(req.params.userId);
+      res.json(redemptions);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user redemptions" });
     }
   });
 

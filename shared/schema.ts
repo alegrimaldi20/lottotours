@@ -1,73 +1,164 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, boolean, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const services = pgTable("services", {
+export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  walletAddress: text("wallet_address").unique(),
+  username: text("username").notNull(),
+  email: text("email"),
+  avatar: text("avatar"),
+  tokens: integer("tokens").notNull().default(0),
+  level: integer("level").notNull().default(1),
+  totalMissionsCompleted: integer("total_missions_completed").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const missions = pgTable("missions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  type: text("type").notNull(), // cultural, local, sports, travel
+  reward: integer("reward").notNull(), // tokens awarded
+  difficulty: text("difficulty").notNull(), // easy, medium, hard
+  location: text("location"), // optional location theme
+  icon: text("icon").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userMissions = pgTable("user_missions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  missionId: varchar("mission_id").notNull().references(() => missions.id),
+  status: text("status").notNull().default("active"), // active, completed, claimed
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const lotteries = pgTable("lotteries", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  theme: text("theme").notNull(), // destination theme like "Paris Adventure", "Tokyo Explorer"
+  prizeTitle: text("prize_title").notNull(),
+  prizeDescription: text("prize_description").notNull(),
+  prizeValue: integer("prize_value").notNull(), // USD value in cents
+  ticketPrice: integer("ticket_price").notNull(), // tokens required per entry
+  maxTickets: integer("max_tickets").notNull(),
+  soldTickets: integer("sold_tickets").notNull().default(0),
+  drawDate: timestamp("draw_date").notNull(),
+  status: text("status").notNull().default("active"), // active, drawn, completed
+  winnerId: varchar("winner_id").references(() => users.id),
+  image: text("image").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const lotteryTickets = pgTable("lottery_tickets", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  lotteryId: varchar("lottery_id").notNull().references(() => lotteries.id),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  ticketNumber: integer("ticket_number").notNull(),
+  purchasedAt: timestamp("purchased_at").defaultNow(),
+});
+
+export const nfts = pgTable("nfts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tokenId: text("token_id").unique(),
   name: text("name").notNull(),
   description: text("description").notNull(),
-  price: integer("price").notNull(), // price in cents
-  duration: integer("duration").notNull(), // duration in minutes
-  icon: text("icon").notNull(),
-});
-
-export const appointments = pgTable("appointments", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  serviceId: varchar("service_id").notNull().references(() => services.id),
-  clientName: text("client_name").notNull(),
-  clientEmail: text("client_email").notNull(),
-  clientPhone: text("client_phone").notNull(),
-  appointmentDate: text("appointment_date").notNull(),
-  appointmentTime: text("appointment_time").notNull(),
-  notes: text("notes"),
-  status: text("status").notNull().default("confirmed"),
+  image: text("image").notNull(),
+  rarity: text("rarity").notNull(), // common, rare, epic, legendary
+  category: text("category").notNull(), // destination, experience, achievement
+  metadata: text("metadata"), // JSON string for additional properties
+  ownerId: varchar("owner_id").references(() => users.id),
+  isRedeemable: boolean("is_redeemable").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const reviews = pgTable("reviews", {
+export const prizes = pgTable("prizes", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  reviewerName: text("reviewer_name").notNull(),
-  serviceId: varchar("service_id").notNull().references(() => services.id),
-  rating: integer("rating").notNull(),
-  content: text("content").notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(), // travel_package, experience, discount, product
+  destination: text("destination"), // for travel packages
+  value: integer("value").notNull(), // USD value in cents
+  tokensRequired: integer("tokens_required").notNull(),
+  image: text("image").notNull(),
+  provider: text("provider").notNull(), // partner company
+  availability: integer("availability").notNull().default(1),
+  validUntil: timestamp("valid_until"),
+  terms: text("terms"),
+  isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const contactMessages = pgTable("contact_messages", {
+export const prizeRedemptions = pgTable("prize_redemptions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  name: text("name").notNull(),
-  email: text("email").notNull(),
-  subject: text("subject").notNull(),
-  message: text("message").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  prizeId: varchar("prize_id").notNull().references(() => prizes.id),
+  status: text("status").notNull().default("pending"), // pending, confirmed, delivered
+  redemptionCode: text("redemption_code").unique(),
+  redeemedAt: timestamp("redeemed_at").defaultNow(),
 });
 
-export const insertServiceSchema = createInsertSchema(services).omit({
-  id: true,
-});
-
-export const insertAppointmentSchema = createInsertSchema(appointments).omit({
+// Insert schemas
+export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
-  status: true,
+  tokens: true,
+  level: true,
+  totalMissionsCompleted: true,
 });
 
-export const insertReviewSchema = createInsertSchema(reviews).omit({
+export const insertMissionSchema = createInsertSchema(missions).omit({
   id: true,
   createdAt: true,
 });
 
-export const insertContactMessageSchema = createInsertSchema(contactMessages).omit({
+export const insertLotterySchema = createInsertSchema(lotteries).omit({
+  id: true,
+  createdAt: true,
+  soldTickets: true,
+  winnerId: true,
+});
+
+export const insertLotteryTicketSchema = createInsertSchema(lotteryTickets).omit({
+  id: true,
+  purchasedAt: true,
+});
+
+export const insertNftSchema = createInsertSchema(nfts).omit({
+  id: true,
+  createdAt: true,
+  tokenId: true,
+});
+
+export const insertPrizeSchema = createInsertSchema(prizes).omit({
   id: true,
   createdAt: true,
 });
 
-export type Service = typeof services.$inferSelect;
-export type InsertService = z.infer<typeof insertServiceSchema>;
-export type Appointment = typeof appointments.$inferSelect;
-export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
-export type Review = typeof reviews.$inferSelect;
-export type InsertReview = z.infer<typeof insertReviewSchema>;
-export type ContactMessage = typeof contactMessages.$inferSelect;
-export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
+export const insertPrizeRedemptionSchema = createInsertSchema(prizeRedemptions).omit({
+  id: true,
+  redeemedAt: true,
+  redemptionCode: true,
+});
+
+// Types
+export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type Mission = typeof missions.$inferSelect;
+export type InsertMission = z.infer<typeof insertMissionSchema>;
+export type UserMission = typeof userMissions.$inferSelect;
+export type Lottery = typeof lotteries.$inferSelect;
+export type InsertLottery = z.infer<typeof insertLotterySchema>;
+export type LotteryTicket = typeof lotteryTickets.$inferSelect;
+export type InsertLotteryTicket = z.infer<typeof insertLotteryTicketSchema>;
+export type NFT = typeof nfts.$inferSelect;
+export type InsertNFT = z.infer<typeof insertNftSchema>;
+export type Prize = typeof prizes.$inferSelect;
+export type InsertPrize = z.infer<typeof insertPrizeSchema>;
+export type PrizeRedemption = typeof prizeRedemptions.$inferSelect;
+export type InsertPrizeRedemption = z.infer<typeof insertPrizeRedemptionSchema>;

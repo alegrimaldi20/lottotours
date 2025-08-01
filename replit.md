@@ -1,8 +1,8 @@
-# BookEasy Appointment Booking System
+# TravelLotto DApp - Blockchain Tourism Lottery Platform
 
 ## Overview
 
-BookEasy is a modern appointment booking web application built with React and Express. The system allows users to view services, book appointments online, leave reviews, and contact the business. It features a clean, responsive design with a blue color scheme and provides both client-facing and administrative functionality for managing appointments and customer interactions.
+TravelLotto is a gamified blockchain-based DApp that combines digital lotteries with authentic travel experiences. Users participate in themed missions, lotteries, and challenges to earn tokens and NFTs that can be redeemed for real travel packages, exclusive experiences, and tourism benefits. The platform features modern Web3 integration, vibrant gamified UI, and transparent blockchain mechanics for international tourism.
 
 ## User Preferences
 
@@ -12,19 +12,21 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Architecture
 - **Framework**: React with TypeScript using Vite as the build tool
-- **UI Library**: Shadcn/ui components built on top of Radix UI primitives
-- **Styling**: Tailwind CSS with custom CSS variables for theming
+- **UI Library**: Shadcn/ui components built on top of Radix UI primitives with gamified styling
+- **Styling**: Tailwind CSS with tourism-themed color palette (Explore Blue, Ocean Pulse, Golden Luck, Travel Mint)
 - **State Management**: TanStack Query (React Query) for server state management
 - **Routing**: Wouter for lightweight client-side routing
-- **Forms**: React Hook Form with Zod validation for type-safe form handling
+- **Forms**: React Hook Form with Zod validation for Web3 wallet integration and user interactions
+- **Animations**: Framer Motion for gamified feedback and smooth transitions
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js framework
 - **Language**: TypeScript with ES modules
-- **Database**: PostgreSQL with Drizzle ORM for type-safe database operations
-- **Storage**: In-memory storage implementation (MemStorage) with interface for future database integration
-- **API Design**: RESTful API with JSON responses and proper error handling
-- **Validation**: Zod schemas shared between client and server for consistent validation
+- **Database**: PostgreSQL with Drizzle ORM for storing user data, missions, lottery results, and NFT metadata
+- **Blockchain Integration**: Web3 API endpoints for token transactions and NFT minting
+- **Storage**: In-memory storage with blockchain event tracking and prize management
+- **API Design**: RESTful API with Web3 integration for lottery mechanics and reward distribution
+- **Validation**: Zod schemas for user submissions, lottery entries, and prize redemption
 
 ### Data Storage Solutions
 - **ORM**: Drizzle ORM configured for PostgreSQL with schema-first approach
