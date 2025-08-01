@@ -24,7 +24,7 @@ Preferred communication style: Simple, everyday language.
 - **Language**: TypeScript with ES modules
 - **Database**: PostgreSQL with Drizzle ORM for storing user data, missions, lottery results, and NFT metadata
 - **Blockchain Integration**: Web3 API endpoints for token transactions and NFT minting
-- **Storage**: In-memory storage with blockchain event tracking and prize management
+- **Storage**: PostgreSQL database with Drizzle ORM for persistent data storage
 - **API Design**: RESTful API with Web3 integration for lottery mechanics and reward distribution
 - **Validation**: Zod schemas for user submissions, lottery entries, and prize redemption
 
