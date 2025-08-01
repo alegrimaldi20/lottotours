@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(210, 40%, 8%);
+  --muted: hsl(210, 40%, 96%);
+  --muted-foreground: hsl(215, 16%, 47%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(210, 40%, 8%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(210, 40%, 8%);
+  --border: hsl(214, 32%, 91%);
+  --input: hsl(214, 32%, 91%);
+  --primary: hsl(217, 91%, 60%);
+  --primary-foreground: hsl(217, 100%, 97%);
+  --secondary: hsl(210, 40%, 96%);
+  --secondary-foreground: hsl(222, 84%, 5%);
+  --accent: hsl(217, 91%, 60%);
+  --accent-foreground: hsl(217, 100%, 97%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --ring: hsl(217, 91%, 60%);
+  --radius: 0.75rem;
+  --slate-50: hsl(210, 40%, 98%);
+  --slate-100: hsl(210, 40%, 96%);
+  --slate-200: hsl(214, 32%, 91%);
+  --slate-300: hsl(213, 27%, 84%);
+  --slate-600: hsl(215, 16%, 47%);
+  --slate-700: hsl(215, 19%, 35%);
+  --slate-900: hsl(222, 84%, 5%);
+  --blue-primary: hsl(217, 91%, 60%);
+  --blue-secondary: hsl(224, 76%, 48%);
+  --blue-50: hsl(214, 100%, 97%);
+  --blue-100: hsl(219, 100%, 95%);
+  --emerald-500: hsl(160, 84%, 39%);
+  --yellow-400: hsl(54, 91%, 59%);
+}
+
+.dark {
+  --background: hsl(222, 84%, 5%);
+  --foreground: hsl(210, 40%, 98%);
+  --muted: hsl(217, 33%, 17%);
+  --muted-foreground: hsl(215, 20%, 65%);
+  --popover: hsl(222, 84%, 5%);
+  --popover-foreground: hsl(210, 40%, 98%);
+  --card: hsl(222, 84%, 5%);
+  --card-foreground: hsl(210, 40%, 98%);
+  --border: hsl(217, 33%, 17%);
+  --input: hsl(217, 33%, 17%);
+  --primary: hsl(217, 91%, 60%);
+  --primary-foreground: hsl(217, 100%, 97%);
+  --secondary: hsl(217, 33%, 17%);
+  --secondary-foreground: hsl(210, 40%, 98%);
+  --accent: hsl(217, 33%, 17%);
+  --accent-foreground: hsl(210, 40%, 98%);
+  --destructive: hsl(0, 63%, 31%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --ring: hsl(217, 91%, 60%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+}
+
+@layer utilities {
+  .bg-slate-50 {
+    background-color: var(--slate-50);
+  }
+  
+  .bg-slate-100 {
+    background-color: var(--slate-100);
+  }
+  
+  .bg-slate-200 {
+    background-color: var(--slate-200);
+  }
+  
+  .text-slate-600 {
+    color: var(--slate-600);
+  }
+  
+  .text-slate-700 {
+    color: var(--slate-700);
+  }
+  
+  .text-slate-900 {
+    color: var(--slate-900);
+  }
+  
+  .border-slate-200 {
+    border-color: var(--slate-200);
+  }
+  
+  .border-slate-300 {
+    border-color: var(--slate-300);
+  }
+  
+  .bg-primary-custom {
+    background-color: var(--blue-primary);
+  }
+  
+  .bg-secondary-custom {
+    background-color: var(--blue-secondary);
+  }
+  
+  .text-primary-custom {
+    color: var(--blue-primary);
+  }
+  
+  .bg-blue-50 {
+    background-color: var(--blue-50);
+  }
+  
+  .bg-blue-100 {
+    background-color: var(--blue-100);
+  }
+  
+  .text-emerald-500 {
+    color: var(--emerald-500);
+  }
+  
+  .text-yellow-400 {
+    color: var(--yellow-400);
+  }
+}
