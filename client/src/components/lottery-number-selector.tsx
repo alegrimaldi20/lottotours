@@ -41,7 +41,8 @@ export default function LotteryNumberSelector({
         randomNumbers.push(randomNum);
       }
     }
-    setSelected(randomNumbers.sort((a, b) => a - b));
+    const newNumbers = randomNumbers.sort((a, b) => a - b);
+    setSelected(newNumbers);
   };
 
   const clearSelection = () => {
@@ -63,19 +64,11 @@ export default function LotteryNumberSelector({
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => {
-                generateRandomNumbers();
-                // Automatically add to cart when quick pick is used
-                setTimeout(() => {
-                  if (onNumbersSelected) {
-                    onNumbersSelected(selected);
-                  }
-                }, 100);
-              }}
+              onClick={generateRandomNumbers}
               className="flex items-center gap-2"
             >
               <Shuffle className="w-4 h-4" />
-              Quick Pick & Add
+              Quick Pick
             </Button>
             <Button 
               variant="outline" 
