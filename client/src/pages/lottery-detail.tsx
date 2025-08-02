@@ -10,6 +10,7 @@ import TravelImageRenderer from "@/components/travel-image-renderer";
 import LotteryNumberSelector from "@/components/lottery-number-selector";
 import React from "react";
 import { showSuccess, showError } from "@/utils/native-notifications";
+import LanguageSelector from "@/components/language-selector";
 import type { Lottery, User } from "@shared/schema";
 
 interface LotteryTicketCart {
@@ -184,7 +185,10 @@ export default function LotteryDetail() {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto p-4 space-y-8">
-
+        {/* Language Selector for Testing */}
+        <LanguageSelector onLanguageChange={(locale) => {
+          console.log('Language changed to:', locale);
+        }} />
         
         {/* Number Selection */}
         <LotteryNumberSelector
