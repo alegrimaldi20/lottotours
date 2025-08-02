@@ -100,7 +100,7 @@ export class DatabaseStorage implements IStorage {
         }
       ]);
 
-      // Insert lotteries with number selection
+      // Insert lotteries (using existing schema)
       await db.insert(lotteries).values([
         {
           id: "lottery-paris-weekend",
@@ -116,10 +116,6 @@ export class DatabaseStorage implements IStorage {
           drawDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
           status: "active",
           image: "paris",
-          drawId: "DRAW-2025-001",
-          numbersToSelect: 6,
-          totalNumbers: 49,
-          winningNumbers: null,
         },
         {
           id: "lottery-tropical-escape",
@@ -135,10 +131,6 @@ export class DatabaseStorage implements IStorage {
           drawDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
           status: "active",
           image: "tropical",
-          drawId: "DRAW-2025-002", 
-          numbersToSelect: 7,
-          totalNumbers: 45,
-          winningNumbers: null,
         },
         {
           id: "lottery-tokyo-adventure",
@@ -154,10 +146,6 @@ export class DatabaseStorage implements IStorage {
           drawDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
           status: "active",
           image: "tokyo",
-          drawId: "DRAW-2025-003",
-          numbersToSelect: 5,
-          totalNumbers: 35,
-          winningNumbers: null,
         },
         {
           id: "lottery-swiss-alps",
@@ -173,10 +161,6 @@ export class DatabaseStorage implements IStorage {
           drawDate: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000),
           status: "active",
           image: "europe",
-          drawId: "DRAW-2025-004",
-          numbersToSelect: 6,
-          totalNumbers: 42,
-          winningNumbers: null,
         }
       ]);
 
