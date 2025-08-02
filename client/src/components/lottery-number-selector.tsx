@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shuffle, Trash2, ShoppingCart, Sparkles } from "lucide-react";
+import Web3Service from "@/lib/web3";
 
 interface LotteryNumberSelectorProps {
   lotteryId: string;
@@ -124,17 +125,32 @@ export const LotteryNumberSelector: React.FC<LotteryNumberSelectorProps> = ({
     }
   }, []);
 
-  // Add to cart - Locale-safe
-  const handleAddToCart = useCallback(() => {
+  // Add to cart with Web3 integration - Locale-safe
+  const handleAddToCart = useCallback(async () => {
     try {
       if (selectedNumbers.length === numbersToSelect) {
+        // Check if wallet is connected for actual blockchain transaction
+        const walletAddress = Web3Service.getWalletAddress();
+        if (walletAddress) {
+          console.log('Web3 wallet connected for transaction:', walletAddress);
+          
+          // Simulate blockchain interaction for ticket purchase
+          const result = await Web3Service.buyLotteryTicket(lotteryId, selectedNumbers);
+          if (result.success) {
+            console.log('Blockchain transaction successful:', result.txHash);
+          } else {
+            console.warn('Blockchain transaction failed:', result.error);
+          }
+        }
+        
+        // Continue with local state management regardless of blockchain status
         onAddToCart(selectedNumbers, false);
         setSelectedNumbers([]); // Clear for next selection
       }
     } catch (error) {
       console.warn('handleAddToCart error:', error);
     }
-  }, [selectedNumbers, numbersToSelect, onAddToCart]);
+  }, [selectedNumbers, numbersToSelect, onAddToCart, lotteryId]);
 
   // Auto-pick all numbers (replaces current selection) - Locale-safe
   const autoPickAll = useCallback(() => {
