@@ -61,11 +61,17 @@ const addToRemoveQueue = (toastId: string) => {
   }
 
   const timeout = setTimeout(() => {
-    toastTimeouts.delete(toastId)
-    dispatch({
-      type: "REMOVE_TOAST",
-      toastId: toastId,
-    })
+    try {
+      toastTimeouts.delete(toastId)
+      dispatch({
+        type: "REMOVE_TOAST",
+        toastId: toastId,
+      })
+    } catch (error) {
+      console.warn("Toast removal error:", error)
+      // Attempt to cleanup the timeout even if removal fails
+      toastTimeouts.delete(toastId)
+    }
   }, TOAST_REMOVE_DELAY)
 
   toastTimeouts.set(toastId, timeout)
@@ -147,19 +153,29 @@ function toast({ ...props }: Toast) {
       type: "UPDATE_TOAST",
       toast: { ...props, id },
     })
-  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id })
+  const dismiss = () => {
+    try {
+      dispatch({ type: "DISMISS_TOAST", toastId: id })
+    } catch (error) {
+      console.warn("Toast dismiss error:", error)
+    }
+  }
 
-  dispatch({
-    type: "ADD_TOAST",
-    toast: {
-      ...props,
-      id,
-      open: true,
-      onOpenChange: (open) => {
-        if (!open) dismiss()
+  try {
+    dispatch({
+      type: "ADD_TOAST",
+      toast: {
+        ...props,
+        id,
+        open: true,
+        onOpenChange: (open) => {
+          if (!open) dismiss()
+        },
       },
-    },
-  })
+    })
+  } catch (error) {
+    console.warn("Toast creation error:", error)
+  }
 
   return {
     id: id,
@@ -174,9 +190,14 @@ function useToast() {
   React.useEffect(() => {
     listeners.push(setState)
     return () => {
-      const index = listeners.indexOf(setState)
-      if (index > -1) {
-        listeners.splice(index, 1)
+      try {
+        const index = listeners.indexOf(setState)
+        if (index > -1) {
+          listeners.splice(index, 1)
+        }
+      } catch (error) {
+        // Silently handle cleanup errors to prevent DOM manipulation issues
+        console.warn("Toast cleanup error:", error)
       }
     }
   }, [state])
@@ -184,7 +205,13 @@ function useToast() {
   return {
     ...state,
     toast,
-    dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
+    dismiss: (toastId?: string) => {
+      try {
+        dispatch({ type: "DISMISS_TOAST", toastId })
+      } catch (error) {
+        console.warn("Toast dismiss error:", error)
+      }
+    },
   }
 }
 
