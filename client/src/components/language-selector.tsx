@@ -50,9 +50,9 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
+    <Card className="w-full max-w-md border-2 border-lottery-gold shadow-lg bg-gradient-to-r from-lottery-gold/5 to-adventure-orange/5">
+      <CardHeader className="pb-3 bg-gradient-to-r from-lottery-gold/10 to-adventure-orange/10">
+        <CardTitle className="flex items-center gap-2 text-lg font-bold text-lottery-gold">
           <Globe className="h-5 w-5" />
           Language / Idioma
         </CardTitle>

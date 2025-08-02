@@ -185,10 +185,12 @@ export default function LotteryDetail() {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto p-4 space-y-8">
-        {/* Language Selector for Testing */}
-        <LanguageSelector onLanguageChange={(locale) => {
-          console.log('Language changed to:', locale);
-        }} />
+        {/* Language Selector for Testing - Prominent Position */}
+        <div className="flex justify-center">
+          <LanguageSelector onLanguageChange={(locale) => {
+            console.log('Language changed to:', locale);
+          }} />
+        </div>
         
         {/* Number Selection */}
         <LotteryNumberSelector
