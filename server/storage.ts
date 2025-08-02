@@ -100,7 +100,7 @@ export class DatabaseStorage implements IStorage {
         }
       ]);
 
-      // Insert lotteries
+      // Insert lotteries with number selection
       await db.insert(lotteries).values([
         {
           id: "lottery-paris-weekend",
@@ -116,6 +116,10 @@ export class DatabaseStorage implements IStorage {
           drawDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
           status: "active",
           image: "paris",
+          drawId: "DRAW-2025-001",
+          numbersToSelect: 6,
+          totalNumbers: 49,
+          winningNumbers: null,
         },
         {
           id: "lottery-tropical-escape",
@@ -131,6 +135,48 @@ export class DatabaseStorage implements IStorage {
           drawDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
           status: "active",
           image: "tropical",
+          drawId: "DRAW-2025-002", 
+          numbersToSelect: 7,
+          totalNumbers: 45,
+          winningNumbers: null,
+        },
+        {
+          id: "lottery-tokyo-adventure",
+          title: "Tokyo Cultural Adventure",
+          description: "Experience Japan's ancient traditions and modern wonders in Tokyo and Mount Fuji",
+          theme: "tokyo",
+          prizeTitle: "Tokyo & Mount Fuji Explorer",
+          prizeDescription: "5 days, 4 nights cultural tour including Mount Fuji, temples, and authentic experiences",
+          prizeValue: 400000,
+          ticketPrice: 75,
+          maxTickets: 800,
+          soldTickets: 156,
+          drawDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
+          status: "active",
+          image: "tokyo",
+          drawId: "DRAW-2025-003",
+          numbersToSelect: 5,
+          totalNumbers: 35,
+          winningNumbers: null,
+        },
+        {
+          id: "lottery-swiss-alps",
+          title: "Swiss Alps Winter Adventure",
+          description: "Luxury ski resort experience in the breathtaking Swiss Alps with mountain views",
+          theme: "europe",
+          prizeTitle: "Swiss Alps Luxury Resort",
+          prizeDescription: "6 days, 5 nights at a 5-star alpine resort with ski passes and spa access",
+          prizeValue: 600000,
+          ticketPrice: 90,
+          maxTickets: 600,
+          soldTickets: 203,
+          drawDate: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000),
+          status: "active",
+          image: "europe",
+          drawId: "DRAW-2025-004",
+          numbersToSelect: 6,
+          totalNumbers: 42,
+          winningNumbers: null,
         }
       ]);
 
@@ -281,6 +327,20 @@ export class DatabaseStorage implements IStorage {
   async purchaseLotteryTicket(insertTicket: InsertLotteryTicket): Promise<LotteryTicket> {
     const [lottery] = await db.select().from(lotteries).where(eq(lotteries.id, insertTicket.lotteryId));
     if (!lottery) throw new Error("Lottery not found");
+    
+    // Check user's tokens and deduct the cost
+    const [user] = await db.select().from(users).where(eq(users.id, insertTicket.userId));
+    if (!user) throw new Error("User not found");
+    
+    if (user.tokens < lottery.ticketPrice) {
+      throw new Error("Insufficient tokens");
+    }
+    
+    // Deduct tokens from user
+    await db
+      .update(users)
+      .set({ tokens: user.tokens - lottery.ticketPrice })
+      .where(eq(users.id, insertTicket.userId));
     
     const [ticket] = await db
       .insert(lotteryTickets)

@@ -240,28 +240,22 @@ export default function Lotteries() {
                       </span>
                     </div>
                     
-                    <Button
-                      onClick={() => handleBuyTicket(lottery)}
-                      disabled={!canAfford || buyTicketMutation.isPending || lottery.soldTickets >= lottery.maxTickets}
-                      className={`w-full shadow-lg ${canAfford 
-                        ? 'btn-lottery' 
-                        : 'bg-slate-300 text-white'
-                      }`}
-                      data-testid={`buy-ticket-${lottery.id}`}
-                    >
-                      {buyTicketMutation.isPending ? (
-                        "Purchasing..."
-                      ) : !canAfford ? (
-                        "Insufficient Tokens"
-                      ) : lottery.soldTickets >= lottery.maxTickets ? (
-                        "Sold Out"
-                      ) : (
-                        <>
-                          <Ticket className="mr-2 h-4 w-4" />
-                          Buy Ticket
-                        </>
-                      )}
-                    </Button>
+                    <Link href={`/lottery/${lottery.id}`} className="block w-full">
+                      <Button
+                        disabled={lottery.soldTickets >= lottery.maxTickets}
+                        className="w-full shadow-lg btn-lottery"
+                        data-testid={`select-numbers-${lottery.id}`}
+                      >
+                        {lottery.soldTickets >= lottery.maxTickets ? (
+                          "Sold Out"
+                        ) : (
+                          <>
+                            <Ticket className="mr-2 h-4 w-4" />
+                            Select Numbers & Play
+                          </>
+                        )}
+                      </Button>
+                    </Link>
                     
                     {!canAfford && (
                       <p className="text-xs text-slate-500 mt-2 text-center">

@@ -7,6 +7,7 @@ import Landing from "./pages/landing";
 import Dashboard from "./pages/dashboard";
 import Marketplace from "./pages/marketplace";
 import Lotteries from "./pages/lotteries";
+import LotteryDetail from "./pages/lottery-detail";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/marketplace" component={Marketplace} />
       <Route path="/lotteries" component={Lotteries} />
+      <Route path="/lottery/:id" component={LotteryDetail} />
       <Route component={NotFound} />
     </Switch>
   );
