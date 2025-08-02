@@ -19,11 +19,7 @@ export default function LotteryNumberSelector({
 }: LotteryNumberSelectorProps) {
   const [selected, setSelected] = useState<number[]>(selectedNumbers);
 
-  useEffect(() => {
-    if (onNumbersSelected && typeof onNumbersSelected === 'function') {
-      onNumbersSelected(selected);
-    }
-  }, [selected, onNumbersSelected]);
+  // Removed automatic callback to prevent infinite loops
 
   const handleNumberClick = (number: number) => {
     if (selected.includes(number)) {
@@ -137,8 +133,10 @@ export default function LotteryNumberSelector({
               size="lg" 
               className="bg-blue-600 hover:bg-blue-700 text-white px-8"
               onClick={() => {
-                if (onNumbersSelected) {
+                if (onNumbersSelected && selected.length === maxNumbers) {
                   onNumbersSelected(selected);
+                  // Clear selection after adding to cart
+                  setSelected([]);
                 }
               }}
             >
