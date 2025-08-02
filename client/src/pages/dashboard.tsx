@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Coins, Trophy, Map, Star, ArrowRight, Gift, Users, Target } from "lucide-react";
+import TravelImageRenderer from "@/components/travel-image-renderer";
 
 // Using sample user for demo
 const SAMPLE_USER_ID = "sample-user";
@@ -179,7 +180,9 @@ export default function Dashboard() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="text-2xl">{mission.icon}</span>
+                          <div className="w-8 h-8">
+                            <TravelImageRenderer type="mission" theme={mission.icon} className="w-full h-full rounded" />
+                          </div>
                           <h3 className="font-semibold text-slate-900">{mission.title}</h3>
                           <Badge 
                             variant={mission.difficulty === 'easy' ? 'secondary' : 

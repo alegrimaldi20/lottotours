@@ -73,7 +73,7 @@ export class DatabaseStorage implements IStorage {
           reward: 50,
           difficulty: "easy",
           location: "Paris",
-          icon: "🗼",
+          icon: "paris",
           isActive: true,
         },
         {
@@ -84,7 +84,7 @@ export class DatabaseStorage implements IStorage {
           reward: 75,
           difficulty: "medium",
           location: "Tokyo",
-          icon: "🍜",
+          icon: "tokyo",
           isActive: true,
         },
         {
@@ -95,7 +95,7 @@ export class DatabaseStorage implements IStorage {
           reward: 100,
           difficulty: "hard",
           location: "Maldives",
-          icon: "🏖️",
+          icon: "tropical",
           isActive: true,
         }
       ]);
@@ -115,7 +115,7 @@ export class DatabaseStorage implements IStorage {
           soldTickets: 245,
           drawDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
           status: "active",
-          image: "🗼",
+          image: "paris",
         },
         {
           id: "lottery-tropical-escape",
@@ -130,7 +130,7 @@ export class DatabaseStorage implements IStorage {
           soldTickets: 127,
           drawDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
           status: "active",
-          image: "🏝️",
+          image: "tropical",
         }
       ]);
 
@@ -144,7 +144,7 @@ export class DatabaseStorage implements IStorage {
           destination: "Europe",
           value: 80000,
           tokensRequired: 500,
-          image: "🏛️",
+          image: "europe",
           provider: "TravelCorp",
           availability: 50,
           validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
@@ -159,7 +159,7 @@ export class DatabaseStorage implements IStorage {
           destination: null,
           value: 25000,
           tokensRequired: 150,
-          image: "🎒",
+          image: "adventure-gear",
           provider: "AdventureGear Co",
           availability: 100,
           validUntil: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),

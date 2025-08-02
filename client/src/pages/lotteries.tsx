@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Trophy, Clock, Users, Ticket, Coins, Calendar, MapPin } from "lucide-react";
+import TravelImageRenderer from "@/components/travel-image-renderer";
 
 // Using sample user for demo
 const SAMPLE_USER_ID = "sample-user";
@@ -156,8 +157,8 @@ export default function Lotteries() {
               >
                 <div className="relative">
                   {/* Prize Image/Icon */}
-                  <div className="h-48 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                    <span className="text-6xl">{lottery.image}</span>
+                  <div className="h-48 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center overflow-hidden">
+                    <TravelImageRenderer type="lottery" theme={lottery.image} className="w-full h-full object-cover" />
                   </div>
                   
                   {/* Theme Badge */}

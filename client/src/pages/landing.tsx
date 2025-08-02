@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { Star, MapPin, Gift, Trophy, Coins, Users, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import TravelImageRenderer from "@/components/travel-image-renderer";
 
 export default function Landing() {
   const scrollToSection = (sectionId: string) => {
@@ -18,8 +19,11 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <div className="text-2xl font-bold gradient-travel bg-clip-text text-transparent" data-testid="logo">
-                🌟 TravelLotto
+              <div className="text-2xl font-bold gradient-travel bg-clip-text text-transparent flex items-center gap-2" data-testid="logo">
+                <div className="w-8 h-8">
+                  <TravelImageRenderer type="cultural" className="w-full h-full" />
+                </div>
+                TravelLotto
               </div>
             </div>
             <nav className="hidden md:flex space-x-8">

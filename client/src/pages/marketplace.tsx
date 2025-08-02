@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Coins, Gift, MapPin, Package, Percent, Clock, Check } from "lucide-react";
+import TravelImageRenderer from "@/components/travel-image-renderer";
 
 // Using sample user for demo
 const SAMPLE_USER_ID = "sample-user";
@@ -182,8 +183,8 @@ export default function Marketplace() {
                     >
                       <div className="relative">
                         {/* Prize Image/Icon */}
-                        <div className="h-40 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-                          <span className="text-5xl">{prize.image}</span>
+                        <div className="h-40 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center overflow-hidden">
+                          <TravelImageRenderer type="prize" theme={prize.image} className="w-full h-full object-cover" />
                         </div>
                         
                         {/* Category Badge */}
