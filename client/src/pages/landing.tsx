@@ -110,6 +110,87 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Destination Showcase - Real Photography */}
+      <section className="py-20 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" data-testid="destinations-title">
+              Authentic Travel <span className="text-gradient-gold">Destinations</span>
+            </h2>
+            <p className="text-xl text-slate-300 max-w-2xl mx-auto" data-testid="destinations-subtitle">
+              Real places, real experiences, real adventures waiting for you
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="relative h-80 rounded-xl overflow-hidden shadow-2xl group hover:shadow-3xl transition-all duration-300" data-testid="destination-paris">
+              <TravelImageRenderer type="paris" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+              <div className="absolute bottom-6 left-6 text-white">
+                <h3 className="font-bold text-xl mb-2">Paris, France</h3>
+                <p className="text-sm opacity-90 mb-3">Iconic Eiffel Tower & Culture</p>
+                <div className="flex items-center gap-2">
+                  <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                  <span className="text-sm">4.9 • Cultural Experience</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative h-80 rounded-xl overflow-hidden shadow-2xl group hover:shadow-3xl transition-all duration-300" data-testid="destination-tropical">
+              <TravelImageRenderer type="tropical" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+              <div className="absolute bottom-6 left-6 text-white">
+                <h3 className="font-bold text-xl mb-2">Tropical Paradise</h3>
+                <p className="text-sm opacity-90 mb-3">Crystal Waters & White Beaches</p>
+                <div className="flex items-center gap-2">
+                  <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                  <span className="text-sm">4.8 • Beach Paradise</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative h-80 rounded-xl overflow-hidden shadow-2xl group hover:shadow-3xl transition-all duration-300" data-testid="destination-tokyo">
+              <TravelImageRenderer type="tokyo" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+              <div className="absolute bottom-6 left-6 text-white">
+                <h3 className="font-bold text-xl mb-2">Tokyo, Japan</h3>
+                <p className="text-sm opacity-90 mb-3">Mount Fuji & Modern City</p>
+                <div className="flex items-center gap-2">
+                  <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                  <span className="text-sm">4.9 • City Adventure</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative h-80 rounded-xl overflow-hidden shadow-2xl group hover:shadow-3xl transition-all duration-300" data-testid="destination-alps">
+              <TravelImageRenderer type="europe" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+              <div className="absolute bottom-6 left-6 text-white">
+                <h3 className="font-bold text-xl mb-2">Swiss Alps</h3>
+                <p className="text-sm opacity-90 mb-3">Snow-Capped Mountains & Lakes</p>
+                <div className="flex items-center gap-2">
+                  <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                  <span className="text-sm">4.9 • Mountain Adventure</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <Link href="/dashboard">
+              <Button 
+                size="lg" 
+                className="btn-adventure px-8 py-4 text-lg shadow-xl"
+                data-testid="button-explore-destinations"
+              >
+                <MapPin className="mr-2 h-5 w-5" />
+                Explore All Destinations
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="features" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

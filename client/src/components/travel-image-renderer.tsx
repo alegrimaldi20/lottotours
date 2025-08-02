@@ -1,13 +1,5 @@
 import React from 'react';
-import { 
-  ParisImage, 
-  TropicalImage, 
-  TokyoImage, 
-  EuropeImage, 
-  AdventureGearImage,
-  CulturalMissionImage,
-  SportsMissionImage
-} from './travel-images';
+import { DestinationImageRenderer, DestinationImages } from './destination-images';
 
 interface TravelImageProps {
   type: string;
@@ -22,75 +14,78 @@ export const TravelImageRenderer: React.FC<TravelImageProps> = ({
   className = "w-full h-full",
   fallbackEmoji = "🌟"
 }) => {
-  // Handle lottery images
-  if (type === "lottery" || theme) {
-    switch (theme || type) {
-      case "paris":
-        return <ParisImage className={className} />;
-      case "tropical":
-        return <TropicalImage className={className} />;
-      default:
-        return <ParisImage className={className} />;
+  // Map themes and types to actual destination image types
+  const getDestinationType = (type: string, theme?: string): keyof typeof DestinationImages => {
+    // Handle lottery images with authentic destination photography
+    if (type === "lottery") {
+      switch (theme) {
+        case "paris": return "paris";
+        case "tropical": return "tropical";
+        case "tokyo": return "tokyo";
+        case "europe": return "europe";
+        default: return "paris";
+      }
     }
-  }
-  
-  // Handle mission icons
-  if (type === "mission") {
-    switch (theme) {
-      case "paris":
-        return <ParisImage className={className} />;
-      case "tokyo":
-        return <TokyoImage className={className} />;
-      case "tropical":
-        return <TropicalImage className={className} />;
-      case "cultural":
-        return <CulturalMissionImage className={className} />;
-      case "sports":
-        return <SportsMissionImage className={className} />;
-      default:
-        return <CulturalMissionImage className={className} />;
+    
+    // Handle mission types with real location imagery
+    if (type === "mission") {
+      switch (theme) {
+        case "paris": return "paris";
+        case "tokyo": return "tokyo";
+        case "tropical": return "tropical";
+        case "cultural": return "cultural";
+        case "sports": return "sports";
+        case "europe": return "europe";
+        default: return "cultural";
+      }
     }
-  }
-  
-  // Handle prize images
-  if (type === "prize") {
-    switch (theme) {
-      case "europe":
-        return <EuropeImage className={className} />;
-      case "adventure-gear":
-        return <AdventureGearImage className={className} />;
-      case "tropical":
-        return <TropicalImage className={className} />;
-      case "paris": 
-        return <ParisImage className={className} />;
-      default:
-        return <EuropeImage className={className} />;
+    
+    // Handle prize images with authentic destination photography
+    if (type === "prize") {
+      switch (theme) {
+        case "europe": return "europe";
+        case "adventure-gear": return "adventure";
+        case "tropical": return "tropical";
+        case "paris": return "paris";
+        case "luxury": return "luxury";
+        case "adventure": return "adventure";
+        default: return "europe";
+      }
     }
-  }
-  
-  // Handle direct image types
-  switch (type) {
-    case "paris":
-      return <ParisImage className={className} />;
-    case "tropical":
-      return <TropicalImage className={className} />;
-    case "tokyo":
-      return <TokyoImage className={className} />;
-    case "europe":
-      return <EuropeImage className={className} />;
-    case "adventure-gear":
-      return <AdventureGearImage className={className} />;
-    case "cultural":
-      return <CulturalMissionImage className={className} />;
-    case "sports":
-      return <SportsMissionImage className={className} />;
-    default:
-      // Fallback to a simple emoji display for backwards compatibility
-      return (
-        <div className={`${className} flex items-center justify-center text-4xl bg-gradient-to-br from-blue-400 to-purple-500`}>
-          {fallbackEmoji}
-        </div>
-      );
+    
+    // Direct type mapping to authentic destinations
+    switch (type) {
+      case "paris": return "paris";
+      case "tropical": return "tropical";
+      case "tokyo": return "tokyo";
+      case "europe": return "europe";
+      case "adventure-gear": return "adventure";
+      case "cultural": return "cultural";
+      case "sports": return "sports";
+      case "luxury": return "luxury";
+      case "venice": return "venice";
+      case "rome": return "rome";
+      case "lottery": return "lottery";
+      default: return "paris";
+    }
+  };
+
+  try {
+    const destinationType = getDestinationType(type, theme);
+    return (
+      <DestinationImageRenderer 
+        type={destinationType}
+        theme={theme}
+        className={className}
+      />
+    );
+  } catch (error) {
+    // Fallback with attractive gradient background if image fails
+    return (
+      <div className={`${className} flex items-center justify-center text-4xl bg-gradient-to-br from-lottery-gold via-adventure-orange to-travel-coral text-white font-bold`}>
+        {fallbackEmoji}
+      </div>
+    );
   }
 };
 
