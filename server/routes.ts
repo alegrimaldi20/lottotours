@@ -9,12 +9,16 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+// Initialize Stripe if valid key is available
+let stripe: Stripe | null = null;
+if (process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.length > 20) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2023-10-16",
+  });
+  console.log("Stripe initialized successfully");
+} else {
+  console.warn("Stripe not initialized - invalid or missing API key:", process.env.STRIPE_SECRET_KEY?.substring(0, 10) + "...");
 }
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
-});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Users routes
@@ -233,6 +237,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!tokenPack) {
         return res.status(404).json({ message: "Token pack not found" });
+      }
+
+      if (!stripe) {
+        return res.status(503).json({ 
+          message: "Payment system not available. Please check Stripe configuration.",
+          error: "STRIPE_NOT_CONFIGURED"
+        });
       }
 
       // Create payment intent

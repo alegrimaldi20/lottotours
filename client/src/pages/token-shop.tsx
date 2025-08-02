@@ -127,14 +127,20 @@ export default function TokenShop() {
         method: 'POST',
         body: { tokenPackId, userId: 'sample-user' }
       });
-      return response.json();
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Payment creation failed');
+      }
+      return data;
     },
     onSuccess: (data) => {
       setClientSecret(data.clientSecret);
       setShowCheckout(true);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Payment creation failed:', error);
+      // Show user-friendly error message
+      alert(`Payment system error: ${error.message || 'Unable to create payment. Please try again later.'}`);
     }
   });
 
