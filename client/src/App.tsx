@@ -1,15 +1,32 @@
+import React from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { SimpleToaster } from "@/components/simple-toast";
+import { useSimpleToast } from "@/hooks/use-simple-toast";
 import Landing from "./pages/landing";
 import Dashboard from "./pages/dashboard";
 import Marketplace from "./pages/marketplace";
 import Lotteries from "./pages/lotteries";
 import LotteryDetail from "./pages/lottery-detail";
 import NotFound from "@/pages/not-found";
+
+export const ToastContext = React.createContext<{
+  toast: (options: { title?: string; description?: string; variant?: "default" | "destructive" }) => string;
+} | null>(null);
+
+function ToastProvider({ children }: { children: React.ReactNode }) {
+  const { toasts, toast, removeToast } = useSimpleToast();
+
+  return (
+    <ToastContext.Provider value={{ toast }}>
+      {children}
+      <SimpleToaster toasts={toasts} onRemove={removeToast} />
+    </ToastContext.Provider>
+  );
+}
 
 function Router() {
   return (
@@ -29,8 +46,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <ErrorBoundary>
-          <Toaster />
-          <Router />
+          <ToastProvider>
+            <Router />
+          </ToastProvider>
         </ErrorBoundary>
       </TooltipProvider>
     </QueryClientProvider>

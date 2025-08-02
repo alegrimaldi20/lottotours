@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/lib/queryClient";
 import TravelImageRenderer from "@/components/travel-image-renderer";
 import LotteryNumberSelector from "@/components/lottery-number-selector";
-import { useToast } from "@/hooks/use-toast";
+import React, { useContext } from "react";
+import { ToastContext } from "@/App";
 import type { Lottery, User } from "@shared/schema";
 
 interface LotteryTicketCart {
@@ -18,7 +19,8 @@ interface LotteryTicketCart {
 
 export default function LotteryDetail() {
   const [, params] = useRoute("/lottery/:id");
-  const { toast } = useToast();
+  const toastContext = useContext(ToastContext);
+  const toast = toastContext?.toast || (() => "");
   const queryClient = useQueryClient();
   const [ticketCart, setTicketCart] = useState<LotteryTicketCart[]>([]);
 
