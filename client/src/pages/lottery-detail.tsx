@@ -198,12 +198,11 @@ export default function LotteryDetail() {
         
         {/* Number Selection */}
         <LotteryNumberSelector
-          lotteryId={lottery.id}
-          drawId={lottery.id.slice(-8)}
-          totalNumbers={49}
-          numbersToSelect={6}
-          ticketPrice={lottery.ticketPrice}
-          onAddToCart={handleAddToCart}
+          onNumbersSelected={(numbers: number[]) => {
+            console.log('Numbers selected:', numbers);
+          }}
+          maxNumbers={6}
+          numberRange={{ min: 1, max: 49 }}
         />
 
         {/* Shopping Cart */}

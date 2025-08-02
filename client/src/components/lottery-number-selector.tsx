@@ -22,7 +22,9 @@ export default function LotteryNumberSelector({
   const { playSound } = useSound();
 
   useEffect(() => {
-    onNumbersSelected(selected);
+    if (onNumbersSelected && typeof onNumbersSelected === 'function') {
+      onNumbersSelected(selected);
+    }
   }, [selected, onNumbersSelected]);
 
   const handleNumberClick = (number: number) => {
