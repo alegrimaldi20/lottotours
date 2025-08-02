@@ -44,7 +44,7 @@ function Router() {
 }
 
 function App() {
-  const { toasts } = useLocaleSafeToast();
+  const { toasts, removeToast } = useLocaleSafeToast();
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -52,7 +52,7 @@ function App() {
         <ErrorBoundary>
           <ToastProvider>
             <Router />
-            <InlineToaster toasts={toasts} />
+            <InlineToaster toasts={toasts} onRemove={removeToast} />
           </ToastProvider>
         </ErrorBoundary>
       </TooltipProvider>

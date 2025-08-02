@@ -63,11 +63,19 @@ export default function LotteryNumberSelector({
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={generateRandomNumbers}
+              onClick={() => {
+                generateRandomNumbers();
+                // Automatically add to cart when quick pick is used
+                setTimeout(() => {
+                  if (onNumbersSelected) {
+                    onNumbersSelected(selected);
+                  }
+                }, 100);
+              }}
               className="flex items-center gap-2"
             >
               <Shuffle className="w-4 h-4" />
-              Quick Pick
+              Quick Pick & Add
             </Button>
             <Button 
               variant="outline" 
@@ -129,9 +137,29 @@ export default function LotteryNumberSelector({
           })}
         </div>
 
+        {/* Action Buttons */}
+        {selected.length === maxNumbers && (
+          <div className="flex justify-center">
+            <Button 
+              size="lg" 
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8"
+              onClick={() => {
+                if (onNumbersSelected) {
+                  onNumbersSelected(selected);
+                }
+              }}
+            >
+              Add Ticket to Cart
+            </Button>
+          </div>
+        )}
+        
         {/* Instructions */}
         <div className="text-sm text-slate-600 text-center bg-slate-50 p-3 rounded-lg">
-          Click numbers to select them. Use Quick Pick for random selection.
+          {selected.length < maxNumbers 
+            ? `Select ${maxNumbers - selected.length} more number${maxNumbers - selected.length === 1 ? '' : 's'} to complete your ticket`
+            : 'Perfect! Click "Add Ticket to Cart" to proceed'
+          }
         </div>
       </CardContent>
     </Card>
