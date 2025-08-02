@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { AnimatedButton } from './animated-button';
-import { useSound } from './sound-manager';
-import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Shuffle, Sparkles } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Shuffle } from 'lucide-react';
 
 interface LotteryNumberSelectorProps {
   onNumbersSelected: (numbers: number[]) => void;
@@ -18,8 +18,6 @@ export default function LotteryNumberSelector({
   selectedNumbers = []
 }: LotteryNumberSelectorProps) {
   const [selected, setSelected] = useState<number[]>(selectedNumbers);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const { playSound } = useSound();
 
   useEffect(() => {
     if (onNumbersSelected && typeof onNumbersSelected === 'function') {
@@ -28,10 +26,6 @@ export default function LotteryNumberSelector({
   }, [selected, onNumbersSelected]);
 
   const handleNumberClick = (number: number) => {
-    if (isAnimating) return;
-    
-    playSound('click');
-    
     if (selected.includes(number)) {
       setSelected(selected.filter(n => n !== number));
     } else if (selected.length < maxNumbers) {
@@ -40,183 +34,106 @@ export default function LotteryNumberSelector({
   };
 
   const generateRandomNumbers = () => {
-    if (isAnimating) return;
-    
-    setIsAnimating(true);
-    playSound('lottery');
-    
-    // Animation sequence
-    const animationDuration = 2000;
-    const intervals = [];
-    
-    // Quick random selections
-    for (let i = 0; i < 20; i++) {
-      const timeout = setTimeout(() => {
-        const randomNumbers: number[] = [];
-        while (randomNumbers.length < maxNumbers) {
-          const randomNum = Math.floor(Math.random() * (numberRange.max - numberRange.min + 1)) + numberRange.min;
-          if (!randomNumbers.includes(randomNum)) {
-            randomNumbers.push(randomNum);
-          }
-        }
-        setSelected(randomNumbers.sort((a, b) => a - b));
-      }, (i * animationDuration) / 20);
-      
-      intervals.push(timeout);
-    }
-    
-    // Final selection
-    setTimeout(() => {
-      const finalNumbers: number[] = [];
-      while (finalNumbers.length < maxNumbers) {
-        const randomNum = Math.floor(Math.random() * (numberRange.max - numberRange.min + 1)) + numberRange.min;
-        if (!finalNumbers.includes(randomNum)) {
-          finalNumbers.push(randomNum);
-        }
+    const randomNumbers: number[] = [];
+    while (randomNumbers.length < maxNumbers) {
+      const randomNum = Math.floor(Math.random() * (numberRange.max - numberRange.min + 1)) + numberRange.min;
+      if (!randomNumbers.includes(randomNum)) {
+        randomNumbers.push(randomNum);
       }
-      setSelected(finalNumbers.sort((a, b) => a - b));
-      setIsAnimating(false);
-      playSound('success');
-    }, animationDuration);
+    }
+    setSelected(randomNumbers.sort((a, b) => a - b));
   };
 
   const clearSelection = () => {
-    if (isAnimating) return;
-    playSound('click');
     setSelected([]);
   };
 
-  const getDiceIcon = (number: number) => {
-    const icons = [Dice1, Dice2, Dice3, Dice4, Dice5, Dice6];
-    const IconComponent = icons[(number - 1) % 6];
-    return IconComponent;
-  };
-
-  const renderNumbers = () => {
-    const numbers = [];
-    for (let i = numberRange.min; i <= numberRange.max; i++) {
-      numbers.push(i);
-    }
-
-    return numbers.map((number) => {
-      const isSelected = selected.includes(number);
-      const IconComponent = getDiceIcon(number);
-      
-      return (
-        <motion.button
-          key={number}
-          onClick={() => handleNumberClick(number)}
-          disabled={isAnimating}
-          className={`
-            relative w-12 h-12 rounded-lg border-2 transition-all duration-300
-            flex items-center justify-center font-bold text-sm
-            ${isSelected
-              ? 'bg-gradient-to-r from-gold-400 to-gold-600 border-gold-300 text-black shadow-lg shadow-gold-400/50'
-              : 'bg-gradient-to-r from-gray-700 to-gray-800 border-gray-600 text-white hover:border-gray-500'
-            }
-            ${isAnimating ? 'cursor-not-allowed opacity-50' : 'hover:scale-105 cursor-pointer'}
-          `}
-          whileHover={!isAnimating ? { scale: 1.1 } : {}}
-          whileTap={!isAnimating ? { scale: 0.95 } : {}}
-          data-testid={`number-${number}`}
-        >
-          <AnimatePresence>
-            {isSelected && (
-              <motion.div
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                exit={{ scale: 0, rotate: 180 }}
-                className="absolute inset-0 flex items-center justify-center"
-              >
-                <Sparkles className="w-3 h-3 text-gold-200 absolute top-1 right-1" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-          
-          <motion.span
-            animate={isAnimating ? {
-              scale: [1, 1.2, 1],
-              color: ['#ffffff', '#ffd700', '#ffffff']
-            } : {}}
-            transition={{ duration: 0.5, repeat: isAnimating ? Infinity : 0 }}
-          >
-            {number}
-          </motion.span>
-        </motion.button>
-      );
-    });
-  };
+  // Generate number grid
+  const numbers = [];
+  for (let i = numberRange.min; i <= numberRange.max; i++) {
+    numbers.push(i);
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h3 className="text-xl font-bold text-gold-400 mb-2">
-          Select Your Lucky Numbers
-        </h3>
-        <p className="text-sm text-gray-400">
-          Choose {maxNumbers} numbers from {numberRange.min} to {numberRange.max}
-        </p>
-        <div className="mt-2 text-sm">
-          <span className="text-gold-400">{selected.length}</span>
-          <span className="text-gray-400"> / {maxNumbers} selected</span>
+    <Card className="w-full max-w-4xl mx-auto">
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <span>Select {maxNumbers} Numbers</span>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={generateRandomNumbers}
+              className="flex items-center gap-2"
+            >
+              <Shuffle className="w-4 h-4" />
+              Quick Pick
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={clearSelection}
+            >
+              Clear
+            </Button>
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Selected Numbers Display */}
+        <div className="flex flex-wrap gap-2 min-h-[40px] items-center">
+          <span className="text-sm font-medium text-slate-600">Selected:</span>
+          {selected.length === 0 ? (
+            <span className="text-slate-400 text-sm">None selected</span>
+          ) : (
+            selected.map((num) => (
+              <Badge 
+                key={num} 
+                variant="default" 
+                className="bg-blue-600 text-white text-base px-3 py-1"
+              >
+                {num}
+              </Badge>
+            ))
+          )}
+          <span className="text-sm text-slate-500 ml-auto">
+            {selected.length}/{maxNumbers}
+          </span>
         </div>
-      </div>
 
-      <div className="grid grid-cols-7 gap-2 max-h-64 overflow-y-auto p-2">
-        {renderNumbers()}
-      </div>
+        {/* Number Grid */}
+        <div className="grid grid-cols-7 gap-2">
+          {numbers.map((number) => {
+            const isSelected = selected.includes(number);
+            const isDisabled = !isSelected && selected.length >= maxNumbers;
+            
+            return (
+              <Button
+                key={number}
+                variant={isSelected ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleNumberClick(number)}
+                disabled={isDisabled}
+                className={`
+                  h-12 w-12 text-base font-medium
+                  ${isSelected 
+                    ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
+                    : 'hover:bg-slate-50'
+                  }
+                  ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                `}
+              >
+                {number}
+              </Button>
+            );
+          })}
+        </div>
 
-      <div className="flex gap-3 justify-center">
-        <AnimatedButton
-          variant="lottery"
-          onClick={generateRandomNumbers}
-          disabled={isAnimating}
-          glowEffect
-          sparkleEffect
-          soundType="lottery"
-          className="flex-1"
-          data-testid="button-quick-pick"
-        >
-          <Shuffle className={`w-4 h-4 mr-2 ${isAnimating ? 'animate-spin' : ''}`} />
-          {isAnimating ? 'Picking...' : 'Quick Pick'}
-        </AnimatedButton>
-        
-        <AnimatedButton
-          variant="secondary"
-          onClick={clearSelection}
-          disabled={isAnimating || selected.length === 0}
-          soundType="click"
-          data-testid="button-clear-selection"
-        >
-          Clear
-        </AnimatedButton>
-      </div>
-
-      <AnimatePresence>
-        {selected.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="bg-gradient-to-r from-gold-900/30 to-gold-800/30 border border-gold-500/30 rounded-lg p-4"
-          >
-            <h4 className="text-sm font-semibold text-gold-400 mb-2">Your Selection:</h4>
-            <div className="flex flex-wrap gap-2">
-              {selected.map((number, index) => (
-                <motion.div
-                  key={number}
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="w-8 h-8 bg-gradient-to-r from-gold-400 to-gold-600 rounded-full flex items-center justify-center text-black font-bold text-sm shadow-lg"
-                >
-                  {number}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+        {/* Instructions */}
+        <div className="text-sm text-slate-600 text-center bg-slate-50 p-3 rounded-lg">
+          Click numbers to select them. Use Quick Pick for random selection.
+        </div>
+      </CardContent>
+    </Card>
   );
 }
