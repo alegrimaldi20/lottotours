@@ -41,11 +41,13 @@ export const LotteryNumberSelector: React.FC<LotteryNumberSelectorProps> = ({
     });
   }, [numbersToSelect]);
 
-  // Auto-pick random numbers
+  // Auto-pick random numbers (fills remaining slots)
   const surpriseMe = useCallback(() => {
+    if (selectedNumbers.length >= numbersToSelect) return;
+    
     const available = numbers.filter(n => !selectedNumbers.includes(n));
     const needed = numbersToSelect - selectedNumbers.length;
-    const shuffled = available.sort(() => Math.random() - 0.5);
+    const shuffled = [...available].sort(() => Math.random() - 0.5);
     const newNumbers = shuffled.slice(0, needed);
     setSelectedNumbers(prev => [...prev, ...newNumbers].sort((a, b) => a - b));
   }, [numbers, selectedNumbers, numbersToSelect]);
@@ -63,9 +65,9 @@ export const LotteryNumberSelector: React.FC<LotteryNumberSelectorProps> = ({
     }
   }, [selectedNumbers, numbersToSelect, onAddToCart]);
 
-  // Auto-pick all numbers
+  // Auto-pick all numbers (replaces current selection)
   const autoPickAll = useCallback(() => {
-    const shuffled = numbers.sort(() => Math.random() - 0.5);
+    const shuffled = [...numbers].sort(() => Math.random() - 0.5);
     const picked = shuffled.slice(0, numbersToSelect);
     setSelectedNumbers(picked.sort((a, b) => a - b));
   }, [numbers, numbersToSelect]);
@@ -92,53 +94,43 @@ export const LotteryNumberSelector: React.FC<LotteryNumberSelectorProps> = ({
       
       <CardContent className="p-6">
         {/* Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Quick Actions:</span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={surpriseMe}
-              disabled={selectedNumbers.length >= numbersToSelect}
-              className="gap-2"
-              data-testid="surprise-me-button"
-            >
-              <Shuffle className="h-4 w-4" />
-              Surprise Me
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={autoPickAll}
-              className="gap-2"
-              data-testid="auto-pick-button"
-            >
-              <Sparkles className="h-4 w-4" />
-              Auto Pick All
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={clearAll}
-              disabled={selectedNumbers.length === 0}
-              className="gap-2"
-              data-testid="clear-all-button"
-            >
-              <Trash2 className="h-4 w-4" />
-              Clear
-            </Button>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={animationsEnabled}
-                onChange={(e) => setAnimationsEnabled(e.target.checked)}
-                className="rounded"
-              />
-              Enable animations
-            </label>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm font-medium text-slate-700 mb-2 sm:mb-0">Quick Actions:</span>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={surpriseMe}
+                disabled={selectedNumbers.length >= numbersToSelect}
+                className="gap-2 bg-blue-50 hover:bg-blue-100 border-blue-200"
+                data-testid="surprise-me-button"
+              >
+                <Shuffle className="h-4 w-4" />
+                Surprise Me
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={autoPickAll}
+                className="gap-2 bg-purple-50 hover:bg-purple-100 border-purple-200"
+                data-testid="auto-pick-button"
+              >
+                <Sparkles className="h-4 w-4" />
+                Auto Pick All
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearAll}
+                disabled={selectedNumbers.length === 0}
+                className="gap-2 bg-red-50 hover:bg-red-100 border-red-200"
+                data-testid="clear-all-button"
+              >
+                <Trash2 className="h-4 w-4" />
+                Clear
+              </Button>
+            </div>
           </div>
         </div>
 
