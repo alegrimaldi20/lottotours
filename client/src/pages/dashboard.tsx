@@ -10,12 +10,15 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Coins, Trophy, Map, Star, ArrowRight, Gift, Users, Target } from "lucide-react";
 import TravelImageRenderer from "@/components/travel-image-renderer";
+import { AnimatedButton, PulseButton } from "@/components/animated-button";
+import { ConfettiCelebration } from "@/components/confetti-celebration";
 
 // Using sample user for demo
 const SAMPLE_USER_ID = "sample-user";
 
 export default function Dashboard() {
   const { toast } = useToast();
+  const [showCelebration, setShowCelebration] = useState(false);
 
   const { data: user, isLoading: userLoading } = useQuery<User>({
     queryKey: ["/api/users", SAMPLE_USER_ID],
@@ -34,6 +37,7 @@ export default function Dashboard() {
     },
     onSuccess: (data, missionId) => {
       const mission = missions?.find(m => m.id === missionId);
+      setShowCelebration(true);
       toast({
         title: "Mission Completed! 🎉",
         description: `You earned ${mission?.reward || 0} tokens!`,
@@ -75,7 +79,12 @@ export default function Dashboard() {
   const levelProgress = user ? ((user.tokens % 100) / 100) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+    <>
+      <ConfettiCelebration 
+        trigger={showCelebration} 
+        onComplete={() => setShowCelebration(false)}
+      />
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -291,5 +300,6 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+    </>
   );
 }
