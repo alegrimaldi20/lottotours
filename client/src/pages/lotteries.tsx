@@ -98,7 +98,7 @@ export default function Lotteries() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -157,7 +157,7 @@ export default function Lotteries() {
               >
                 <div className="relative">
                   {/* Prize Image/Icon */}
-                  <div className="h-48 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center overflow-hidden">
+                  <div className="h-48 bg-gradient-casino flex items-center justify-center overflow-hidden">
                     <TravelImageRenderer type="lottery" theme={lottery.image} className="w-full h-full object-cover" />
                   </div>
                   
@@ -243,10 +243,10 @@ export default function Lotteries() {
                     <Button
                       onClick={() => handleBuyTicket(lottery)}
                       disabled={!canAfford || buyTicketMutation.isPending || lottery.soldTickets >= lottery.maxTickets}
-                      className={`w-full ${canAfford 
-                        ? 'bg-gradient-to-r from-explore-blue to-ocean-pulse hover:from-ocean-pulse hover:to-explore-blue' 
-                        : 'bg-slate-300'
-                      } text-white`}
+                      className={`w-full shadow-lg ${canAfford 
+                        ? 'btn-lottery' 
+                        : 'bg-slate-300 text-white'
+                      }`}
                       data-testid={`buy-ticket-${lottery.id}`}
                     >
                       {buyTicketMutation.isPending ? (

@@ -44,6 +44,22 @@ export default {
         border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",
+        // Travel & Lottery themed colors
+        'lottery-gold': 'var(--lottery-gold)',
+        'lottery-orange': 'var(--lottery-orange)',
+        'lottery-purple': 'var(--lottery-purple)',
+        'lottery-pink': 'var(--lottery-pink)',
+        'adventure-teal': 'var(--adventure-teal)',
+        'adventure-cyan': 'var(--adventure-cyan)',
+        'travel-coral': 'var(--travel-coral)',
+        'travel-emerald': 'var(--travel-emerald)',
+        'sunset-red': 'var(--sunset-red)',
+        'sunrise-yellow': 'var(--sunrise-yellow)',
+        // Legacy mappings
+        'explore-blue': 'var(--explore-blue)',
+        'ocean-pulse': 'var(--ocean-pulse)',
+        'golden-luck': 'var(--golden-luck)',
+        'travel-mint': 'var(--travel-mint)',
         chart: {
           "1": "var(--chart-1)",
           "2": "var(--chart-2)",

@@ -13,13 +13,13 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-lottery-purple/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <div className="text-2xl font-bold gradient-travel bg-clip-text text-transparent flex items-center gap-2" data-testid="logo">
+              <div className="text-2xl font-bold text-gradient-gold flex items-center gap-2" data-testid="logo">
                 <div className="w-8 h-8">
                   <TravelImageRenderer type="cultural" className="w-full h-full" />
                 </div>
@@ -29,20 +29,20 @@ export default function Landing() {
             <nav className="hidden md:flex space-x-8">
               <button 
                 onClick={() => scrollToSection('features')}
-                className="text-slate-600 hover:text-explore-blue transition-colors"
+                className="text-slate-600 hover:text-lottery-gold transition-colors"
                 data-testid="nav-features"
               >
                 Features
               </button>
               <button 
                 onClick={() => scrollToSection('how-it-works')}
-                className="text-slate-600 hover:text-explore-blue transition-colors"
+                className="text-slate-600 hover:text-lottery-gold transition-colors"
                 data-testid="nav-how-it-works"
               >
                 How It Works
               </button>
               <Link href="/dashboard">
-                <Button className="bg-explore-blue hover:bg-ocean-pulse text-white" data-testid="button-get-started">
+                <Button className="btn-lottery shadow-lg" data-testid="button-get-started">
                   Get Started
                 </Button>
               </Link>
@@ -57,7 +57,7 @@ export default function Landing() {
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-6" data-testid="hero-title">
               Turn Your Dreams Into
-              <span className="gradient-travel bg-clip-text text-transparent"> Adventures</span>
+              <span className="text-gradient-gold"> Adventures</span>
             </h1>
             <p className="text-xl md:text-2xl text-slate-600 mb-8 max-w-3xl mx-auto" data-testid="hero-subtitle">
               Complete missions, win lotteries, and earn tokens to unlock real travel experiences. 
@@ -67,7 +67,7 @@ export default function Landing() {
               <Link href="/dashboard">
                 <Button 
                   size="lg" 
-                  className="bg-explore-blue hover:bg-ocean-pulse text-white px-8 py-4 text-lg"
+                  className="btn-lottery px-8 py-4 text-lg shadow-xl"
                   data-testid="button-start-exploring"
                 >
                   <Sparkles className="mr-2 h-5 w-5" />
@@ -78,7 +78,7 @@ export default function Landing() {
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="border-explore-blue text-explore-blue hover:bg-explore-blue hover:text-white px-8 py-4 text-lg"
+                  className="btn-adventure px-8 py-4 text-lg shadow-xl"
                   data-testid="button-view-lotteries"
                 >
                   <Trophy className="mr-2 h-5 w-5" />
@@ -90,19 +90,19 @@ export default function Landing() {
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 bg-white rounded-2xl p-8 shadow-lg max-w-4xl mx-auto">
               <div className="text-center" data-testid="stat-adventures">
-                <div className="text-3xl font-bold text-explore-blue">1000+</div>
+                <div className="text-3xl font-bold text-gradient-gold">1000+</div>
                 <div className="text-slate-600">Adventures Won</div>
               </div>
               <div className="text-center" data-testid="stat-destinations">
-                <div className="text-3xl font-bold text-ocean-pulse">50+</div>
+                <div className="text-3xl font-bold text-gradient-adventure">50+</div>
                 <div className="text-slate-600">Destinations</div>
               </div>
               <div className="text-center" data-testid="stat-users">
-                <div className="text-3xl font-bold text-golden-luck">25K+</div>
+                <div className="text-3xl font-bold text-gradient-lottery">25K+</div>
                 <div className="text-slate-600">Active Explorers</div>
               </div>
               <div className="text-center" data-testid="stat-prizes">
-                <div className="text-3xl font-bold text-travel-mint">$2M+</div>
+                <div className="text-3xl font-bold text-gradient-gold">$2M+</div>
                 <div className="text-slate-600">Prizes Given</div>
               </div>
             </div>

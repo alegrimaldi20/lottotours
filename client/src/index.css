@@ -3,62 +3,95 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(210, 40%, 8%);
-  --muted: hsl(210, 40%, 96%);
-  --muted-foreground: hsl(215, 16%, 47%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(210, 40%, 8%);
+  /* Base colors - vibrant travel & lottery theme */
+  --background: hsl(240, 100%, 99%);
+  --foreground: hsl(240, 85%, 10%);
+  --muted: hsl(280, 100%, 97%);
+  --muted-foreground: hsl(240, 35%, 45%);
+  --popover: hsl(280, 100%, 98%);
+  --popover-foreground: hsl(240, 85%, 10%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(210, 40%, 8%);
-  --border: hsl(214, 32%, 91%);
-  --input: hsl(214, 32%, 91%);
-  --primary: hsl(240, 79%, 58%);
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(187, 85%, 53%);
+  --card-foreground: hsl(240, 85%, 10%);
+  --border: hsl(280, 60%, 88%);
+  --input: hsl(280, 60%, 94%);
+  
+  /* Primary colors - lottery gold/orange theme */
+  --primary: hsl(38, 100%, 50%);
+  --primary-foreground: hsl(240, 85%, 10%);
+  --secondary: hsl(280, 100%, 65%);
   --secondary-foreground: hsl(0, 0%, 100%);
-  --accent: hsl(45, 93%, 58%);
-  --accent-foreground: hsl(240, 79%, 58%);
-  --destructive: hsl(0, 84%, 60%);
-  --destructive-foreground: hsl(210, 40%, 98%);
-  --ring: hsl(217, 91%, 60%);
-  --radius: 0.75rem;
-  --slate-50: hsl(210, 40%, 98%);
-  --slate-100: hsl(210, 40%, 96%);
-  --slate-200: hsl(214, 32%, 91%);
-  --slate-300: hsl(213, 27%, 84%);
-  --slate-600: hsl(215, 16%, 47%);
-  --slate-700: hsl(215, 19%, 35%);
-  --slate-900: hsl(222, 84%, 5%);
-  --explore-blue: hsl(240, 79%, 58%);
-  --ocean-pulse: hsl(187, 85%, 53%);
-  --golden-luck: hsl(45, 93%, 58%);
-  --travel-mint: hsl(160, 84%, 56%);
-  --success-green: hsl(160, 84%, 39%);
-  --warning-amber: hsl(45, 93%, 58%);
-  --error-red: hsl(0, 84%, 60%);
+  --accent: hsl(195, 100%, 55%);
+  --accent-foreground: hsl(240, 85%, 10%);
+  
+  /* State colors */
+  --destructive: hsl(0, 100%, 55%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --ring: hsl(38, 100%, 50%);
+  --radius: 1rem;
+  
+  /* Custom travel & lottery colors */
+  --lottery-gold: hsl(38, 100%, 50%);
+  --lottery-orange: hsl(25, 100%, 55%);
+  --lottery-purple: hsl(280, 100%, 65%);
+  --lottery-pink: hsl(320, 100%, 70%);
+  --adventure-teal: hsl(195, 100%, 55%);
+  --adventure-cyan: hsl(180, 100%, 60%);
+  --travel-coral: hsl(15, 100%, 65%);
+  --travel-emerald: hsl(150, 100%, 55%);
+  --sunset-red: hsl(0, 100%, 65%);
+  --sunrise-yellow: hsl(50, 100%, 60%);
+  
+  /* Legacy color mappings for gradual transition */
+  --slate-50: hsl(280, 100%, 98%);
+  --slate-100: hsl(280, 100%, 96%);
+  --slate-200: hsl(280, 60%, 90%);
+  --slate-300: hsl(280, 40%, 82%);
+  --slate-600: hsl(240, 35%, 45%);
+  --slate-700: hsl(240, 45%, 25%);
+  --slate-900: hsl(240, 85%, 10%);
+  --explore-blue: hsl(195, 100%, 55%);
+  --ocean-pulse: hsl(180, 100%, 60%);
+  --golden-luck: hsl(38, 100%, 50%);
+  --travel-mint: hsl(150, 100%, 55%);
+  --success-green: hsl(150, 100%, 45%);
+  --warning-amber: hsl(38, 100%, 50%);
+  --error-red: hsl(0, 100%, 55%);
 }
 
 .dark {
-  --background: hsl(222, 84%, 5%);
-  --foreground: hsl(210, 40%, 98%);
-  --muted: hsl(217, 33%, 17%);
-  --muted-foreground: hsl(215, 20%, 65%);
-  --popover: hsl(222, 84%, 5%);
-  --popover-foreground: hsl(210, 40%, 98%);
-  --card: hsl(222, 84%, 5%);
-  --card-foreground: hsl(210, 40%, 98%);
-  --border: hsl(217, 33%, 17%);
-  --input: hsl(217, 33%, 17%);
-  --primary: hsl(240, 79%, 58%);
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(217, 33%, 17%);
-  --secondary-foreground: hsl(210, 40%, 98%);
-  --accent: hsl(217, 33%, 17%);
-  --accent-foreground: hsl(210, 40%, 98%);
-  --destructive: hsl(0, 63%, 31%);
-  --destructive-foreground: hsl(210, 40%, 98%);
-  --ring: hsl(217, 91%, 60%);
+  /* Dark mode - vibrant neon casino/travel theme */
+  --background: hsl(240, 85%, 5%);
+  --foreground: hsl(280, 100%, 95%);
+  --muted: hsl(240, 60%, 12%);
+  --muted-foreground: hsl(280, 40%, 75%);
+  --popover: hsl(240, 80%, 8%);
+  --popover-foreground: hsl(280, 100%, 95%);
+  --card: hsl(240, 70%, 8%);
+  --card-foreground: hsl(280, 100%, 95%);
+  --border: hsl(280, 60%, 20%);
+  --input: hsl(280, 60%, 15%);
+  
+  /* Dark primary colors - neon effect */
+  --primary: hsl(38, 100%, 60%);
+  --primary-foreground: hsl(240, 85%, 5%);
+  --secondary: hsl(280, 100%, 70%);
+  --secondary-foreground: hsl(240, 85%, 5%);
+  --accent: hsl(195, 100%, 65%);
+  --accent-foreground: hsl(240, 85%, 5%);
+  
+  --destructive: hsl(0, 100%, 65%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --ring: hsl(38, 100%, 60%);
+  
+  /* Dark mode custom colors */
+  --lottery-gold: hsl(38, 100%, 60%);
+  --lottery-orange: hsl(25, 100%, 65%);
+  --lottery-purple: hsl(280, 100%, 75%);
+  --lottery-pink: hsl(320, 100%, 80%);
+  --adventure-teal: hsl(195, 100%, 65%);
+  --adventure-cyan: hsl(180, 100%, 70%);
+  --travel-coral: hsl(15, 100%, 75%);
+  --travel-emerald: hsl(150, 100%, 65%);
 }
 
 @layer base {
@@ -137,11 +170,99 @@
     color: var(--travel-mint);
   }
   
+  /* Enhanced lottery & travel gradients */
   .gradient-travel {
-    background: linear-gradient(135deg, var(--explore-blue) 0%, var(--ocean-pulse) 100%);
+    background: linear-gradient(135deg, var(--lottery-gold), var(--lottery-orange), var(--travel-coral));
   }
   
-  .gradient-luck {
-    background: linear-gradient(135deg, var(--golden-luck) 0%, var(--travel-mint) 100%);
+  .gradient-lottery {
+    background: linear-gradient(135deg, var(--lottery-purple), var(--lottery-pink), var(--lottery-gold));
+  }
+  
+  .gradient-adventure {
+    background: linear-gradient(135deg, var(--adventure-teal), var(--adventure-cyan), var(--travel-emerald));
+  }
+  
+  .gradient-sunset {
+    background: linear-gradient(135deg, var(--sunrise-yellow), var(--lottery-orange), var(--sunset-red));
+  }
+  
+  .gradient-casino {
+    background: linear-gradient(135deg, var(--lottery-gold), var(--lottery-purple), var(--lottery-pink));
+  }
+  
+  /* Vibrant card backgrounds */
+  .bg-lottery-card {
+    background: linear-gradient(135deg, var(--lottery-gold), var(--lottery-orange));
+  }
+  
+  .bg-adventure-card {
+    background: linear-gradient(135deg, var(--adventure-teal), var(--travel-emerald));
+  }
+  
+  .bg-travel-card {
+    background: linear-gradient(135deg, var(--travel-coral), var(--lottery-pink));
+  }
+  
+  /* Neon glow effects */
+  .glow-gold {
+    box-shadow: 0 0 20px var(--lottery-gold), 0 0 40px var(--lottery-gold), 0 0 60px var(--lottery-gold);
+  }
+  
+  .glow-purple {
+    box-shadow: 0 0 20px var(--lottery-purple), 0 0 40px var(--lottery-purple);
+  }
+  
+  .glow-teal {
+    box-shadow: 0 0 20px var(--adventure-teal), 0 0 40px var(--adventure-teal);
+  }
+  
+  /* Enhanced button styles */
+  .btn-lottery {
+    background: linear-gradient(135deg, var(--lottery-gold), var(--lottery-orange));
+    color: var(--foreground);
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-lottery:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 165, 0, 0.3);
+  }
+  
+  .btn-adventure {
+    background: linear-gradient(135deg, var(--adventure-teal), var(--adventure-cyan));
+    color: white;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-adventure:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 191, 255, 0.3);
+  }
+  
+  /* Dynamic text effects */
+  .text-gradient-gold {
+    background: linear-gradient(135deg, var(--lottery-gold), var(--lottery-orange));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .text-gradient-adventure {
+    background: linear-gradient(135deg, var(--adventure-teal), var(--travel-emerald));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .text-gradient-lottery {
+    background: linear-gradient(135deg, var(--lottery-purple), var(--lottery-pink));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 }

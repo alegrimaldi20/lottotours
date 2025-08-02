@@ -73,7 +73,7 @@ export default function Dashboard() {
   const levelProgress = user ? ((user.tokens % 100) / 100) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -111,7 +111,7 @@ export default function Dashboard() {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200" data-testid="stat-tokens">
+          <Card className="bg-lottery-card border-lottery-gold/20 shadow-lg" data-testid="stat-tokens">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Tokens</CardTitle>
               <Coins className="h-4 w-4 text-golden-luck" />
@@ -122,7 +122,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-200" data-testid="stat-level">
+          <Card className="bg-adventure-card border-adventure-teal/20 shadow-lg" data-testid="stat-level">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Explorer Level</CardTitle>
               <Star className="h-4 w-4 text-travel-mint" />
@@ -134,7 +134,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200" data-testid="stat-missions">
+          <Card className="bg-travel-card border-travel-coral/20 shadow-lg" data-testid="stat-missions">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Missions Completed</CardTitle>
               <Target className="h-4 w-4 text-golden-luck" />
@@ -145,7 +145,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200" data-testid="stat-rank">
+          <Card className="bg-gradient-lottery border-lottery-purple/20 shadow-lg" data-testid="stat-rank">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Global Rank</CardTitle>
               <Trophy className="h-4 w-4 text-explore-blue" />
@@ -208,7 +208,7 @@ export default function Dashboard() {
                       <Button 
                         onClick={() => handleCompleteMission(mission.id)}
                         disabled={completeMissionMutation.isPending}
-                        className="ml-4 bg-explore-blue hover:bg-ocean-pulse"
+                        className="ml-4 btn-lottery shadow-lg"
                         data-testid={`complete-mission-${mission.id}`}
                       >
                         {completeMissionMutation.isPending ? "Completing..." : "Complete"}
@@ -232,18 +232,18 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <Link href="/lotteries">
-                  <Button className="w-full justify-start bg-gradient-to-r from-explore-blue to-ocean-pulse text-white" data-testid="button-view-lotteries">
+                  <Button className="w-full justify-start btn-lottery shadow-lg" data-testid="button-view-lotteries">
                     <Trophy className="mr-2 h-4 w-4" />
                     View Active Lotteries
                   </Button>
                 </Link>
                 <Link href="/marketplace">
-                  <Button variant="outline" className="w-full justify-start" data-testid="button-browse-prizes">
+                  <Button className="w-full justify-start btn-adventure shadow-lg" data-testid="button-browse-prizes">
                     <Gift className="mr-2 h-4 w-4" />
                     Browse Prize Marketplace
                   </Button>
                 </Link>
-                <Button variant="outline" className="w-full justify-start" data-testid="button-invite-friends">
+                <Button variant="outline" className="w-full justify-start border-lottery-purple text-lottery-purple hover:bg-lottery-purple hover:text-white shadow-lg" data-testid="button-invite-friends">
                   <Users className="mr-2 h-4 w-4" />
                   Invite Friends
                 </Button>

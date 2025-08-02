@@ -113,7 +113,7 @@ export default function Marketplace() {
   const categories = ['all', 'travel_package', 'experience', 'product', 'discount'];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -183,7 +183,7 @@ export default function Marketplace() {
                     >
                       <div className="relative">
                         {/* Prize Image/Icon */}
-                        <div className="h-40 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center overflow-hidden">
+                        <div className="h-40 bg-gradient-adventure flex items-center justify-center overflow-hidden">
                           <TravelImageRenderer type="prize" theme={prize.image} className="w-full h-full object-cover" />
                         </div>
                         
@@ -268,10 +268,10 @@ export default function Marketplace() {
                         <Button
                           onClick={() => handleRedeemPrize(prize)}
                           disabled={!canAfford || !isAvailable || redeemPrizeMutation.isPending}
-                          className={`w-full ${canAfford && isAvailable
-                            ? 'bg-gradient-to-r from-explore-blue to-ocean-pulse hover:from-ocean-pulse hover:to-explore-blue' 
-                            : 'bg-slate-300'
-                          } text-white`}
+                          className={`w-full shadow-lg ${canAfford && isAvailable
+                            ? 'btn-adventure' 
+                            : 'bg-slate-300 text-white'
+                          }`}
                           data-testid={`redeem-prize-${prize.id}`}
                         >
                           {redeemPrizeMutation.isPending ? (
@@ -310,7 +310,7 @@ export default function Marketplace() {
                     Check back soon for new {categoryName(category).toLowerCase()} in our marketplace!
                   </p>
                   <Link href="/dashboard">
-                    <Button className="bg-explore-blue hover:bg-ocean-pulse">
+                    <Button className="btn-lottery shadow-lg">
                       Complete Missions to Earn Tokens
                     </Button>
                   </Link>
