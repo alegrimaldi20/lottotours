@@ -10,6 +10,8 @@ import TravelImageRenderer from "@/components/travel-image-renderer";
 import LotteryNumberSelector from "@/components/lottery-number-selector";
 import React, { useContext } from "react";
 import { ToastContext } from "@/App";
+import { InlineToaster } from "@/components/inline-toast";
+import { useLocaleSafeToast } from "@/hooks/use-locale-safe-toast";
 import type { Lottery, User } from "@shared/schema";
 
 interface LotteryTicketCart {
@@ -19,8 +21,7 @@ interface LotteryTicketCart {
 
 export default function LotteryDetail() {
   const [, params] = useRoute("/lottery/:id");
-  const toastContext = useContext(ToastContext);
-  const toast = toastContext?.toast || (() => "");
+  const { toasts, toast, removeToast } = useLocaleSafeToast();
   const queryClient = useQueryClient();
   const [ticketCart, setTicketCart] = useState<LotteryTicketCart[]>([]);
 
@@ -187,6 +188,9 @@ export default function LotteryDetail() {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto p-4 space-y-8">
+        {/* Locale-Safe Toast Notifications */}
+        <InlineToaster toasts={toasts} onRemove={removeToast} />
+        
         {/* Number Selection */}
         <LotteryNumberSelector
           lotteryId={lottery.id}

@@ -14,14 +14,40 @@ export function SimpleToast({ id, title, description, variant = "default", onRem
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Small delay to trigger animation
-    const timer = setTimeout(() => setIsVisible(true), 10);
-    return () => clearTimeout(timer);
+    try {
+      // Small delay to trigger animation
+      const timer = setTimeout(() => {
+        try {
+          setIsVisible(true);
+        } catch (error) {
+          console.warn("Toast visibility error:", error);
+        }
+      }, 50);
+      return () => {
+        try {
+          clearTimeout(timer);
+        } catch (error) {
+          console.warn("Toast timer cleanup error:", error);
+        }
+      };
+    } catch (error) {
+      console.warn("Toast effect error:", error);
+    }
   }, []);
 
   const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(() => onRemove(id), 300); // Wait for animation to complete
+    try {
+      setIsVisible(false);
+      setTimeout(() => {
+        try {
+          onRemove(id);
+        } catch (error) {
+          console.warn("Toast removal callback error:", error);
+        }
+      }, 300); // Wait for animation to complete
+    } catch (error) {
+      console.warn("Toast close error:", error);
+    }
   };
 
   return (
