@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,35 +25,69 @@ export const LotteryNumberSelector: React.FC<LotteryNumberSelectorProps> = ({
 }) => {
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
   const [animationsEnabled, setAnimationsEnabled] = useState(true);
+  const stateRef = useRef<number[]>([]);
+  const pendingUpdate = useRef<boolean>(false);
+
+  // Sync ref with state
+  useEffect(() => {
+    stateRef.current = selectedNumbers;
+  }, [selectedNumbers]);
 
   // Generate number grid (1 to totalNumbers)
   const numbers = Array.from({ length: totalNumbers }, (_, i) => i + 1);
 
-  // Toggle number selection - Locale-safe implementation
+  // Toggle number selection - Ultra-safe implementation with debouncing
   const toggleNumber = useCallback((number: number) => {
-    try {
-      setSelectedNumbers(prev => {
-        try {
-          if (prev.includes(number)) {
-            // Remove number safely
-            const filtered = prev.filter(n => n !== number);
-            return filtered;
-          } else if (prev.length < numbersToSelect) {
-            // Add number safely without complex operations
-            const newArray = [...prev, number];
-            // Simple numeric sort that avoids locale issues
-            newArray.sort((a, b) => a - b);
-            return newArray;
-          }
-          return prev;
-        } catch (error) {
-          console.warn('State update error in toggleNumber:', error);
-          return prev;
-        }
-      });
-    } catch (error) {
-      console.warn('toggleNumber error:', error);
+    // Prevent rapid successive calls that might cause DOM issues
+    if (pendingUpdate.current) {
+      return;
     }
+    
+    pendingUpdate.current = true;
+    
+    // Use requestAnimationFrame to ensure DOM is stable
+    requestAnimationFrame(() => {
+      try {
+        const current = stateRef.current;
+        let newNumbers: number[] = [];
+        
+        if (current.includes(number)) {
+          // Remove number
+          newNumbers = current.filter(n => n !== number);
+        } else if (current.length < numbersToSelect) {
+          // Add number
+          newNumbers = [...current, number];
+          // Sort without using array methods that might be locale-sensitive
+          for (let i = 0; i < newNumbers.length - 1; i++) {
+            for (let j = i + 1; j < newNumbers.length; j++) {
+              if (newNumbers[i] > newNumbers[j]) {
+                const temp = newNumbers[i];
+                newNumbers[i] = newNumbers[j];
+                newNumbers[j] = temp;
+              }
+            }
+          }
+        } else {
+          newNumbers = current;
+        }
+        
+        // Update state in next tick to avoid synchronous DOM issues
+        setTimeout(() => {
+          try {
+            setSelectedNumbers(newNumbers);
+            stateRef.current = newNumbers;
+          } catch (error) {
+            console.warn('State update error:', error);
+          } finally {
+            pendingUpdate.current = false;
+          }
+        }, 0);
+        
+      } catch (error) {
+        console.warn('toggleNumber error:', error);
+        pendingUpdate.current = false;
+      }
+    });
   }, [numbersToSelect]);
 
   // Auto-pick random numbers (fills remaining slots) - Locale-safe
@@ -233,7 +267,19 @@ export const LotteryNumberSelector: React.FC<LotteryNumberSelectorProps> = ({
                   try {
                     e.preventDefault();
                     e.stopPropagation();
+                    
+                    // Additional safety: disable button temporarily
+                    const button = e.currentTarget;
+                    button.disabled = true;
+                    
                     toggleNumber(number);
+                    
+                    // Re-enable after short delay
+                    setTimeout(() => {
+                      if (button) {
+                        button.disabled = isDisabled;
+                      }
+                    }, 100);
                   } catch (error) {
                     console.warn('Button click error:', error);
                   }
