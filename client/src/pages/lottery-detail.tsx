@@ -225,44 +225,64 @@ export default function LotteryDetail() {
         />
 
         {/* Quick Actions */}
-        <div className="flex flex-wrap gap-4 justify-center">
-          <Button 
-            onClick={() => {
-              const randomNumbers: number[] = [];
-              while (randomNumbers.length < 6) {
-                const randomNum = Math.floor(Math.random() * 49) + 1;
-                if (!randomNumbers.includes(randomNum)) {
-                  randomNumbers.push(randomNum);
-                }
-              }
-              handleAddToCart(randomNumbers.sort((a, b) => a - b), true);
-            }}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <Shuffle className="w-4 h-4" />
-            Quick Pick Single Ticket
-          </Button>
-          <Button 
-            onClick={() => {
-              for (let i = 0; i < 5; i++) {
-                const randomNumbers: number[] = [];
-                while (randomNumbers.length < 6) {
-                  const randomNum = Math.floor(Math.random() * 49) + 1;
-                  if (!randomNumbers.includes(randomNum)) {
-                    randomNumbers.push(randomNum);
-                  }
-                }
-                handleAddToCart(randomNumbers.sort((a, b) => a - b), true);
-              }
-            }}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <Shuffle className="w-4 h-4" />
-            Quick Pick 5 Tickets
-          </Button>
-        </div>
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle className="text-center">Quick Purchase Options</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Single Quick Pick */}
+              <div className="text-center space-y-3">
+                <h3 className="font-medium">Single Random Ticket</h3>
+                <Button 
+                  onClick={() => {
+                    const randomNumbers: number[] = [];
+                    while (randomNumbers.length < 6) {
+                      const randomNum = Math.floor(Math.random() * 49) + 1;
+                      if (!randomNumbers.includes(randomNum)) {
+                        randomNumbers.push(randomNum);
+                      }
+                    }
+                    handleAddToCart(randomNumbers.sort((a, b) => a - b), true);
+                  }}
+                  variant="outline"
+                  className="w-full flex items-center gap-2"
+                >
+                  <Shuffle className="w-4 h-4" />
+                  Quick Pick 1 Ticket
+                </Button>
+              </div>
+
+              {/* Multiple Tickets Selector */}
+              <div className="text-center space-y-3">
+                <h3 className="font-medium">Multiple Random Tickets</h3>
+                <div className="text-sm text-slate-600 mb-2">
+                  Click to add tickets one by one
+                </div>
+                <Button 
+                  onClick={() => {
+                    const randomNumbers: number[] = [];
+                    while (randomNumbers.length < 6) {
+                      const randomNum = Math.floor(Math.random() * 49) + 1;
+                      if (!randomNumbers.includes(randomNum)) {
+                        randomNumbers.push(randomNum);
+                      }
+                    }
+                    handleAddToCart(randomNumbers.sort((a, b) => a - b), true);
+                  }}
+                  variant="outline"
+                  className="w-full flex items-center gap-2"
+                >
+                  <Shuffle className="w-4 h-4" />
+                  Add 1 More Random Ticket
+                </Button>
+                <div className="text-xs text-slate-500">
+                  Each click adds another random ticket to your cart
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Shopping Cart */}
         {ticketCart.length > 0 && (
