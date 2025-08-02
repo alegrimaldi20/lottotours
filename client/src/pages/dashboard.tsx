@@ -36,9 +36,10 @@ export default function Dashboard() {
     },
     onSuccess: (data, missionId) => {
       const mission = missions?.find(m => m.id === missionId);
+      queryClient.invalidateQueries({ queryKey: ["/api/users/sample-user"] });
       toast({
         title: "Mission Completed!",
-        description: `You earned ${mission?.reward || 0} tokens!`,
+        description: `You earned ${mission?.reward || 0} tokens! New balance: ${(user?.tokens || 0) + (mission?.reward || 0)} tokens`,
       });
       // Update user tokens
       if (user && mission) {

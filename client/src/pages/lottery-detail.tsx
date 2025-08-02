@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRoute, Link } from "wouter";
-import { ArrowLeft, Calendar, Users, Trophy, MapPin, Clock, Coins } from "lucide-react";
+import { ArrowLeft, Calendar, Users, Trophy, MapPin, Clock, Coins, Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -53,19 +53,23 @@ export default function LotteryDetail() {
       return { ticketCount: ticketCart.length, totalCost };
     },
     onSuccess: (data) => {
-      showSuccess(
-        "Tickets Purchased!",
-        `Successfully bought ${data.ticketCount} ticket${data.ticketCount > 1 ? 's' : ''} for ${data.totalCost} tokens.`
-      );
+      if (typeof showSuccess === 'function') {
+        showSuccess(
+          "Tickets Purchased!",
+          `Successfully bought ${data.ticketCount} ticket${data.ticketCount > 1 ? 's' : ''} for ${data.totalCost} tokens. New balance: ${(user?.tokens || 0) - data.totalCost} tokens`
+        );
+      }
       setTicketCart([]);
       queryClient.invalidateQueries({ queryKey: [`/api/lotteries/${params?.id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/users/sample-user"] });
     },
     onError: (error) => {
-      showError(
-        "Purchase Failed",
-        error.message || "Failed to purchase tickets. Please try again."
-      );
+      if (typeof showError === 'function') {
+        showError(
+          "Purchase Failed",
+          error.message || "Failed to purchase tickets. Please try again."
+        );
+      }
     },
   });
 
@@ -220,13 +224,63 @@ export default function LotteryDetail() {
           numberRange={{ min: 1, max: 49 }}
         />
 
+        {/* Quick Actions */}
+        <div className="flex flex-wrap gap-4 justify-center">
+          <Button 
+            onClick={() => {
+              const randomNumbers: number[] = [];
+              while (randomNumbers.length < 6) {
+                const randomNum = Math.floor(Math.random() * 49) + 1;
+                if (!randomNumbers.includes(randomNum)) {
+                  randomNumbers.push(randomNum);
+                }
+              }
+              handleAddToCart(randomNumbers.sort((a, b) => a - b), true);
+            }}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Shuffle className="w-4 h-4" />
+            Quick Pick Single Ticket
+          </Button>
+          <Button 
+            onClick={() => {
+              for (let i = 0; i < 5; i++) {
+                const randomNumbers: number[] = [];
+                while (randomNumbers.length < 6) {
+                  const randomNum = Math.floor(Math.random() * 49) + 1;
+                  if (!randomNumbers.includes(randomNum)) {
+                    randomNumbers.push(randomNum);
+                  }
+                }
+                handleAddToCart(randomNumbers.sort((a, b) => a - b), true);
+              }
+            }}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Shuffle className="w-4 h-4" />
+            Quick Pick 5 Tickets
+          </Button>
+        </div>
+
         {/* Shopping Cart */}
         {ticketCart.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Trophy className="h-5 w-5 text-lottery-gold" />
-                Your Tickets ({ticketCart.length})
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-blue-600" />
+                  Your Tickets ({ticketCart.length})
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setTicketCart([])}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  Clear All
+                </Button>
               </CardTitle>
             </CardHeader>
             <CardContent>
