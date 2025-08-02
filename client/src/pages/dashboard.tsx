@@ -27,7 +27,9 @@ export default function Dashboard() {
 
   const completeMissionMutation = useMutation({
     mutationFn: async (missionId: string) => {
-      const response = await apiRequest("POST", `/api/users/${SAMPLE_USER_ID}/missions/${missionId}/complete`, {});
+      const response = await apiRequest(`/api/users/${SAMPLE_USER_ID}/missions/${missionId}/complete`, {
+        method: "POST",
+      });
       return response.json();
     },
     onSuccess: (data, missionId) => {
