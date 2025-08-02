@@ -29,47 +29,97 @@ export const LotteryNumberSelector: React.FC<LotteryNumberSelectorProps> = ({
   // Generate number grid (1 to totalNumbers)
   const numbers = Array.from({ length: totalNumbers }, (_, i) => i + 1);
 
-  // Toggle number selection
+  // Toggle number selection - Locale-safe implementation
   const toggleNumber = useCallback((number: number) => {
-    setSelectedNumbers(prev => {
-      if (prev.includes(number)) {
-        return prev.filter(n => n !== number);
-      } else if (prev.length < numbersToSelect) {
-        return [...prev, number].sort((a, b) => a - b);
-      }
-      return prev;
-    });
+    try {
+      setSelectedNumbers(prev => {
+        try {
+          if (prev.includes(number)) {
+            // Remove number safely
+            const filtered = prev.filter(n => n !== number);
+            return filtered;
+          } else if (prev.length < numbersToSelect) {
+            // Add number safely without complex operations
+            const newArray = [...prev, number];
+            // Simple numeric sort that avoids locale issues
+            newArray.sort((a, b) => a - b);
+            return newArray;
+          }
+          return prev;
+        } catch (error) {
+          console.warn('State update error in toggleNumber:', error);
+          return prev;
+        }
+      });
+    } catch (error) {
+      console.warn('toggleNumber error:', error);
+    }
   }, [numbersToSelect]);
 
-  // Auto-pick random numbers (fills remaining slots)
+  // Auto-pick random numbers (fills remaining slots) - Locale-safe
   const surpriseMe = useCallback(() => {
-    if (selectedNumbers.length >= numbersToSelect) return;
-    
-    const available = numbers.filter(n => !selectedNumbers.includes(n));
-    const needed = numbersToSelect - selectedNumbers.length;
-    const shuffled = [...available].sort(() => Math.random() - 0.5);
-    const newNumbers = shuffled.slice(0, needed);
-    setSelectedNumbers(prev => [...prev, ...newNumbers].sort((a, b) => a - b));
+    try {
+      if (selectedNumbers.length >= numbersToSelect) return;
+      
+      const available = numbers.filter(n => !selectedNumbers.includes(n));
+      const needed = numbersToSelect - selectedNumbers.length;
+      const shuffled = [...available].sort(() => Math.random() - 0.5);
+      const newNumbers = shuffled.slice(0, needed);
+      
+      setSelectedNumbers(prev => {
+        try {
+          const combined = [...prev, ...newNumbers];
+          combined.sort((a, b) => a - b);
+          return combined;
+        } catch (error) {
+          console.warn('surpriseMe state update error:', error);
+          return prev;
+        }
+      });
+    } catch (error) {
+      console.warn('surpriseMe error:', error);
+    }
   }, [numbers, selectedNumbers, numbersToSelect]);
 
-  // Clear all selections
+  // Clear all selections - Locale-safe
   const clearAll = useCallback(() => {
-    setSelectedNumbers([]);
+    try {
+      setSelectedNumbers([]);
+    } catch (error) {
+      console.warn('clearAll error:', error);
+    }
   }, []);
 
-  // Add to cart
+  // Add to cart - Locale-safe
   const handleAddToCart = useCallback(() => {
-    if (selectedNumbers.length === numbersToSelect) {
-      onAddToCart(selectedNumbers, false);
-      setSelectedNumbers([]); // Clear for next selection
+    try {
+      if (selectedNumbers.length === numbersToSelect) {
+        onAddToCart(selectedNumbers, false);
+        setSelectedNumbers([]); // Clear for next selection
+      }
+    } catch (error) {
+      console.warn('handleAddToCart error:', error);
     }
   }, [selectedNumbers, numbersToSelect, onAddToCart]);
 
-  // Auto-pick all numbers (replaces current selection)
+  // Auto-pick all numbers (replaces current selection) - Locale-safe
   const autoPickAll = useCallback(() => {
-    const shuffled = [...numbers].sort(() => Math.random() - 0.5);
-    const picked = shuffled.slice(0, numbersToSelect);
-    setSelectedNumbers(picked.sort((a, b) => a - b));
+    try {
+      const shuffled = [...numbers].sort(() => Math.random() - 0.5);
+      const picked = shuffled.slice(0, numbersToSelect);
+      
+      setSelectedNumbers(() => {
+        try {
+          picked.sort((a, b) => a - b);
+          return picked;
+        } catch (error) {
+          console.warn('autoPickAll state update error:', error);
+          return [];
+        }
+      });
+    } catch (error) {
+      console.warn('autoPickAll error:', error);
+    }
   }, [numbers, numbersToSelect]);
 
   const canAddToCart = selectedNumbers.length === numbersToSelect;
@@ -179,7 +229,15 @@ export const LotteryNumberSelector: React.FC<LotteryNumberSelectorProps> = ({
             return (
               <button
                 key={number}
-                onClick={() => toggleNumber(number)}
+                onClick={(e) => {
+                  try {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleNumber(number);
+                  } catch (error) {
+                    console.warn('Button click error:', error);
+                  }
+                }}
                 disabled={isDisabled}
                 className={`
                   aspect-square rounded-lg border-2 font-semibold text-lg transition-all duration-200
