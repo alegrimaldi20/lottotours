@@ -4,7 +4,8 @@ import {
   type Lottery, type InsertLottery, type LotteryTicket, type InsertLotteryTicket,
   type NFT, type InsertNFT,
   type Prize, type InsertPrize, type PrizeRedemption, type InsertPrizeRedemption,
-  users, missions, userMissions, lotteries, lotteryTickets, nfts, prizes, prizeRedemptions
+  type TokenPack, type InsertTokenPack, type TokenPurchase, type InsertTokenPurchase,
+  users, missions, userMissions, lotteries, lotteryTickets, nfts, prizes, prizeRedemptions, tokenPacks, tokenPurchases
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
@@ -41,6 +42,14 @@ export interface IStorage {
   getActivePrizes(): Promise<Prize[]>;
   redeemPrize(redemption: InsertPrizeRedemption): Promise<PrizeRedemption>;
   getUserRedemptions(userId: string): Promise<PrizeRedemption[]>;
+
+  // Token Packs & Purchases
+  getTokenPacks(): Promise<TokenPack[]>;
+  getActiveTokenPacks(): Promise<TokenPack[]>;
+  createTokenPurchase(purchase: InsertTokenPurchase): Promise<TokenPurchase>;
+  updateTokenPurchaseStatus(paymentIntentId: string, status: string): Promise<TokenPurchase>;
+  getUserTokenPurchases(userId: string): Promise<TokenPurchase[]>;
+  updateUserStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -407,6 +416,45 @@ export class DatabaseStorage implements IStorage {
 
   async getUserRedemptions(userId: string): Promise<PrizeRedemption[]> {
     return await db.select().from(prizeRedemptions).where(eq(prizeRedemptions.userId, userId));
+  }
+
+  // Token Pack & Purchase Methods
+  async getTokenPacks(): Promise<TokenPack[]> {
+    return await db.select().from(tokenPacks);
+  }
+
+  async getActiveTokenPacks(): Promise<TokenPack[]> {
+    return await db.select().from(tokenPacks).where(eq(tokenPacks.isActive, true));
+  }
+
+  async createTokenPurchase(purchase: InsertTokenPurchase): Promise<TokenPurchase> {
+    const [newPurchase] = await db
+      .insert(tokenPurchases)
+      .values(purchase)
+      .returning();
+    return newPurchase;
+  }
+
+  async updateTokenPurchaseStatus(paymentIntentId: string, status: string): Promise<TokenPurchase> {
+    const [updatedPurchase] = await db
+      .update(tokenPurchases)
+      .set({ status })
+      .where(eq(tokenPurchases.stripePaymentIntentId, paymentIntentId))
+      .returning();
+    return updatedPurchase;
+  }
+
+  async getUserTokenPurchases(userId: string): Promise<TokenPurchase[]> {
+    return await db.select().from(tokenPurchases).where(eq(tokenPurchases.userId, userId));
+  }
+
+  async updateUserStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ stripeCustomerId })
+      .where(eq(users.id, userId))
+      .returning();
+    return updatedUser;
   }
 }
 

@@ -12,6 +12,7 @@ export const users = pgTable("users", {
   tokens: integer("tokens").notNull().default(0),
   level: integer("level").notNull().default(1),
   totalMissionsCompleted: integer("total_missions_completed").notNull().default(0),
+  stripeCustomerId: text("stripe_customer_id").unique(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -105,6 +106,29 @@ export const prizeRedemptions = pgTable("prize_redemptions", {
   redeemedAt: timestamp("redeemed_at").defaultNow(),
 });
 
+export const tokenPacks = pgTable("token_packs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  tokenAmount: integer("token_amount").notNull(),
+  priceUsd: decimal("price_usd", { precision: 10, scale: 2 }).notNull(),
+  stripePriceId: text("stripe_price_id"),
+  isActive: boolean("is_active").notNull().default(true),
+  popularBadge: boolean("popular_badge").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const tokenPurchases = pgTable("token_purchases", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  tokenPackId: varchar("token_pack_id").notNull().references(() => tokenPacks.id),
+  stripePaymentIntentId: text("stripe_payment_intent_id").unique(),
+  tokensGranted: integer("tokens_granted").notNull(),
+  amountPaid: decimal("amount_paid", { precision: 10, scale: 2 }).notNull(),
+  status: text("status").notNull().default("pending"), // pending, completed, failed
+  purchasedAt: timestamp("purchased_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -148,6 +172,16 @@ export const insertPrizeRedemptionSchema = createInsertSchema(prizeRedemptions).
   redemptionCode: true,
 });
 
+export const insertTokenPackSchema = createInsertSchema(tokenPacks).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertTokenPurchaseSchema = createInsertSchema(tokenPurchases).omit({
+  id: true,
+  purchasedAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -164,3 +198,7 @@ export type Prize = typeof prizes.$inferSelect;
 export type InsertPrize = z.infer<typeof insertPrizeSchema>;
 export type PrizeRedemption = typeof prizeRedemptions.$inferSelect;
 export type InsertPrizeRedemption = z.infer<typeof insertPrizeRedemptionSchema>;
+export type TokenPack = typeof tokenPacks.$inferSelect;
+export type InsertTokenPack = z.infer<typeof insertTokenPackSchema>;
+export type TokenPurchase = typeof tokenPurchases.$inferSelect;
+export type InsertTokenPurchase = z.infer<typeof insertTokenPurchaseSchema>;

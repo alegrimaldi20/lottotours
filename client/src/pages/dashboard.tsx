@@ -243,6 +243,12 @@ export default function Dashboard() {
                     Browse Prize Marketplace
                   </Button>
                 </Link>
+                <Link href="/token-shop">
+                  <Button className="w-full justify-start btn-lottery shadow-lg" data-testid="button-token-shop">
+                    <Coins className="mr-2 h-4 w-4" />
+                    Buy Token Packs
+                  </Button>
+                </Link>
                 <Button variant="outline" className="w-full justify-start border-lottery-purple text-lottery-purple hover:bg-lottery-purple hover:text-white shadow-lg" data-testid="button-invite-friends">
                   <Users className="mr-2 h-4 w-4" />
                   Invite Friends

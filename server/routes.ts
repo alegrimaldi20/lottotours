@@ -1,12 +1,20 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import Stripe from "stripe";
 import { 
   insertUserSchema, 
   insertLotteryTicketSchema, 
   insertPrizeRedemptionSchema 
 } from "@shared/schema";
 import { z } from "zod";
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2023-10-16",
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Users routes
@@ -201,6 +209,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(redemptions);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch user redemptions" });
+    }
+  });
+
+  // Token Packs routes
+  app.get("/api/token-packs", async (req, res) => {
+    try {
+      const tokenPacks = await storage.getActiveTokenPacks();
+      res.json(tokenPacks);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch token packs" });
+    }
+  });
+
+  // Create payment intent for token purchase
+  app.post("/api/create-token-payment-intent", async (req, res) => {
+    try {
+      const { tokenPackId, userId } = req.body;
+      
+      // Get token pack details
+      const tokenPacks = await storage.getTokenPacks();
+      const tokenPack = tokenPacks.find(pack => pack.id === tokenPackId);
+      
+      if (!tokenPack) {
+        return res.status(404).json({ message: "Token pack not found" });
+      }
+
+      // Create payment intent
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(parseFloat(tokenPack.priceUsd) * 100), // Convert to cents
+        currency: "usd",
+        metadata: {
+          tokenPackId,
+          userId,
+          tokenAmount: tokenPack.tokenAmount.toString()
+        }
+      });
+
+      // Create purchase record
+      await storage.createTokenPurchase({
+        userId,
+        tokenPackId,
+        stripePaymentIntentId: paymentIntent.id,
+        tokensGranted: tokenPack.tokenAmount,
+        amountPaid: tokenPack.priceUsd,
+        status: "pending"
+      });
+
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id
+      });
+    } catch (error: any) {
+      console.error('Payment intent creation failed:', error);
+      res.status(500).json({ message: "Error creating payment intent: " + error.message });
+    }
+  });
+
+  // Get user's token purchase history
+  app.get("/api/users/:userId/token-purchases", async (req, res) => {
+    try {
+      const purchases = await storage.getUserTokenPurchases(req.params.userId);
+      res.json(purchases);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch token purchases" });
     }
   });
 
