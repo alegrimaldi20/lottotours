@@ -247,6 +247,12 @@ export default function Dashboard() {
                     View All Missions
                   </Button>
                 </Link>
+                <Link href="/verification-demo">
+                  <Button className="w-full justify-start bg-gradient-to-r from-purple-500 to-amber-500 hover:from-purple-600 hover:to-amber-600 text-white shadow-lg mb-2" data-testid="button-verification-demo">
+                    <Target className="mr-2 h-4 w-4" />
+                    Verification Demo
+                  </Button>
+                </Link>
                 <Link href="/lotteries">
                   <Button className="w-full justify-start btn-lottery shadow-lg" data-testid="button-view-lotteries">
                     <Trophy className="mr-2 h-4 w-4" />

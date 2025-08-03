@@ -126,15 +126,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/users/:userId/missions", async (req, res) => {
-    try {
-      const userMissions = await storage.getUserMissions(req.params.userId);
-      res.json(userMissions);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch user missions" });
-    }
-  });
-
   // Lotteries routes
   app.get("/api/lotteries", async (req, res) => {
     try {

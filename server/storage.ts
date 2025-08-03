@@ -8,7 +8,7 @@ import {
   users, missions, userMissions, lotteries, lotteryTickets, nfts, prizes, prizeRedemptions, tokenPacks, tokenPurchases
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -18,12 +18,15 @@ export interface IStorage {
   getUserByWallet(walletAddress: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUserTokens(userId: string, tokens: number): Promise<User>;
+  incrementUserMissionsCompleted(userId: string): Promise<User>;
 
   // Missions
   getMissions(): Promise<Mission[]>;
   getActiveMissions(): Promise<Mission[]>;
   getUserMissions(userId: string): Promise<UserMission[]>;
-  completeMission(userId: string, missionId: string): Promise<UserMission>;
+  startMission(userId: string, missionId: string): Promise<UserMission>;
+  completeMission(userId: string, missionId: string, verificationData?: any): Promise<UserMission>;
+  verifyMission(userMissionId: string, approved: boolean, verifiedBy: string): Promise<UserMission>;
 
   // Lotteries
   getLotteries(): Promise<Lottery[]>;
@@ -475,15 +478,18 @@ export class DatabaseStorage implements IStorage {
         // Update to in_progress
         const [updated] = await db
           .update(userMissions)
-          .set({ status: "in_progress", startedAt: new Date() })
+          .set({ 
+            status: "in_progress",
+            startedAt: new Date()
+          })
           .where(eq(userMissions.id, existingMission.id))
           .returning();
         return updated;
       }
       return existingMission;
     }
-
-    // Create new mission in progress
+    
+    // Create new mission record
     const [userMission] = await db
       .insert(userMissions)
       .values({
@@ -491,42 +497,45 @@ export class DatabaseStorage implements IStorage {
         missionId,
         status: "in_progress",
         startedAt: new Date(),
+        verificationStatus: "none"
       })
       .returning();
     
     return userMission;
   }
 
-  async verifyMission(userMissionId: string, approved: boolean, verifiedBy: string = "admin"): Promise<UserMission> {
+  async verifyMission(userMissionId: string, approved: boolean, verifiedBy: string): Promise<UserMission> {
+    // Get the user mission
     const [userMission] = await db
       .select()
       .from(userMissions)
       .where(eq(userMissions.id, userMissionId));
-
+    
     if (!userMission) {
       throw new Error("User mission not found");
     }
 
+    // Get the mission to award tokens
     const [mission] = await db
       .select()
       .from(missions)
       .where(eq(missions.id, userMission.missionId));
-
+    
     if (!mission) {
       throw new Error("Mission not found");
     }
 
-    const tokensAwarded = approved ? mission.reward : 0;
-    const status = approved ? "completed" : "failed";
-    const verificationStatus = approved ? "approved" : "rejected";
-
+    const now = new Date();
+    let status = approved ? "completed" : "failed";
+    let tokensAwarded = approved ? mission.reward : 0;
+    
     const [updated] = await db
       .update(userMissions)
-      .set({
+      .set({ 
         status,
-        completedAt: approved ? new Date() : null,
+        completedAt: approved ? now : null,
         tokensAwarded,
-        verificationStatus,
+        verificationStatus: approved ? "approved" : "rejected",
         verifiedBy
       })
       .where(eq(userMissions.id, userMissionId))
@@ -541,13 +550,15 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
-  private async incrementUserMissionsCompleted(userId: string): Promise<void> {
-    await db
+  async incrementUserMissionsCompleted(userId: string): Promise<User> {
+    const [updated] = await db
       .update(users)
-      .set({
+      .set({ 
         totalMissionsCompleted: sql`${users.totalMissionsCompleted} + 1`
       })
-      .where(eq(users.id, userId));
+      .where(eq(users.id, userId))
+      .returning();
+    return updated;
   }
 
   // Lotteries
