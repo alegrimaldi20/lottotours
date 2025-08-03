@@ -13,7 +13,7 @@ import { z } from "zod";
 let stripe: Stripe | null = null;
 if (process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.length > 20) {
   stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2023-10-16",
+    apiVersion: "2025-07-30.basil",
   });
   console.log("Stripe initialized successfully");
 } else {
@@ -94,7 +94,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userMission = await storage.startMission(req.params.userId, req.params.missionId);
       res.status(201).json(userMission);
     } catch (error) {
-      res.status(500).json({ message: "Failed to start mission", error: error.message });
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      res.status(500).json({ message: "Failed to start mission", error: errorMessage });
     }
   });
 
@@ -108,7 +109,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       res.status(201).json(userMission);
     } catch (error) {
-      res.status(400).json({ message: error.message || "Failed to complete mission" });
+      const errorMessage = error instanceof Error ? error.message : "Failed to complete mission";
+      res.status(400).json({ message: errorMessage });
     }
   });
 
@@ -122,7 +124,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       res.status(200).json(userMission);
     } catch (error) {
-      res.status(400).json({ message: error.message || "Failed to verify mission" });
+      const errorMessage = error instanceof Error ? error.message : "Failed to verify mission";
+      res.status(400).json({ message: errorMessage });
     }
   });
 
