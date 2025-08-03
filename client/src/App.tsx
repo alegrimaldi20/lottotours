@@ -13,6 +13,7 @@ import Marketplace from "./pages/marketplace";
 import Lotteries from "./pages/lotteries";
 import LotteryDetail from "./pages/lottery-detail";
 import TokenShop from "./pages/token-shop";
+import Missions from "./pages/missions";
 import NotFound from "@/pages/not-found";
 
 export const ToastContext = React.createContext<{
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/lottery/:id" component={LotteryDetail} />
       <Route path="/marketplace" component={Marketplace} />
       <Route path="/token-shop" component={TokenShop} />
+      <Route path="/missions" component={Missions} />
       <Route component={NotFound} />
     </Switch>
   );

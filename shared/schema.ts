@@ -25,6 +25,11 @@ export const missions = pgTable("missions", {
   difficulty: text("difficulty").notNull(), // easy, medium, hard
   location: text("location"), // optional location theme
   icon: text("icon").notNull(),
+  verificationMethod: text("verification_method").notNull().default("auto"), // auto, manual, proof_required, time_based
+  verificationCriteria: text("verification_criteria"), // JSON string with specific criteria
+  completionTimeLimit: integer("completion_time_limit"), // minutes to complete after starting
+  requiredProofType: text("required_proof_type"), // photo, text, location, none
+  autoCompleteDelay: integer("auto_complete_delay").default(0), // seconds before auto-completion
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -33,8 +38,13 @@ export const userMissions = pgTable("user_missions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id),
   missionId: varchar("mission_id").notNull().references(() => missions.id),
-  status: text("status").notNull().default("active"), // active, completed, claimed
+  status: text("status").notNull().default("active"), // active, in_progress, pending_verification, completed, failed, claimed
+  startedAt: timestamp("started_at"),
   completedAt: timestamp("completed_at"),
+  verificationData: text("verification_data"), // JSON string with proof/verification info
+  tokensAwarded: integer("tokens_awarded").default(0),
+  verificationStatus: text("verification_status").default("none"), // none, pending, approved, rejected
+  verifiedBy: text("verified_by"), // system, admin, or verification method
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -143,6 +153,22 @@ export const insertMissionSchema = createInsertSchema(missions).omit({
   createdAt: true,
 });
 
+export const insertUserMissionSchema = createInsertSchema(userMissions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const missionVerificationSchema = z.object({
+  proofType: z.enum(["photo", "text", "location", "none"]),
+  proofData: z.string().optional(),
+  location: z.object({
+    latitude: z.number(),
+    longitude: z.number(),
+    accuracy: z.number().optional(),
+  }).optional(),
+  additionalData: z.record(z.any()).optional(),
+});
+
 export const insertLotterySchema = createInsertSchema(lotteries).omit({
   id: true,
   createdAt: true,
@@ -188,6 +214,8 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Mission = typeof missions.$inferSelect;
 export type InsertMission = z.infer<typeof insertMissionSchema>;
 export type UserMission = typeof userMissions.$inferSelect;
+export type InsertUserMission = z.infer<typeof insertUserMissionSchema>;
+export type MissionVerification = z.infer<typeof missionVerificationSchema>;
 export type Lottery = typeof lotteries.$inferSelect;
 export type InsertLottery = z.infer<typeof insertLotterySchema>;
 export type LotteryTicket = typeof lotteryTickets.$inferSelect;

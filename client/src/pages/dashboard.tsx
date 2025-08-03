@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { type User, type Mission } from "@shared/schema";
+import { type User, type Mission, type UserMission } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Coins, Trophy, Map, Star, ArrowRight, Gift, Users, Target } from "lucide-react";
 import TravelImageRenderer from "@/components/travel-image-renderer";
+import MissionVerification from "@/components/mission-verification";
 
 
 // Using sample user for demo
@@ -25,6 +26,10 @@ export default function Dashboard() {
 
   const { data: missions, isLoading: missionsLoading } = useQuery<Mission[]>({
     queryKey: ["/api/missions"],
+  });
+
+  const { data: userMissions } = useQuery<(UserMission & { mission: Mission })[]>({
+    queryKey: [`/api/users/${SAMPLE_USER_ID}/missions`],
   });
 
   const completeMissionMutation = useMutation({
@@ -236,6 +241,12 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
+                <Link href="/missions">
+                  <Button className="w-full justify-start btn-adventure shadow-lg mb-2" data-testid="button-view-missions">
+                    <Target className="mr-2 h-4 w-4" />
+                    View All Missions
+                  </Button>
+                </Link>
                 <Link href="/lotteries">
                   <Button className="w-full justify-start btn-lottery shadow-lg" data-testid="button-view-lotteries">
                     <Trophy className="mr-2 h-4 w-4" />

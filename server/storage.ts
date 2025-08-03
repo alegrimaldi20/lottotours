@@ -72,41 +72,82 @@ export class DatabaseStorage implements IStorage {
 
   private async initializeSampleData() {
     try {
-      // Insert missions
+      // Insert missions with verification methods
       await db.insert(missions).values([
         {
           id: "mission-paris-culture",
-          title: "Discover Paris Culture",
-          description: "Learn about 3 famous Parisian landmarks and their history",
+          title: "Discover Parisian Culture",
+          description: "Visit a local museum and share your experience with traditional French culture",
           type: "cultural",
-          reward: 50,
+          reward: 150,
           difficulty: "easy",
-          location: "Paris",
-          icon: "paris",
-          isActive: true,
-        },
-        {
-          id: "mission-tokyo-food",
-          title: "Tokyo Food Explorer",
-          description: "Identify 5 traditional Japanese dishes and their origins",
-          type: "cultural",
-          reward: 75,
-          difficulty: "medium",
-          location: "Tokyo",
-          icon: "tokyo",
+          location: "Paris, France",
+          icon: "🎨",
+          verificationMethod: "auto",
+          verificationCriteria: null,
+          completionTimeLimit: null,
+          requiredProofType: "none",
+          autoCompleteDelay: 5,
           isActive: true,
         },
         {
           id: "mission-beach-adventure",
           title: "Beach Adventure Challenge",
-          description: "Complete beach-themed activities and earn tropical rewards",
-          type: "sports",
-          reward: 100,
-          difficulty: "hard",
-          location: "Maldives",
-          icon: "tropical",
+          description: "Document your tropical beach exploration with photos and local insights",
+          type: "travel",
+          reward: 200,
+          difficulty: "medium",
+          location: "Tropical beaches",
+          icon: "🏖️",
+          verificationMethod: "proof_required",
+          verificationCriteria: JSON.stringify({
+            requiredElements: ["photo", "location", "description"],
+            minDescriptionLength: 50
+          }),
+          completionTimeLimit: null,
+          requiredProofType: "photo",
+          autoCompleteDelay: 0,
           isActive: true,
-        }
+        },
+        {
+          id: "mission-mountain-hike",
+          title: "Mountain Summit Quest",
+          description: "Complete a challenging mountain hike and capture the summit view",
+          type: "sports",
+          reward: 300,
+          difficulty: "hard",
+          location: "Mountain regions",
+          icon: "⛰️",
+          verificationMethod: "time_based",
+          verificationCriteria: JSON.stringify({
+            minimumDuration: 120,
+            requiredElevationGain: 500
+          }),
+          completionTimeLimit: 180,
+          requiredProofType: "photo",
+          autoCompleteDelay: 0,
+          isActive: true,
+        },
+        {
+          id: "mission-local-cuisine",
+          title: "Local Cuisine Explorer",
+          description: "Try 3 authentic local dishes and write a detailed review of each experience",
+          type: "cultural",
+          reward: 180,
+          difficulty: "easy",
+          location: "Any destination",
+          icon: "🍽️",
+          verificationMethod: "manual",
+          verificationCriteria: JSON.stringify({
+            requiredDishes: 3,
+            minReviewLength: 100,
+            requiresPhotos: true
+          }),
+          completionTimeLimit: null,
+          requiredProofType: "text",
+          autoCompleteDelay: 0,
+          isActive: true,
+        },
       ]);
 
       // Insert lotteries (using existing schema)
@@ -250,10 +291,12 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async updateUserTokens(userId: string, tokens: number): Promise<User> {
+  async updateUserTokens(userId: string, tokenChange: number): Promise<User> {
     const [user] = await db
       .update(users)
-      .set({ tokens })
+      .set({
+        tokens: sql`${users.tokens} + ${tokenChange}`
+      })
       .where(eq(users.id, userId))
       .returning();
     
@@ -270,11 +313,157 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(missions).where(eq(missions.isActive, true));
   }
 
-  async getUserMissions(userId: string): Promise<UserMission[]> {
-    return await db.select().from(userMissions).where(eq(userMissions.userId, userId));
+  async getUserMissions(userId: string): Promise<(UserMission & { mission: Mission })[]> {
+    return await db
+      .select({
+        id: userMissions.id,
+        userId: userMissions.userId,
+        missionId: userMissions.missionId,
+        status: userMissions.status,
+        startedAt: userMissions.startedAt,
+        completedAt: userMissions.completedAt,
+        verificationData: userMissions.verificationData,
+        tokensAwarded: userMissions.tokensAwarded,
+        verificationStatus: userMissions.verificationStatus,
+        verifiedBy: userMissions.verifiedBy,
+        createdAt: userMissions.createdAt,
+        mission: {
+          id: missions.id,
+          title: missions.title,
+          description: missions.description,
+          type: missions.type,
+          reward: missions.reward,
+          difficulty: missions.difficulty,
+          location: missions.location,
+          icon: missions.icon,
+          verificationMethod: missions.verificationMethod,
+          verificationCriteria: missions.verificationCriteria,
+          completionTimeLimit: missions.completionTimeLimit,
+          requiredProofType: missions.requiredProofType,
+          autoCompleteDelay: missions.autoCompleteDelay,
+          isActive: missions.isActive,
+          createdAt: missions.createdAt,
+        }
+      })
+      .from(userMissions)
+      .innerJoin(missions, eq(userMissions.missionId, missions.id))
+      .where(eq(userMissions.userId, userId));
   }
 
-  async completeMission(userId: string, missionId: string): Promise<UserMission> {
+  async completeMission(userId: string, missionId: string, verificationData?: any): Promise<UserMission> {
+    // Get mission details for verification requirements
+    const [mission] = await db
+      .select()
+      .from(missions)
+      .where(eq(missions.id, missionId));
+    
+    if (!mission) {
+      throw new Error("Mission not found");
+    }
+
+    // Check if mission already exists
+    const [existingMission] = await db
+      .select()
+      .from(userMissions)
+      .where(and(eq(userMissions.userId, userId), eq(userMissions.missionId, missionId)));
+    
+    const now = new Date();
+    let status = "completed";
+    let verificationStatus = "approved";
+    let verifiedBy = "system";
+    let tokensAwarded = mission.reward;
+
+    // Apply verification method logic
+    switch (mission.verificationMethod) {
+      case "auto":
+        // Immediate completion with auto-delay if specified
+        if (mission.autoCompleteDelay && mission.autoCompleteDelay > 0) {
+          status = "in_progress";
+          verificationStatus = "pending";
+          // Note: In a real system, you'd set up a delayed job here
+        }
+        break;
+      
+      case "manual":
+        status = "pending_verification";
+        verificationStatus = "pending";
+        verifiedBy = "admin";
+        tokensAwarded = 0; // No tokens until manually verified
+        break;
+      
+      case "proof_required":
+        if (!verificationData || !verificationData.proofData) {
+          throw new Error("Proof required for this mission");
+        }
+        status = "pending_verification";
+        verificationStatus = "pending";
+        verifiedBy = "system";
+        tokensAwarded = 0; // No tokens until proof is verified
+        break;
+      
+      case "time_based":
+        if (!existingMission || !existingMission.startedAt) {
+          throw new Error("Mission must be started first for time-based verification");
+        }
+        const timeElapsed = now.getTime() - existingMission.startedAt.getTime();
+        const requiredTime = (mission.completionTimeLimit || 60) * 60 * 1000; // Convert minutes to milliseconds
+        
+        if (timeElapsed < requiredTime) {
+          throw new Error(`Mission requires ${mission.completionTimeLimit} minutes to complete`);
+        }
+        break;
+    }
+    
+    if (existingMission) {
+      // Update existing mission
+      const [updated] = await db
+        .update(userMissions)
+        .set({ 
+          status,
+          completedAt: status === "completed" ? now : null,
+          verificationData: verificationData ? JSON.stringify(verificationData) : null,
+          tokensAwarded,
+          verificationStatus,
+          verifiedBy
+        })
+        .where(eq(userMissions.id, existingMission.id))
+        .returning();
+
+      // Award tokens if immediately approved
+      if (tokensAwarded > 0) {
+        await this.updateUserTokens(userId, tokensAwarded);
+        await this.incrementUserMissionsCompleted(userId);
+      }
+
+      return updated;
+    }
+
+    // Create new mission record
+    const [userMission] = await db
+      .insert(userMissions)
+      .values({
+        userId,
+        missionId,
+        status,
+        startedAt: status === "in_progress" ? now : null,
+        completedAt: status === "completed" ? now : null,
+        verificationData: verificationData ? JSON.stringify(verificationData) : null,
+        tokensAwarded,
+        verificationStatus,
+        verifiedBy
+      })
+      .returning();
+
+    // Award tokens if immediately approved
+    if (tokensAwarded > 0) {
+      await this.updateUserTokens(userId, tokensAwarded);
+      await this.incrementUserMissionsCompleted(userId);
+    }
+    
+    return userMission;
+  }
+
+  async startMission(userId: string, missionId: string): Promise<UserMission> {
     // Check if mission already exists
     const [existingMission] = await db
       .select()
@@ -282,25 +471,83 @@ export class DatabaseStorage implements IStorage {
       .where(and(eq(userMissions.userId, userId), eq(userMissions.missionId, missionId)));
     
     if (existingMission) {
-      const [updated] = await db
-        .update(userMissions)
-        .set({ status: "completed", completedAt: new Date() })
-        .where(eq(userMissions.id, existingMission.id))
-        .returning();
-      return updated;
+      if (existingMission.status === "active") {
+        // Update to in_progress
+        const [updated] = await db
+          .update(userMissions)
+          .set({ status: "in_progress", startedAt: new Date() })
+          .where(eq(userMissions.id, existingMission.id))
+          .returning();
+        return updated;
+      }
+      return existingMission;
     }
 
+    // Create new mission in progress
     const [userMission] = await db
       .insert(userMissions)
       .values({
         userId,
         missionId,
-        status: "completed",
-        completedAt: new Date(),
+        status: "in_progress",
+        startedAt: new Date(),
       })
       .returning();
     
     return userMission;
+  }
+
+  async verifyMission(userMissionId: string, approved: boolean, verifiedBy: string = "admin"): Promise<UserMission> {
+    const [userMission] = await db
+      .select()
+      .from(userMissions)
+      .where(eq(userMissions.id, userMissionId));
+
+    if (!userMission) {
+      throw new Error("User mission not found");
+    }
+
+    const [mission] = await db
+      .select()
+      .from(missions)
+      .where(eq(missions.id, userMission.missionId));
+
+    if (!mission) {
+      throw new Error("Mission not found");
+    }
+
+    const tokensAwarded = approved ? mission.reward : 0;
+    const status = approved ? "completed" : "failed";
+    const verificationStatus = approved ? "approved" : "rejected";
+
+    const [updated] = await db
+      .update(userMissions)
+      .set({
+        status,
+        completedAt: approved ? new Date() : null,
+        tokensAwarded,
+        verificationStatus,
+        verifiedBy
+      })
+      .where(eq(userMissions.id, userMissionId))
+      .returning();
+
+    // Award tokens if approved
+    if (approved && tokensAwarded > 0) {
+      await this.updateUserTokens(userMission.userId, tokensAwarded);
+      await this.incrementUserMissionsCompleted(userMission.userId);
+    }
+
+    return updated;
+  }
+
+  private async incrementUserMissionsCompleted(userId: string): Promise<void> {
+    await db
+      .update(users)
+      .set({
+        totalMissionsCompleted: sql`${users.totalMissionsCompleted} + 1`
+      })
+      .where(eq(users.id, userId));
   }
 
   // Lotteries

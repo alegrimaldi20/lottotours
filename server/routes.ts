@@ -88,12 +88,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/users/:userId/missions/:missionId/complete", async (req, res) => {
+  // Mission management routes
+  app.post("/api/users/:userId/missions/:missionId/start", async (req, res) => {
     try {
-      const userMission = await storage.completeMission(req.params.userId, req.params.missionId);
+      const userMission = await storage.startMission(req.params.userId, req.params.missionId);
       res.status(201).json(userMission);
     } catch (error) {
-      res.status(500).json({ message: "Failed to complete mission" });
+      res.status(500).json({ message: "Failed to start mission", error: error.message });
+    }
+  });
+
+  app.post("/api/users/:userId/missions/:missionId/complete", async (req, res) => {
+    try {
+      const { verificationData } = req.body;
+      const userMission = await storage.completeMission(
+        req.params.userId, 
+        req.params.missionId,
+        verificationData
+      );
+      res.status(201).json(userMission);
+    } catch (error) {
+      res.status(400).json({ message: error.message || "Failed to complete mission" });
+    }
+  });
+
+  app.post("/api/user-missions/:userMissionId/verify", async (req, res) => {
+    try {
+      const { approved, verifiedBy } = req.body;
+      const userMission = await storage.verifyMission(
+        req.params.userMissionId,
+        approved,
+        verifiedBy || "admin"
+      );
+      res.status(200).json(userMission);
+    } catch (error) {
+      res.status(400).json({ message: error.message || "Failed to verify mission" });
+    }
+  });
+
+  app.get("/api/users/:userId/missions", async (req, res) => {
+    try {
+      const userMissions = await storage.getUserMissions(req.params.userId);
+      res.json(userMissions);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user missions" });
     }
   });
 
