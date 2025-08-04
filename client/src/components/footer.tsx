@@ -91,13 +91,18 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors" data-testid="footer-link-privacy">
+                <a href="/privacy-policy" className="hover:text-white transition-colors" data-testid="footer-link-privacy">
                   Privacy Policy
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors" data-testid="footer-link-terms">
+                <a href="/terms-of-service" className="hover:text-white transition-colors" data-testid="footer-link-terms">
                   Terms of Service
+                </a>
+              </li>
+              <li>
+                <a href="/operating-conditions" className="hover:text-white transition-colors" data-testid="footer-link-operations">
+                  Operating Conditions
                 </a>
               </li>
               <li>

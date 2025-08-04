@@ -15,6 +15,10 @@ import LotteryDetail from "./pages/lottery-detail";
 import TokenShop from "./pages/token-shop";
 import Missions from "./pages/missions";
 import VerificationDemo from "./pages/verification-demo";
+import TermsOfService from "./pages/terms-of-service";
+import PrivacyPolicy from "./pages/privacy-policy";
+import OperatingConditions from "./pages/operating-conditions";
+import ServiceConditionsDashboard from "./pages/service-conditions-dashboard";
 import NotFound from "@/pages/not-found";
 
 export const ToastContext = React.createContext<{
@@ -42,6 +46,10 @@ function Router() {
       <Route path="/token-shop" component={TokenShop} />
       <Route path="/missions" component={Missions} />
       <Route path="/verification-demo" component={VerificationDemo} />
+      <Route path="/terms-of-service" component={TermsOfService} />
+      <Route path="/privacy-policy" component={PrivacyPolicy} />
+      <Route path="/operating-conditions" component={OperatingConditions} />
+      <Route path="/service-conditions" component={ServiceConditionsDashboard} />
       <Route component={NotFound} />
     </Switch>
   );

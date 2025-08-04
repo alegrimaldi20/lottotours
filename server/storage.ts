@@ -5,7 +5,8 @@ import {
   type NFT, type InsertNFT,
   type Prize, type InsertPrize, type PrizeRedemption, type InsertPrizeRedemption,
   type TokenPack, type InsertTokenPack, type TokenPurchase, type InsertTokenPurchase,
-  users, missions, userMissions, lotteries, lotteryTickets, nfts, prizes, prizeRedemptions, tokenPacks, tokenPurchases
+  type ServiceCondition, type InsertServiceCondition, type UserAgreement, type InsertUserAgreement,
+  users, missions, userMissions, lotteries, lotteryTickets, nfts, prizes, prizeRedemptions, tokenPacks, tokenPurchases, serviceConditions, userAgreements
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";

@@ -139,6 +139,32 @@ export const tokenPurchases = pgTable("token_purchases", {
   purchasedAt: timestamp("purchased_at").defaultNow(),
 });
 
+export const serviceConditions = pgTable("service_conditions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  conditionType: text("condition_type").notNull(), // terms_of_service, privacy_policy, operating_conditions
+  version: text("version").notNull(),
+  title: text("title").notNull(),
+  content: text("content").notNull(), // JSON string with sections and rules
+  effectiveDate: timestamp("effective_date").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userAgreements = pgTable("user_agreements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  serviceConditionId: varchar("service_condition_id").notNull().references(() => serviceConditions.id),
+  conditionType: text("condition_type").notNull(), // terms_of_service, privacy_policy, operating_conditions
+  version: text("version").notNull(),
+  agreementStatus: text("agreement_status").notNull().default("pending"), // pending, accepted, revoked
+  sectionsAccepted: text("sections_accepted").array(), // array of section IDs accepted by user
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  agreementData: text("agreement_data"), // JSON string with additional agreement metadata
+  agreedAt: timestamp("agreed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -208,6 +234,16 @@ export const insertTokenPurchaseSchema = createInsertSchema(tokenPurchases).omit
   purchasedAt: true,
 });
 
+export const insertServiceConditionSchema = createInsertSchema(serviceConditions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserAgreementSchema = createInsertSchema(userAgreements).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -230,3 +266,7 @@ export type TokenPack = typeof tokenPacks.$inferSelect;
 export type InsertTokenPack = z.infer<typeof insertTokenPackSchema>;
 export type TokenPurchase = typeof tokenPurchases.$inferSelect;
 export type InsertTokenPurchase = z.infer<typeof insertTokenPurchaseSchema>;
+export type ServiceCondition = typeof serviceConditions.$inferSelect;
+export type InsertServiceCondition = z.infer<typeof insertServiceConditionSchema>;
+export type UserAgreement = typeof userAgreements.$inferSelect;
+export type InsertUserAgreement = z.infer<typeof insertUserAgreementSchema>;
