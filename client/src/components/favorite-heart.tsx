@@ -111,9 +111,9 @@ export default function FavoriteHeart({
   };
 
   const sizeClasses = {
-    sm: "h-4 w-4",
-    md: "h-5 w-5", 
-    lg: "h-6 w-6"
+    sm: "h-3 w-3 sm:h-4 sm:w-4",
+    md: "h-4 w-4 sm:h-5 sm:w-5", 
+    lg: "h-5 w-5 sm:h-6 sm:w-6"
   };
 
   const isPending = addFavoriteMutation.isPending || removeFavoriteMutation.isPending;

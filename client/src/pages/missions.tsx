@@ -31,27 +31,28 @@ export default function Missions() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-4 md:py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
+        {/* Header - Mobile Responsive */}
+        <div className="mb-6 md:mb-8">
           <div className="flex items-center gap-4 mb-4">
             <Link href="/dashboard">
               <Button variant="outline" size="sm">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
+                <span className="hidden sm:inline">Back to Dashboard</span>
+                <span className="sm:hidden">Back</span>
               </Button>
             </Link>
           </div>
           
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-slate-900 mb-2">Mission Control</h1>
-              <p className="text-lg text-slate-600">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-2">Mission Control</h1>
+              <p className="text-sm sm:text-base md:text-lg text-slate-600">
                 Complete missions with advanced verification systems to earn tokens and unlock travel rewards
               </p>
             </div>
-            <Badge variant="outline" className="text-lg px-4 py-2">
+            <Badge variant="outline" className="text-sm sm:text-base md:text-lg px-3 py-2 self-start">
               {missions?.length || 0} missions available
             </Badge>
           </div>
@@ -63,7 +64,7 @@ export default function Missions() {
             <CardTitle className="text-blue-900">Mission Verification Methods</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 text-xs sm:text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 <span><strong>Auto:</strong> Instant completion</span>

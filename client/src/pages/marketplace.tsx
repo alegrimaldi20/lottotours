@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Coins, Gift, MapPin, Package, Percent, Clock, Check } from "lucide-react";
 import TravelImageRenderer from "@/components/travel-image-renderer";
 import FavoriteHeart from "@/components/favorite-heart";
+import MobileNavigation from "@/components/mobile-navigation";
 
 // Using sample user for demo
 const SAMPLE_USER_ID = "sample-user";
@@ -33,10 +34,14 @@ export default function Marketplace() {
         throw new Error("Insufficient tokens");
       }
       
-      const response = await apiRequest("POST", "/api/prize-redemptions", {
-        userId: SAMPLE_USER_ID,
-        prizeId,
-        status: "pending"
+      const response = await apiRequest("/api/prize-redemptions", {
+        method: "POST",
+        body: JSON.stringify({
+          userId: SAMPLE_USER_ID,
+          prizeId,
+          status: "pending"
+        }),
+        headers: { "Content-Type": "application/json" }
       });
       return response.json();
     },
@@ -115,16 +120,16 @@ export default function Marketplace() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
-      {/* Header */}
+      {/* Header - Mobile Responsive */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/">
-              <div className="text-2xl font-bold gradient-travel bg-clip-text text-transparent" data-testid="logo">
+              <div className="text-xl sm:text-2xl font-bold gradient-travel bg-clip-text text-transparent" data-testid="logo">
                 🌟 TravelLotto
               </div>
             </Link>
-            <nav className="flex space-x-6">
+            <nav className="hidden md:flex space-x-6">
               <Link href="/dashboard">
                 <Button variant="ghost" data-testid="nav-dashboard">Dashboard</Button>
               </Link>
@@ -135,17 +140,19 @@ export default function Marketplace() {
                 <Button variant="ghost" className="bg-blue-50 text-explore-blue" data-testid="nav-marketplace">Marketplace</Button>
               </Link>
             </nav>
+            {/* Mobile Navigation */}
+            <MobileNavigation currentPath="/marketplace" />
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4" data-testid="marketplace-title">
+        {/* Header Section - Mobile Responsive */}
+        <div className="text-center mb-8 md:mb-12">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-4" data-testid="marketplace-title">
             🏪 Prize Marketplace
           </h1>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-6" data-testid="marketplace-subtitle">
+          <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto mb-6 px-4" data-testid="marketplace-subtitle">
             Redeem your hard-earned tokens for amazing travel packages, experiences, and exclusive rewards
           </p>
           
@@ -160,7 +167,7 @@ export default function Marketplace() {
 
         {/* Category Tabs */}
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 mb-8">
             {categories.map((category) => (
               <TabsTrigger key={category} value={category} className="flex items-center gap-2" data-testid={`tab-${category}`}>
                 {category !== 'all' && categoryIcon(category)}
@@ -171,7 +178,7 @@ export default function Marketplace() {
 
           {categories.map((category) => (
             <TabsContent key={category} value={category}>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 {filterPrizesByCategory(category).map((prize) => {
                   const canAfford = user ? user.tokens >= prize.tokensRequired : false;
                   const isAvailable = prize.availability > 0;
@@ -183,8 +190,8 @@ export default function Marketplace() {
                       data-testid={`prize-${prize.id}`}
                     >
                       <div className="relative">
-                        {/* Prize Image/Icon */}
-                        <div className="h-40 bg-gradient-adventure flex items-center justify-center overflow-hidden">
+                        {/* Prize Image/Icon - Responsive */}
+                        <div className="h-32 sm:h-40 bg-gradient-adventure flex items-center justify-center overflow-hidden">
                           <TravelImageRenderer type="prize" theme={prize.image} className="w-full h-full object-cover" />
                         </div>
                         

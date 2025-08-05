@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { Coins, Trophy, Map, Star, ArrowRight, Gift, Users, User as UserIcon, Target, Crown } from "lucide-react";
 import TravelImageRenderer from "@/components/travel-image-renderer";
 import MissionVerification from "@/components/mission-verification";
+import MobileNavigation from "@/components/mobile-navigation";
 
 
 // Using sample user for demo
@@ -84,16 +85,16 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
-      {/* Header */}
+      {/* Header - Mobile Responsive */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/">
-              <div className="text-2xl font-bold gradient-travel bg-clip-text text-transparent" data-testid="logo">
+              <div className="text-xl sm:text-2xl font-bold gradient-travel bg-clip-text text-transparent" data-testid="logo">
                 🌟 TravelLotto
               </div>
             </Link>
-            <nav className="flex space-x-6">
+            <nav className="hidden lg:flex space-x-4 xl:space-x-6">
               <Link href="/dashboard">
                 <Button variant="ghost" data-testid="nav-dashboard">Dashboard</Button>
               </Link>
@@ -103,36 +104,29 @@ export default function Dashboard() {
               <Link href="/marketplace">
                 <Button variant="ghost" data-testid="nav-marketplace">Marketplace</Button>
               </Link>
-              <Link href="/winner-dashboard">
-                <Button variant="ghost" data-testid="nav-winners">My Prizes</Button>
-              </Link>
-              <Link href="/affiliate-dashboard">
-                <Button variant="ghost" data-testid="nav-affiliate">Affiliate Program</Button>
-              </Link>
-              <Link href="/country-operations">
-                <Button variant="ghost" data-testid="nav-operations">Global Operations</Button>
-              </Link>
-              <Link href="/unique-ids">
-                <Button variant="ghost" data-testid="nav-unique-ids">Unique IDs</Button>
+              <Link href="/profile">
+                <Button variant="ghost" data-testid="nav-profile">Profile</Button>
               </Link>
             </nav>
+            {/* Mobile Navigation */}
+            <MobileNavigation currentPath="/dashboard" />
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2" data-testid="welcome-title">
+        {/* Welcome Section - Mobile Responsive */}
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2" data-testid="welcome-title">
             Welcome back, {user?.username || 'Explorer'}! 🌍
           </h1>
-          <p className="text-slate-600" data-testid="welcome-subtitle">
+          <p className="text-slate-600 text-sm sm:text-base" data-testid="welcome-subtitle">
             Ready for your next adventure? Complete missions and enter lotteries to win amazing prizes!
           </p>
         </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {/* Stats Overview - Mobile Responsive */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
           <Card className="bg-lottery-card border-lottery-gold/20 shadow-lg" data-testid="stat-tokens">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Tokens</CardTitle>

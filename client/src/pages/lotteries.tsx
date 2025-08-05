@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { Trophy, Clock, Users, Ticket, Coins, Calendar, MapPin } from "lucide-react";
 import TravelImageRenderer from "@/components/travel-image-renderer";
 import FavoriteHeart from "@/components/favorite-heart";
+import MobileNavigation from "@/components/mobile-navigation";
 
 // Using sample user for demo
 const SAMPLE_USER_ID = "sample-user";
@@ -100,16 +101,16 @@ export default function Lotteries() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
-      {/* Header */}
+      {/* Header - Mobile Responsive */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/">
-              <div className="text-2xl font-bold gradient-travel bg-clip-text text-transparent" data-testid="logo">
+              <div className="text-xl sm:text-2xl font-bold gradient-travel bg-clip-text text-transparent" data-testid="logo">
                 🌟 TravelLotto
               </div>
             </Link>
-            <nav className="flex space-x-6">
+            <nav className="hidden md:flex space-x-6">
               <Link href="/dashboard">
                 <Button variant="ghost" data-testid="nav-dashboard">Dashboard</Button>
               </Link>
@@ -120,17 +121,19 @@ export default function Lotteries() {
                 <Button variant="ghost" data-testid="nav-marketplace">Marketplace</Button>
               </Link>
             </nav>
+            {/* Mobile Navigation */}
+            <MobileNavigation currentPath="/lotteries" />
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4" data-testid="lotteries-title">
+        {/* Header Section - Mobile Responsive */}
+        <div className="text-center mb-8 md:mb-12">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-4" data-testid="lotteries-title">
             🎲 Active Travel Lotteries
           </h1>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-6" data-testid="lotteries-subtitle">
+          <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto mb-6 px-4" data-testid="lotteries-subtitle">
             Enter exciting lotteries for a chance to win amazing travel packages and experiences
           </p>
           
@@ -143,8 +146,8 @@ export default function Lotteries() {
           </div>
         </div>
 
-        {/* Lotteries Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+        {/* Lotteries Grid - Responsive */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
           {lotteries?.map((lottery) => {
             const ticketsSoldPercentage = (lottery.soldTickets / lottery.maxTickets) * 100;
             const timeRemaining = formatTimeRemaining(lottery.drawDate);
