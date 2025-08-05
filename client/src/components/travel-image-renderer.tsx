@@ -19,11 +19,14 @@ export const TravelImageRenderer: React.FC<TravelImageProps> = ({
     // Handle lottery images with authentic destination photography
     if (type === "lottery") {
       switch (theme) {
+        case "bali": return "tropical";
+        case "patagonia": return "adventure";
+        case "morocco": return "cultural";
         case "paris": return "paris";
         case "tropical": return "tropical";
         case "tokyo": return "tokyo";
         case "europe": return "europe";
-        default: return "paris";
+        default: return "tropical";
       }
     }
     

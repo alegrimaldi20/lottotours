@@ -120,8 +120,30 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
-          <p data-testid="footer-copyright">&copy; 2025 TravelLotto. All rights reserved.</p>
+        <div className="border-t border-slate-800 mt-8 pt-8">
+          <div className="grid md:grid-cols-2 gap-8 mb-6">
+            <div>
+              <h4 className="font-semibold mb-4 text-white">Platform Features</h4>
+              <ul className="space-y-2 text-slate-400 text-sm">
+                <li>✓ Blockchain-verified lottery drawings with unique codes</li>
+                <li>✓ QR code verification for winning tickets</li>
+                <li>✓ Multi-language support (English, Spanish, Portuguese)</li>
+                <li>✓ Secure token-based economy</li>
+                <li>✓ Real travel packages and experiences</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4 text-white">Current Destinations</h4>
+              <ul className="space-y-2 text-slate-400 text-sm">
+                <li>🏝️ Bali Cultural Immersion - 8 days</li>
+                <li>🏔️ Patagonia Wilderness - 10 days</li>
+                <li>🏜️ Morocco Desert & Cities - 12 days</li>
+              </ul>
+            </div>
+          </div>
+          <div className="text-center text-slate-400">
+            <p data-testid="footer-copyright">&copy; 2025 TravelLotto. All rights reserved. | Blockchain-powered travel experiences.</p>
+          </div>
         </div>
       </div>
     </footer>
