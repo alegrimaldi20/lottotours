@@ -112,6 +112,11 @@ export default function Dashboard() {
               <Link href="/marketplace">
                 <Button variant="ghost" data-testid="nav-marketplace">Marketplace</Button>
               </Link>
+              <Link href="/country-operations">
+                <Button variant="ghost" data-testid="nav-expansion">
+                  <span className="hidden xl:inline">South American</span> Expansion
+                </Button>
+              </Link>
               <Link href="/profile">
                 <Button variant="ghost" data-testid="nav-profile">Profile</Button>
               </Link>
@@ -283,6 +288,16 @@ export default function Dashboard() {
                   <Button className="w-full justify-start btn-lottery shadow-lg" data-testid="button-token-shop">
                     <Coins className="mr-2 h-4 w-4" />
                     Buy Token Packs
+                  </Button>
+                </Link>
+                <Link href="/country-operations">
+                  <Button className="w-full justify-start bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg" data-testid="button-country-operations">
+                    <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/>
+                      <path d="M12 2v20"/>
+                      <path d="M21 12H3"/>
+                    </svg>
+                    South American Expansion
                   </Button>
                 </Link>
                 <Link href="/affiliate-dashboard">
