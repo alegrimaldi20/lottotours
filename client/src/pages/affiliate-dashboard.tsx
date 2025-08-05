@@ -4,7 +4,9 @@ import { Link } from "wouter";
 import { 
   Link as LinkIcon, Users, TrendingUp, DollarSign, Award, Copy,
   Eye, MousePointer, UserPlus, ShoppingCart, Trophy, Calendar,
-  BarChart3, PieChart, Target, Zap, Crown, Star, Gift
+  BarChart3, PieChart, Target, Zap, Crown, Star, Gift, Download,
+  Share2, Mail, MessageSquare, Globe, Smartphone, Monitor,
+  TrendingDown, RefreshCw, Filter, ArrowUpRight, ArrowDownRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +17,8 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import CampaignCreator from "@/components/campaign-creator";
 
 // Sample affiliate program data
 const sampleAffiliateProgram = {
@@ -61,7 +65,8 @@ const sampleRecentReferrals = [
     firstTransactionAmount: 18900, // $189
     totalSpent: 18900,
     status: "converted",
-    source: "social_media"
+    source: "social_media",
+    campaign: "summer_adventure"
   },
   {
     id: "ref-2", 
@@ -69,7 +74,8 @@ const sampleRecentReferrals = [
     username: "wanderlust_maria",
     registeredAt: new Date("2025-01-19T16:45:00Z"),
     status: "registered",
-    source: "email"
+    source: "email",
+    campaign: "newsletter_january"
   },
   {
     id: "ref-3",
@@ -80,8 +86,56 @@ const sampleRecentReferrals = [
     firstTransactionAmount: 12500, // $125
     totalSpent: 24800, // $248 (repeat customer)
     status: "converted",
-    source: "banner"
+    source: "banner",
+    campaign: "winter_promo"
   }
+];
+
+const sampleLeaderboard = [
+  {
+    rank: 1,
+    agencyName: "European Adventures",
+    totalReferrals: 156,
+    convertedReferrals: 42,
+    totalRevenue: 127800, // $1,278
+    commissionEarned: 25560, // $255.60
+    conversionRate: 0.269,
+    badge: "platinum"
+  },
+  {
+    rank: 2,
+    agencyName: "Nordic Expeditions", 
+    totalReferrals: 134,
+    convertedReferrals: 31,
+    totalRevenue: 98500, // $985
+    commissionEarned: 19700, // $197
+    conversionRate: 0.231,
+    badge: "gold"
+  },
+  {
+    rank: 3,
+    agencyName: "Mediterranean Tours",
+    totalReferrals: 89,
+    convertedReferrals: 23,
+    totalRevenue: 76300, // $763
+    commissionEarned: 13734, // $137.34
+    conversionRate: 0.258,
+    badge: "silver"
+  }
+];
+
+const sampleTrafficSources = [
+  { source: "Social Media", clicks: 487, conversions: 12, rate: 2.46, revenue: 34200 },
+  { source: "Email Campaigns", clicks: 312, conversions: 8, rate: 2.56, revenue: 22500 },
+  { source: "Banner Ads", clicks: 298, conversions: 3, rate: 1.01, revenue: 8900 },
+  { source: "Direct Links", clicks: 150, conversions: 5, rate: 3.33, revenue: 15600 }
+];
+
+const sampleCampaignPerformance = [
+  { name: "Summer Adventure", clicks: 245, conversions: 8, revenue: 18700, roi: 234 },
+  { name: "Winter Promo", clicks: 189, conversions: 6, revenue: 14200, roi: 198 },
+  { name: "Newsletter January", clicks: 167, conversions: 4, revenue: 9800, roi: 156 },
+  { name: "Holiday Special", clicks: 134, conversions: 5, revenue: 12300, roi: 211 }
 ];
 
 const tierColors = {
@@ -100,6 +154,7 @@ const tierIcons = {
 
 export default function AffiliateDashboard() {
   const [copiedLink, setCopiedLink] = useState(false);
+  const [showCampaignCreator, setShowCampaignCreator] = useState(false);
   const { toast } = useToast();
 
   // Mock queries - replace with real API calls
@@ -115,6 +170,21 @@ export default function AffiliateDashboard() {
 
   const { data: recentReferrals = sampleRecentReferrals } = useQuery({
     queryKey: ['/api/affiliate/agency-1/referrals'],
+    enabled: true
+  });
+
+  const { data: leaderboard = sampleLeaderboard } = useQuery({
+    queryKey: ['/api/affiliate/leaderboard/monthly'],
+    enabled: true
+  });
+
+  const { data: trafficSources = sampleTrafficSources } = useQuery({
+    queryKey: ['/api/affiliate/agency-1/traffic-sources'],
+    enabled: true
+  });
+
+  const { data: campaignPerformance = sampleCampaignPerformance } = useQuery({
+    queryKey: ['/api/affiliate/agency-1/campaigns'],
     enabled: true
   });
 
@@ -164,6 +234,15 @@ export default function AffiliateDashboard() {
   };
 
   const currentTierInfo = getTierInfo(referralStats.currentTier);
+
+  const handleCreateCampaign = (campaignData: any) => {
+    console.log("Creating campaign:", campaignData);
+    setShowCampaignCreator(false);
+    toast({
+      title: "Campaign Created!",
+      description: `Campaign "${campaignData.name}" has been created successfully.`,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -244,9 +323,21 @@ export default function AffiliateDashboard() {
           </Card>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Affiliate Link & Tools */}
-          <div className="lg:col-span-2 space-y-8">
+        {/* Advanced Analytics Tabs */}
+        <Tabs defaultValue="overview" className="w-full mb-8">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+            <TabsTrigger value="payouts">Payouts</TabsTrigger>
+          </TabsList>
+
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-8">
+            <div className="grid lg:grid-cols-3 gap-8">
+              {/* Affiliate Link & Tools */}
+              <div className="lg:col-span-2 space-y-8">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -340,6 +431,11 @@ export default function AffiliateDashboard() {
                         {referral.totalSpent > 0 && (
                           <p className="text-sm font-semibold text-green-600 mt-1">
                             {formatCurrency(referral.totalSpent)}
+                          </p>
+                        )}
+                        {referral.campaign && (
+                          <p className="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded mt-1 inline-block">
+                            {referral.campaign.replace('_', ' ')}
                           </p>
                         )}
                       </div>
@@ -445,21 +541,322 @@ export default function AffiliateDashboard() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button variant="outline" className="w-full justify-start">
-                  <Eye className="mr-2 h-4 w-4" />
+                  <Download className="mr-2 h-4 w-4" />
                   Download Banners
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <PieChart className="mr-2 h-4 w-4" />
+                  <Mail className="mr-2 h-4 w-4" />
                   Email Templates
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <BarChart3 className="mr-2 h-4 w-4" />
+                  <Share2 className="mr-2 h-4 w-4" />
                   Social Media Kit
+                </Button>
+                <Button variant="outline" className="w-full justify-start">
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  WhatsApp Templates
                 </Button>
               </CardContent>
             </Card>
-          </div>
-        </div>
+
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-yellow-600" />
+                  Quick Actions
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button className="w-full justify-start bg-blue-600 hover:bg-blue-700 text-white">
+                  <Globe className="mr-2 h-4 w-4" />
+                  Create Landing Page
+                </Button>
+                <Button variant="outline" className="w-full justify-start">
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  Generate QR Code
+                </Button>
+                <Button variant="outline" className="w-full justify-start">
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Reset Link Analytics
+                </Button>
+              </CardContent>
+            </Card>
+            </div>
+            </div>
+          </TabsContent>
+
+          {/* Leaderboard Tab */}
+          <TabsContent value="leaderboard" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-yellow-600" />
+                  Monthly Affiliate Leaderboard
+                </CardTitle>
+                <CardDescription>
+                  Top performing travel agencies this month
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {leaderboard.map((entry, index) => (
+                    <div key={index} className={`p-4 rounded-lg border ${
+                      entry.rank === 1 ? 'border-yellow-500 bg-yellow-50' :
+                      entry.rank === 2 ? 'border-gray-400 bg-gray-50' :
+                      entry.rank === 3 ? 'border-amber-600 bg-amber-50' :
+                      'border-slate-200 bg-white'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                            entry.rank === 1 ? 'bg-yellow-500 text-white' :
+                            entry.rank === 2 ? 'bg-gray-400 text-white' :
+                            entry.rank === 3 ? 'bg-amber-600 text-white' :
+                            'bg-slate-200 text-slate-700'
+                          }`}>
+                            {entry.rank}
+                          </div>
+                          <div>
+                            <h3 className="font-semibold">{entry.agencyName}</h3>
+                            <div className="flex items-center gap-4 text-sm text-slate-600">
+                              <span>{entry.totalReferrals} referrals</span>
+                              <span>{entry.convertedReferrals} conversions</span>
+                              <span>{(entry.conversionRate * 100).toFixed(1)}% rate</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-green-600">{formatCurrency(entry.commissionEarned)}</p>
+                          <p className="text-sm text-slate-500">{formatCurrency(entry.totalRevenue)} revenue</p>
+                          <Badge className={`mt-1 ${tierColors[entry.badge as keyof typeof tierColors]}`}>
+                            {entry.badge.charAt(0).toUpperCase() + entry.badge.slice(1)}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Traffic Sources */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-blue-600" />
+                    Traffic Sources
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {trafficSources.map((source, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                        <div>
+                          <p className="font-medium">{source.source}</p>
+                          <p className="text-sm text-slate-500">{source.clicks} clicks</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold">{source.rate.toFixed(2)}%</p>
+                          <p className="text-sm text-green-600">{formatCurrency(source.revenue)}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Device Breakdown */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Monitor className="h-5 w-5 text-purple-600" />
+                    Device Analytics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Smartphone className="h-4 w-4 text-blue-600" />
+                        <span>Mobile</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="font-semibold">64%</span>
+                        <Progress value={64} className="w-20 h-2 mt-1" />
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Monitor className="h-4 w-4 text-purple-600" />
+                        <span>Desktop</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="font-semibold">28%</span>
+                        <Progress value={28} className="w-20 h-2 mt-1" />
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Monitor className="h-4 w-4 text-green-600" />
+                        <span>Tablet</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="font-semibold">8%</span>
+                        <Progress value={8} className="w-20 h-2 mt-1" />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Campaigns Tab */}
+          <TabsContent value="campaigns" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="h-5 w-5 text-green-600" />
+                      Campaign Performance
+                    </CardTitle>
+                    <CardDescription>
+                      Track your marketing campaign effectiveness
+                    </CardDescription>
+                  </div>
+                  <Dialog open={showCampaignCreator} onOpenChange={setShowCampaignCreator}>
+                    <DialogTrigger asChild>
+                      <Button className="bg-green-600 hover:bg-green-700">
+                        <Target className="mr-2 h-4 w-4" />
+                        Create Campaign
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                      <CampaignCreator 
+                        onCreateCampaign={handleCreateCampaign}
+                        onClose={() => setShowCampaignCreator(false)}
+                      />
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {campaignPerformance.map((campaign, index) => (
+                    <div key={index} className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold">{campaign.name}</h3>
+                        <Badge className={campaign.roi > 200 ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}>
+                          {campaign.roi}% ROI
+                        </Badge>
+                      </div>
+                      <div className="grid grid-cols-4 gap-4 text-sm">
+                        <div>
+                          <p className="text-slate-500">Clicks</p>
+                          <p className="font-semibold">{campaign.clicks}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500">Conversions</p>
+                          <p className="font-semibold">{campaign.conversions}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500">Revenue</p>
+                          <p className="font-semibold text-green-600">{formatCurrency(campaign.revenue)}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500">Conv. Rate</p>
+                          <p className="font-semibold">{((campaign.conversions / campaign.clicks) * 100).toFixed(1)}%</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Payouts Tab */}
+          <TabsContent value="payouts" className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Payout Summary */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="h-5 w-5 text-green-600" />
+                    Payout Summary
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                    <span className="text-sm">Available Balance</span>
+                    <span className="font-bold text-green-600">{formatCurrency(referralStats.commissionEarned)}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                    <span className="text-sm">Pending Approval</span>
+                    <span className="font-semibold text-blue-600">{formatCurrency(12450)}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                    <span className="text-sm">Total Paid Out</span>
+                    <span className="font-semibold">{formatCurrency(89650)}</span>
+                  </div>
+                  <Button className="w-full bg-green-600 hover:bg-green-700">
+                    Request Payout
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Payout History */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-blue-600" />
+                    Recent Payouts
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 border rounded-lg">
+                      <div>
+                        <p className="font-medium">January 2025</p>
+                        <p className="text-sm text-slate-500">Paid on Jan 31</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-green-600">+{formatCurrency(42380)}</p>
+                        <Badge className="bg-green-100 text-green-800">Paid</Badge>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center p-3 border rounded-lg">
+                      <div>
+                        <p className="font-medium">December 2024</p>
+                        <p className="text-sm text-slate-500">Paid on Dec 31</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-green-600">+{formatCurrency(38750)}</p>
+                        <Badge className="bg-green-100 text-green-800">Paid</Badge>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center p-3 border rounded-lg">
+                      <div>
+                        <p className="font-medium">February 2025</p>
+                        <p className="text-sm text-slate-500">Processing</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-blue-600">+{formatCurrency(12450)}</p>
+                        <Badge className="bg-blue-100 text-blue-800">Pending</Badge>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

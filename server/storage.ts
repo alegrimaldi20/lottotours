@@ -100,21 +100,26 @@ export interface IStorage {
   getAffiliateProgram(id: string): Promise<AffiliateProgram | null>;
   createAffiliateProgram(program: InsertAffiliateProgram): Promise<AffiliateProgram>;
   updateAffiliateProgram(id: string, updates: Partial<AffiliateProgram>): Promise<AffiliateProgram>;
+  generateUniqueReferralCode(agencyId: string): Promise<string>;
   
   // Affiliate Referral Tracking
   trackAffiliateClick(referralCode: string, userId: string, clickData: any): Promise<AffiliateReferral>;
   updateAffiliateReferralStatus(referralId: string, status: string, transactionData?: any): Promise<AffiliateReferral>;
   getAffiliateReferrals(agencyId?: string, affiliateProgramId?: string): Promise<AffiliateReferral[]>;
+  getTopReferralSources(agencyId: string, period: string): Promise<any[]>;
   
   // Affiliate Payouts & Performance
   calculateAffiliatePayout(affiliateProgramId: string, periodStart: Date, periodEnd: Date): Promise<AffiliatePayout>;
   getAffiliatePayouts(agencyId?: string): Promise<AffiliatePayout[]>;
   updatePayoutStatus(payoutId: string, status: string, paymentData?: any): Promise<AffiliatePayout>;
+  getPayoutHistory(agencyId: string, limit?: number): Promise<AffiliatePayout[]>;
   
   // Affiliate Analytics & Leaderboard
   getAffiliateLeaderboard(period: string, limit?: number): Promise<AffiliateLeaderboard[]>;
   createTrackingEvent(event: InsertAffiliateTrackingEvent): Promise<AffiliateTrackingEvent>;
   getAffiliateAnalytics(agencyId: string, period: string): Promise<any>;
+  getConversionFunnel(agencyId: string): Promise<any>;
+  getRevenueBySource(agencyId: string, period: string): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
