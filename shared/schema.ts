@@ -677,6 +677,16 @@ export const insertUserFavoriteSchema = createInsertSchema(userFavorites).omit({
   createdAt: true,
 });
 
+export const insertCountryOperationSchema = createInsertSchema(countryOperations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertTerritoryManagementSchema = createInsertSchema(territoryManagement).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -744,3 +754,7 @@ export type AffiliateLeaderboard = typeof affiliateLeaderboard.$inferSelect;
 export type InsertAffiliateLeaderboard = z.infer<typeof insertAffiliateLeaderboardSchema>;
 export type UserFavorite = typeof userFavorites.$inferSelect;
 export type InsertUserFavorite = z.infer<typeof insertUserFavoriteSchema>;
+export type CountryOperation = typeof countryOperations.$inferSelect;
+export type InsertCountryOperation = z.infer<typeof insertCountryOperationSchema>;
+export type TerritoryManagement = typeof territoryManagement.$inferSelect;
+export type InsertTerritoryManagement = z.infer<typeof insertTerritoryManagementSchema>;

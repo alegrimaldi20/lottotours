@@ -474,6 +474,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Country Operations Routes
+  app.get("/api/country-operations", async (req, res) => {
+    try {
+      const countries = await storage.getCountryOperations();
+      res.json(countries);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch country operations" });
+    }
+  });
+
+  app.get("/api/country-operations/:countryCode", async (req, res) => {
+    try {
+      const country = await storage.getCountryOperation(req.params.countryCode);
+      if (!country) {
+        return res.status(404).json({ message: "Country operation not found" });
+      }
+      res.json(country);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch country operation" });
+    }
+  });
+
+  // Territory Management Routes
+  app.get("/api/territories", async (req, res) => {
+    try {
+      const { countryCode } = req.query;
+      const territories = await storage.getTerritoryManagements(countryCode as string);
+      res.json(territories);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch territories" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

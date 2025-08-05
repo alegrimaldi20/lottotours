@@ -14,9 +14,11 @@ import {
   type AffiliateProgram, type InsertAffiliateProgram, type AffiliateReferral, type InsertAffiliateReferral,
   type AffiliatePayout, type InsertAffiliatePayout, type AffiliateTrackingEvent, type InsertAffiliateTrackingEvent,
   type AffiliateLeaderboard, type InsertAffiliateLeaderboard,
+  type CountryOperation, type InsertCountryOperation, type TerritoryManagement, type InsertTerritoryManagement,
   users, missions, userMissions, lotteries, lotteryTickets, lotteryDraws, missionActivities, nfts, prizes, prizeRedemptions, tokenPacks, tokenPurchases, serviceConditions, userAgreements, userFavorites,
   travelAgencies, agencyTourPackages, prizeWinners, agencyCommissions, agencyAnalytics,
-  affiliatePrograms, affiliateReferrals, affiliatePayouts, affiliateTrackingEvents, affiliateLeaderboard
+  affiliatePrograms, affiliateReferrals, affiliatePayouts, affiliateTrackingEvents, affiliateLeaderboard,
+  countryOperations, territoryManagement
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql } from "drizzle-orm";
@@ -139,6 +141,18 @@ export interface IStorage {
   getAffiliateAnalytics(agencyId: string, period: string): Promise<any>;
   getConversionFunnel(agencyId: string): Promise<any>;
   getRevenueBySource(agencyId: string, period: string): Promise<any[]>;
+
+  // Country Operations Management
+  getCountryOperations(): Promise<CountryOperation[]>;
+  getCountryOperation(countryCode: string): Promise<CountryOperation | null>;
+  createCountryOperation(operation: InsertCountryOperation): Promise<CountryOperation>;
+  updateCountryOperation(countryCode: string, updates: Partial<CountryOperation>): Promise<CountryOperation>;
+
+  // Territory Management
+  getTerritoryManagements(countryCode?: string): Promise<TerritoryManagement[]>;
+  getTerritoryManagement(id: string): Promise<TerritoryManagement | null>;
+  createTerritoryManagement(territory: InsertTerritoryManagement): Promise<TerritoryManagement>;
+  updateTerritoryManagement(id: string, updates: Partial<TerritoryManagement>): Promise<TerritoryManagement>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -159,8 +173,200 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  private async initializeSouthAmericanCountries() {
+    try {
+      // Check if countries already exist
+      const existingCountries = await db.select().from(countryOperations).limit(1);
+      if (existingCountries.length > 0) {
+        return; // Already initialized
+      }
+
+      const southAmericanCountries = [
+        {
+          countryCode: "CO",
+          countryName: "Colombia",
+          region: "South America",
+          currency: "COP",
+          timezone: "America/Bogota",
+          language: "es",
+          totalAgencies: 89,
+          targetAgencies: 360,
+          activeAgencies: 72,
+          territoryDivisions: 36,
+          marketPenetration: "0.2500",
+          averageCommissionRate: "0.2200",
+          totalRevenue: 2890000,
+          monthlyGrowth: "0.3200",
+          regulatoryStatus: "compliant",
+          launchDate: new Date("2024-01-15"),
+          isActive: true,
+        },
+        {
+          countryCode: "PE",
+          countryName: "Peru",
+          region: "South America",
+          currency: "PEN",
+          timezone: "America/Lima",
+          language: "es",
+          totalAgencies: 67,
+          targetAgencies: 360,
+          activeAgencies: 54,
+          territoryDivisions: 36,
+          marketPenetration: "0.1900",
+          averageCommissionRate: "0.2000",
+          totalRevenue: 2340000,
+          monthlyGrowth: "0.2800",
+          regulatoryStatus: "compliant",
+          launchDate: new Date("2024-02-01"),
+          isActive: true,
+        },
+        {
+          countryCode: "EC",
+          countryName: "Ecuador",
+          region: "South America",
+          currency: "USD",
+          timezone: "America/Guayaquil",
+          language: "es",
+          totalAgencies: 45,
+          targetAgencies: 360,
+          activeAgencies: 38,
+          territoryDivisions: 36,
+          marketPenetration: "0.1300",
+          averageCommissionRate: "0.2100",
+          totalRevenue: 1560000,
+          monthlyGrowth: "0.2500",
+          regulatoryStatus: "compliant",
+          launchDate: new Date("2024-03-01"),
+          isActive: true,
+        },
+        {
+          countryCode: "BO",
+          countryName: "Bolivia",
+          region: "South America",
+          currency: "BOB",
+          timezone: "America/La_Paz",
+          language: "es",
+          totalAgencies: 32,
+          targetAgencies: 360,
+          activeAgencies: 26,
+          territoryDivisions: 36,
+          marketPenetration: "0.0900",
+          averageCommissionRate: "0.2300",
+          totalRevenue: 890000,
+          monthlyGrowth: "0.3500",
+          regulatoryStatus: "compliant",
+          launchDate: new Date("2024-04-01"),
+          isActive: true,
+        },
+        {
+          countryCode: "CL",
+          countryName: "Chile",
+          region: "South America",
+          currency: "CLP",
+          timezone: "America/Santiago",
+          language: "es",
+          totalAgencies: 78,
+          targetAgencies: 360,
+          activeAgencies: 65,
+          territoryDivisions: 36,
+          marketPenetration: "0.2200",
+          averageCommissionRate: "0.1900",
+          totalRevenue: 3450000,
+          monthlyGrowth: "0.1800",
+          regulatoryStatus: "compliant",
+          launchDate: new Date("2024-01-01"),
+          isActive: true,
+        },
+        {
+          countryCode: "UY",
+          countryName: "Uruguay",
+          region: "South America",
+          currency: "UYU",
+          timezone: "America/Montevideo",
+          language: "es",
+          totalAgencies: 28,
+          targetAgencies: 360,
+          activeAgencies: 23,
+          territoryDivisions: 36,
+          marketPenetration: "0.0800",
+          averageCommissionRate: "0.2400",
+          totalRevenue: 780000,
+          monthlyGrowth: "0.4200",
+          regulatoryStatus: "compliant",
+          launchDate: new Date("2024-05-01"),
+          isActive: true,
+        },
+        {
+          countryCode: "PY",
+          countryName: "Paraguay",
+          region: "South America",
+          currency: "PYG",
+          timezone: "America/Asuncion",
+          language: "es",
+          totalAgencies: 24,
+          targetAgencies: 360,
+          activeAgencies: 19,
+          territoryDivisions: 36,
+          marketPenetration: "0.0700",
+          averageCommissionRate: "0.2500",
+          totalRevenue: 650000,
+          monthlyGrowth: "0.3800",
+          regulatoryStatus: "compliant",
+          launchDate: new Date("2024-06-01"),
+          isActive: true,
+        },
+        {
+          countryCode: "AR",
+          countryName: "Argentina",
+          region: "South America",
+          currency: "ARS",
+          timezone: "America/Argentina/Buenos_Aires",
+          language: "es",
+          totalAgencies: 112,
+          targetAgencies: 360,
+          activeAgencies: 89,
+          territoryDivisions: 36,
+          marketPenetration: "0.3100",
+          averageCommissionRate: "0.1800",
+          totalRevenue: 4670000,
+          monthlyGrowth: "0.1500",
+          regulatoryStatus: "compliant",
+          launchDate: new Date("2023-12-01"),
+          isActive: true,
+        },
+        {
+          countryCode: "BR",
+          countryName: "Brazil",
+          region: "South America",
+          currency: "BRL",
+          timezone: "America/Sao_Paulo",
+          language: "pt",
+          totalAgencies: 156,
+          targetAgencies: 360,
+          activeAgencies: 134,
+          territoryDivisions: 36,
+          marketPenetration: "0.4300",
+          averageCommissionRate: "0.1700",
+          totalRevenue: 6890000,
+          monthlyGrowth: "0.2200",
+          regulatoryStatus: "compliant",
+          launchDate: new Date("2023-11-01"),
+          isActive: true,
+        },
+      ];
+
+      await db.insert(countryOperations).values(southAmericanCountries);
+      console.log("✅ South American country operations initialized successfully");
+    } catch (error) {
+      console.error("❌ Failed to initialize South American countries:", error);
+    }
+  }
+
   private async initializeSampleData() {
     try {
+      // Initialize South American country operations for international expansion
+      await this.initializeSouthAmericanCountries();
+      
       // Insert missions with verification methods
       await db.insert(missions).values([
         {
@@ -1044,6 +1250,105 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return updatedUser;
   }
+
+  // Country Operations Management
+  async getCountryOperations(): Promise<CountryOperation[]> {
+    return await db.select().from(countryOperations).where(eq(countryOperations.isActive, true));
+  }
+
+  async getCountryOperation(countryCode: string): Promise<CountryOperation | null> {
+    const [country] = await db.select().from(countryOperations).where(eq(countryOperations.countryCode, countryCode));
+    return country || null;
+  }
+
+  async createCountryOperation(operation: InsertCountryOperation): Promise<CountryOperation> {
+    const [newOperation] = await db
+      .insert(countryOperations)
+      .values(operation)
+      .returning();
+    return newOperation;
+  }
+
+  async updateCountryOperation(countryCode: string, updates: Partial<CountryOperation>): Promise<CountryOperation> {
+    const [updatedOperation] = await db
+      .update(countryOperations)
+      .set(updates)
+      .where(eq(countryOperations.countryCode, countryCode))
+      .returning();
+    return updatedOperation;
+  }
+
+  // Territory Management
+  async getTerritoryManagements(countryCode?: string): Promise<TerritoryManagement[]> {
+    if (countryCode) {
+      return await db.select().from(territoryManagement)
+        .where(and(eq(territoryManagement.countryCode, countryCode), eq(territoryManagement.isActive, true)));
+    }
+    return await db.select().from(territoryManagement).where(eq(territoryManagement.isActive, true));
+  }
+
+  async getTerritoryManagement(id: string): Promise<TerritoryManagement | null> {
+    const [territory] = await db.select().from(territoryManagement).where(eq(territoryManagement.id, id));
+    return territory || null;
+  }
+
+  async createTerritoryManagement(territory: InsertTerritoryManagement): Promise<TerritoryManagement> {
+    const [newTerritory] = await db
+      .insert(territoryManagement)
+      .values(territory)
+      .returning();
+    return newTerritory;
+  }
+
+  async updateTerritoryManagement(id: string, updates: Partial<TerritoryManagement>): Promise<TerritoryManagement> {
+    const [updatedTerritory] = await db
+      .update(territoryManagement)
+      .set(updates)
+      .where(eq(territoryManagement.id, id))
+      .returning();
+    return updatedTerritory;
+  }
+
+  // Placeholder implementations for missing interface methods
+  async getServiceConditions(): Promise<ServiceCondition[]> { return []; }
+  async createServiceCondition(condition: InsertServiceCondition): Promise<ServiceCondition> { throw new Error("Method not implemented"); }
+  async createUserAgreement(agreement: InsertUserAgreement): Promise<UserAgreement> { throw new Error("Method not implemented"); }
+  async getUserAgreements(userId: string): Promise<UserAgreement[]> { return []; }
+  async getTravelAgencies(): Promise<TravelAgency[]> { return []; }
+  async getTravelAgency(id: string): Promise<TravelAgency | null> { return null; }
+  async createTravelAgency(agency: InsertTravelAgency): Promise<TravelAgency> { throw new Error("Method not implemented"); }
+  async updateTravelAgency(id: string, updates: Partial<InsertTravelAgency>): Promise<TravelAgency> { throw new Error("Method not implemented"); }
+  async getAgencyTourPackages(agencyId?: string): Promise<AgencyTourPackage[]> { return []; }
+  async getAgencyTourPackage(id: string): Promise<AgencyTourPackage | null> { return null; }
+  async createAgencyTourPackage(tourPackage: InsertAgencyTourPackage): Promise<AgencyTourPackage> { throw new Error("Method not implemented"); }
+  async getPrizeWinners(userId?: string): Promise<PrizeWinner[]> { return []; }
+  async getPrizeWinner(id: string): Promise<PrizeWinner | null> { return null; }
+  async createPrizeWinner(prizeWinner: InsertPrizeWinner): Promise<PrizeWinner> { throw new Error("Method not implemented"); }
+  async updatePrizeWinner(id: string, updates: Partial<PrizeWinner>): Promise<PrizeWinner> { throw new Error("Method not implemented"); }
+  async getUserPrizeWinners(userId: string): Promise<PrizeWinner[]> { return []; }
+  async getAgencyCommissions(agencyId?: string): Promise<AgencyCommission[]> { return []; }
+  async createAgencyCommission(commission: InsertAgencyCommission): Promise<AgencyCommission> { throw new Error("Method not implemented"); }
+  async updateAgencyCommissionStatus(id: string, status: string): Promise<AgencyCommission> { throw new Error("Method not implemented"); }
+  async getAgencyAnalytics(agencyId: string, dateRange?: { start: Date; end: Date }): Promise<AgencyAnalytics[]> { return []; }
+  async createAgencyAnalytics(analytics: InsertAgencyAnalytics): Promise<AgencyAnalytics> { throw new Error("Method not implemented"); }
+  async getAffiliatePrograms(agencyId?: string): Promise<AffiliateProgram[]> { return []; }
+  async getAffiliateProgram(id: string): Promise<AffiliateProgram | null> { return null; }
+  async createAffiliateProgram(program: InsertAffiliateProgram): Promise<AffiliateProgram> { throw new Error("Method not implemented"); }
+  async updateAffiliateProgram(id: string, updates: Partial<AffiliateProgram>): Promise<AffiliateProgram> { throw new Error("Method not implemented"); }
+  async generateUniqueReferralCode(agencyId: string): Promise<string> { return randomUUID(); }
+  async trackAffiliateClick(referralCode: string, userId: string, clickData: any): Promise<AffiliateReferral> { throw new Error("Method not implemented"); }
+  async updateAffiliateReferralStatus(referralId: string, status: string, transactionData?: any): Promise<AffiliateReferral> { throw new Error("Method not implemented"); }
+  async getAffiliateReferrals(agencyId?: string, affiliateProgramId?: string): Promise<AffiliateReferral[]> { return []; }
+  async getTopReferralSources(agencyId: string, period: string): Promise<any[]> { return []; }
+  async calculateAffiliatePayout(affiliateProgramId: string, periodStart: Date, periodEnd: Date): Promise<AffiliatePayout> { throw new Error("Method not implemented"); }
+  async getAffiliatePayouts(agencyId?: string): Promise<AffiliatePayout[]> { return []; }
+  async updatePayoutStatus(payoutId: string, status: string, paymentData?: any): Promise<AffiliatePayout> { throw new Error("Method not implemented"); }
+  async getPayoutHistory(agencyId: string, limit?: number): Promise<AffiliatePayout[]> { return []; }
+  async getAffiliateLeaderboard(period: string, limit?: number): Promise<AffiliateLeaderboard[]> { return []; }
+  async createTrackingEvent(event: InsertAffiliateTrackingEvent): Promise<AffiliateTrackingEvent> { throw new Error("Method not implemented"); }
+  async getAffiliateAnalytics(agencyId: string, period: string): Promise<any> { return {}; }
+  async getConversionFunnel(agencyId: string): Promise<any> { return {}; }
+  async getRevenueBySource(agencyId: string, period: string): Promise<any[]> { return []; }
 }
 
 export const storage = new DatabaseStorage();
