@@ -279,7 +279,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json(draw);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch lottery draw" });
+      res.status(500).json({ message: "Failed to fetch draw" });
+    }
+  });
+
+  // New lottery code-based endpoints for unique identification
+  app.get("/api/lotteries/code/:lotteryCode", async (req, res) => {
+    try {
+      const lottery = await storage.getLotteryByCode(req.params.lotteryCode);
+      if (!lottery) {
+        return res.status(404).json({ message: "Lottery not found" });
+      }
+      res.json(lottery);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch lottery by code" });
+    }
+  });
+
+  app.get("/api/lottery-draws/code/:drawCode", async (req, res) => {
+    try {
+      const draw = await storage.getLotteryDrawByCode(req.params.drawCode);
+      if (!draw) {
+        return res.status(404).json({ message: "Draw not found" });
+      }
+      res.json(draw);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch draw by code" });
+    }
+  });
+
+  // QR Code verification endpoint
+  app.post("/api/lottery-draws/verify-qr", async (req, res) => {
+    try {
+      const { qrCodeData } = req.body;
+      if (!qrCodeData) {
+        return res.status(400).json({ message: "QR code data is required" });
+      }
+      
+      const result = await storage.verifyWinnerQrCode(qrCodeData);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to verify QR code" });
+    }
+  });
+
+  // Draw execution endpoint
+  app.post("/api/lotteries/:lotteryId/draw", async (req, res) => {
+    try {
+      const { drawExecutorId } = req.body;
+      const result = await storage.drawLottery(req.params.lotteryId, drawExecutorId);
+      res.status(201).json(result);
+    } catch (error: any) {
+      res.status(500).json({ message: "Failed to execute draw", error: error.message });
     }
   });
 

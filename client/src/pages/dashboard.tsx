@@ -14,6 +14,7 @@ import MissionVerification from "@/components/mission-verification";
 import MobileNavigation from "@/components/mobile-navigation";
 import ProfileDropdown from "@/components/profile-dropdown";
 import LanguageSelector from "@/components/language-selector";
+import { LotteryDrawTest } from "@/components/lottery-draw-test";
 import { useLanguage } from "@/lib/i18n";
 
 
@@ -104,6 +105,9 @@ export default function Dashboard() {
               </Link>
               <Link href="/lotteries">
                 <Button variant="ghost" data-testid="nav-lotteries">Lotteries</Button>
+              </Link>
+              <Link href="/lottery-verification">
+                <Button variant="ghost" data-testid="nav-verification">Verification</Button>
               </Link>
               <Link href="/marketplace">
                 <Button variant="ghost" data-testid="nav-marketplace">Marketplace</Button>
@@ -361,6 +365,11 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Lottery Drawing Test Section */}
+        <div className="mb-8">
+          <LotteryDrawTest />
         </div>
       </div>
     </div>

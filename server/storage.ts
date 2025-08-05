@@ -22,6 +22,7 @@ import { db } from "./db";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import * as crypto from "crypto";
+import { generateLotteryCode, generateDrawCode, generateTicketCode, generateWinnerQrCode, verifyQrCode } from "./utils/lottery-codes";
 
 export interface IStorage {
   // Users
@@ -54,11 +55,14 @@ export interface IStorage {
   getLotteries(): Promise<Lottery[]>;
   getActiveLotteries(): Promise<Lottery[]>;
   getLottery(id: string): Promise<Lottery | undefined>;
+  getLotteryByCode(lotteryCode: string): Promise<Lottery | undefined>;
   purchaseLotteryTicket(ticket: InsertLotteryTicket): Promise<LotteryTicket>;
   getUserLotteryTickets(userId: string): Promise<LotteryTicket[]>;
   drawLottery(lotteryId: string, drawExecutorId?: string): Promise<{lottery: Lottery, draw: LotteryDraw}>;
   getLotteryDraws(lotteryId?: string): Promise<LotteryDraw[]>;
   getLotteryDraw(drawId: string): Promise<LotteryDraw | undefined>;
+  getLotteryDrawByCode(drawCode: string): Promise<LotteryDraw | undefined>;
+  verifyWinnerQrCode(qrCodeData: string): Promise<{isValid: boolean, data?: any, error?: string}>;
 
   // NFTs
   getUserNFTs(userId: string): Promise<NFT[]>;
@@ -235,7 +239,7 @@ export class DatabaseStorage implements IStorage {
         },
       ]);
 
-      // Insert lotteries (using existing schema)
+      // Insert lotteries with lottery codes
       await db.insert(lotteries).values([
         {
           id: "lottery-paris-weekend",
@@ -251,6 +255,7 @@ export class DatabaseStorage implements IStorage {
           drawDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
           status: "active",
           image: "paris",
+          lotteryCode: "LT2025-001",
         },
         {
           id: "lottery-tropical-escape",
@@ -266,6 +271,7 @@ export class DatabaseStorage implements IStorage {
           drawDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
           status: "active",
           image: "tropical",
+          lotteryCode: "LT2025-002",
         },
         {
           id: "lottery-tokyo-adventure",
@@ -281,6 +287,7 @@ export class DatabaseStorage implements IStorage {
           drawDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
           status: "active",
           image: "tokyo",
+          lotteryCode: "LT2025-003",
         },
         {
           id: "lottery-swiss-alps",
@@ -296,6 +303,7 @@ export class DatabaseStorage implements IStorage {
           drawDate: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000),
           status: "active",
           image: "europe",
+          lotteryCode: "LT2025-004",
         }
       ]);
 
@@ -812,6 +820,9 @@ export class DatabaseStorage implements IStorage {
       throw new Error("Insufficient tokens");
     }
     
+    // Generate ticket code
+    const ticketCode = generateTicketCode(lottery.lotteryCode || undefined);
+    
     // Deduct tokens from user
     await db
       .update(users)
@@ -820,7 +831,10 @@ export class DatabaseStorage implements IStorage {
     
     const [ticket] = await db
       .insert(lotteryTickets)
-      .values(insertTicket)
+      .values({
+        ...insertTicket,
+        ticketCode
+      })
       .returning();
     
     // Update sold tickets count
@@ -851,10 +865,22 @@ export class DatabaseStorage implements IStorage {
       .update(`${lotteryId}-${winningTicket.id}-${Date.now()}`)
       .digest('hex');
     
+    // Generate human-readable draw code
+    const drawCode = generateDrawCode(lottery.lotteryCode || undefined);
+    
+    // Generate QR code for winning ticket
+    const winnerQrCode = generateWinnerQrCode({
+      drawCode,
+      ticketCode: winningTicket.ticketCode || `TK-${Date.now()}`,
+      winnerId: winningTicket.userId,
+      verificationHash,
+      drawnAt: new Date()
+    });
+
     const [draw] = await db
       .insert(lotteryDraws)
       .values({
-        drawId,
+        drawCode,
         lotteryId,
         winningTicketId: winningTicket.id,
         winnerId: winningTicket.userId,
@@ -862,6 +888,7 @@ export class DatabaseStorage implements IStorage {
         totalTicketsSold: tickets.length,
         drawExecutorId: drawExecutorId || 'system',
         verificationHash,
+        winnerQrCode,
         drawData: JSON.stringify({
           totalParticipants: new Set(tickets.map(t => t.userId)).size,
           winningTicketNumber: winningTicket.ticketNumber,
@@ -869,6 +896,15 @@ export class DatabaseStorage implements IStorage {
         })
       })
       .returning();
+    
+    // Update winning ticket with QR code
+    await db
+      .update(lotteryTickets)
+      .set({ 
+        isWinningTicket: true,
+        winnerQrCode
+      })
+      .where(eq(lotteryTickets.id, winningTicket.id));
     
     const [updatedLottery] = await db
       .update(lotteries)
@@ -892,6 +928,51 @@ export class DatabaseStorage implements IStorage {
   async getLotteryDraw(drawId: string): Promise<LotteryDraw | undefined> {
     const [draw] = await db.select().from(lotteryDraws).where(eq(lotteryDraws.drawId, drawId));
     return draw;
+  }
+
+  async getLotteryByCode(lotteryCode: string): Promise<Lottery | undefined> {
+    const [lottery] = await db.select().from(lotteries).where(eq(lotteries.lotteryCode, lotteryCode));
+    return lottery;
+  }
+
+  async getLotteryDrawByCode(drawCode: string): Promise<LotteryDraw | undefined> {
+    const [draw] = await db.select().from(lotteryDraws).where(eq(lotteryDraws.drawCode, drawCode));
+    return draw;
+  }
+
+  async verifyWinnerQrCode(qrCodeData: string): Promise<{isValid: boolean, data?: any, error?: string}> {
+    const result = verifyQrCode(qrCodeData);
+    
+    if (!result.isValid) {
+      return result;
+    }
+    
+    try {
+      // Verify the QR code data against database records
+      const draw = await this.getLotteryDrawByCode(result.data.drawCode);
+      if (!draw) {
+        return { isValid: false, error: 'Draw not found in database' };
+      }
+      
+      if (draw.winnerId !== result.data.winnerId) {
+        return { isValid: false, error: 'Winner ID mismatch' };
+      }
+      
+      if (draw.verificationHash !== result.data.verificationHash) {
+        return { isValid: false, error: 'Verification hash mismatch' };
+      }
+      
+      return { 
+        isValid: true, 
+        data: {
+          ...result.data,
+          draw,
+          verifiedAt: new Date().toISOString()
+        }
+      };
+    } catch (error) {
+      return { isValid: false, error: 'Database verification failed' };
+    }
   }
 
   // NFTs

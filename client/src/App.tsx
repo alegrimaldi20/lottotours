@@ -25,6 +25,7 @@ import WinnerDashboard from "./pages/winner-dashboard";
 import AffiliateDashboard from "./pages/affiliate-dashboard";
 import CountryOperations from "./pages/country-operations";
 import UniqueIds from "./pages/unique-ids";
+import LotteryVerification from "./pages/lottery-verification";
 import NotFound from "@/pages/not-found";
 
 export const ToastContext = React.createContext<{
@@ -61,6 +62,7 @@ function Router() {
       <Route path="/affiliate-dashboard" component={AffiliateDashboard} />
       <Route path="/country-operations" component={CountryOperations} />
       <Route path="/unique-ids" component={UniqueIds} />
+      <Route path="/lottery-verification" component={LotteryVerification} />
       <Route component={NotFound} />
     </Switch>
   );
