@@ -15,144 +15,234 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Sample data for country operations
+// Sample data for South American expansion strategy
 const sampleCountries = [
   {
-    countryCode: "US",
-    countryName: "United States",
-    region: "North America",
-    currency: "USD",
-    totalAgencies: 342,
+    countryCode: "CO",
+    countryName: "Colombia",
+    region: "South America",
+    currency: "COP",
+    totalAgencies: 89,
     targetAgencies: 360,
-    activeAgencies: 298,
-    marketPenetration: 0.95,
-    totalRevenue: 12450000, // $124,500
-    monthlyGrowth: 0.12,
-    averageCommissionRate: 0.18,
-    flag: "🇺🇸",
-    status: "active"
-  },
-  {
-    countryCode: "CA",
-    countryName: "Canada", 
-    region: "North America",
-    currency: "CAD",
-    totalAgencies: 287,
-    targetAgencies: 360,
-    activeAgencies: 245,
-    marketPenetration: 0.80,
-    totalRevenue: 8920000, // $89,200
-    monthlyGrowth: 0.15,
-    averageCommissionRate: 0.16,
-    flag: "🇨🇦",
-    status: "active"
-  },
-  {
-    countryCode: "MX",
-    countryName: "Mexico",
-    region: "North America", 
-    currency: "MXN",
-    totalAgencies: 198,
-    targetAgencies: 360,
-    activeAgencies: 156,
-    marketPenetration: 0.55,
-    totalRevenue: 4350000, // $43,500
-    monthlyGrowth: 0.22,
-    averageCommissionRate: 0.20,
-    flag: "🇲🇽",
+    activeAgencies: 72,
+    marketPenetration: 0.25,
+    totalRevenue: 2890000, // $28,900
+    monthlyGrowth: 0.32,
+    averageCommissionRate: 0.22,
+    flag: "🇨🇴",
     status: "expanding"
   },
   {
-    countryCode: "DE",
-    countryName: "Germany",
-    region: "Europe",
-    currency: "EUR",
-    totalAgencies: 356,
+    countryCode: "PE",
+    countryName: "Peru", 
+    region: "South America",
+    currency: "PEN",
+    totalAgencies: 67,
     targetAgencies: 360,
-    activeAgencies: 334,
-    marketPenetration: 0.99,
-    totalRevenue: 15670000, // $156,700
-    monthlyGrowth: 0.08,
-    averageCommissionRate: 0.17,
-    flag: "🇩🇪",
-    status: "active"
-  },
-  {
-    countryCode: "FR",
-    countryName: "France",
-    region: "Europe",
-    currency: "EUR", 
-    totalAgencies: 301,
-    targetAgencies: 360,
-    activeAgencies: 289,
-    marketPenetration: 0.84,
-    totalRevenue: 11230000, // $112,300
-    monthlyGrowth: 0.11,
-    averageCommissionRate: 0.16,
-    flag: "🇫🇷",
-    status: "active"
-  },
-  {
-    countryCode: "JP",
-    countryName: "Japan",
-    region: "Asia",
-    currency: "JPY",
-    totalAgencies: 124,
-    targetAgencies: 360,
-    activeAgencies: 98,
-    marketPenetration: 0.34,
-    totalRevenue: 6780000, // $67,800
+    activeAgencies: 54,
+    marketPenetration: 0.19,
+    totalRevenue: 2340000, // $23,400
     monthlyGrowth: 0.28,
-    averageCommissionRate: 0.19,
-    flag: "🇯🇵",
+    averageCommissionRate: 0.20,
+    flag: "🇵🇪",
+    status: "expanding"
+  },
+  {
+    countryCode: "EC",
+    countryName: "Ecuador",
+    region: "South America", 
+    currency: "USD",
+    totalAgencies: 45,
+    targetAgencies: 360,
+    activeAgencies: 38,
+    marketPenetration: 0.13,
+    totalRevenue: 1560000, // $15,600
+    monthlyGrowth: 0.25,
+    averageCommissionRate: 0.21,
+    flag: "🇪🇨",
     status: "launching"
+  },
+  {
+    countryCode: "BO",
+    countryName: "Bolivia",
+    region: "South America",
+    currency: "BOB",
+    totalAgencies: 32,
+    targetAgencies: 360,
+    activeAgencies: 26,
+    marketPenetration: 0.09,
+    totalRevenue: 890000, // $8,900
+    monthlyGrowth: 0.35,
+    averageCommissionRate: 0.23,
+    flag: "🇧🇴",
+    status: "launching"
+  },
+  {
+    countryCode: "CL",
+    countryName: "Chile",
+    region: "South America",
+    currency: "CLP", 
+    totalAgencies: 78,
+    targetAgencies: 360,
+    activeAgencies: 65,
+    marketPenetration: 0.22,
+    totalRevenue: 3450000, // $34,500
+    monthlyGrowth: 0.18,
+    averageCommissionRate: 0.19,
+    flag: "🇨🇱",
+    status: "expanding"
+  },
+  {
+    countryCode: "UY",
+    countryName: "Uruguay",
+    region: "South America",
+    currency: "UYU",
+    totalAgencies: 28,
+    targetAgencies: 360,
+    activeAgencies: 23,
+    marketPenetration: 0.08,
+    totalRevenue: 780000, // $7,800
+    monthlyGrowth: 0.42,
+    averageCommissionRate: 0.24,
+    flag: "🇺🇾",
+    status: "launching"
+  },
+  {
+    countryCode: "PY",
+    countryName: "Paraguay",
+    region: "South America",
+    currency: "PYG",
+    totalAgencies: 24,
+    targetAgencies: 360,
+    activeAgencies: 19,
+    marketPenetration: 0.07,
+    totalRevenue: 650000, // $6,500
+    monthlyGrowth: 0.38,
+    averageCommissionRate: 0.25,
+    flag: "🇵🇾",
+    status: "launching"
+  },
+  {
+    countryCode: "AR",
+    countryName: "Argentina",
+    region: "South America",
+    currency: "ARS",
+    totalAgencies: 112,
+    targetAgencies: 360,
+    activeAgencies: 89,
+    marketPenetration: 0.31,
+    totalRevenue: 4670000, // $46,700
+    monthlyGrowth: 0.15,
+    averageCommissionRate: 0.18,
+    flag: "🇦🇷",
+    status: "expanding"
+  },
+  {
+    countryCode: "BR",
+    countryName: "Brazil",
+    region: "South America",
+    currency: "BRL",
+    totalAgencies: 156,
+    targetAgencies: 360,
+    activeAgencies: 134,
+    marketPenetration: 0.43,
+    totalRevenue: 6890000, // $68,900
+    monthlyGrowth: 0.22,
+    averageCommissionRate: 0.17,
+    flag: "🇧🇷",
+    status: "expanding"
   }
 ];
 
 const sampleTerritories = [
   {
-    id: "US-T001",
+    id: "CO-T001",
     territoryCode: "T001",
-    territoryName: "New York Metro",
-    countryCode: "US",
-    region: "New York",
-    majorCities: ["New York City", "Brooklyn", "Queens", "Manhattan"],
-    targetAgencies: 15,
-    assignedAgencies: 12,
-    currentLoad: 234,
-    maxCapacity: 400,
+    territoryName: "Bogotá Metropolitan",
+    countryCode: "CO",
+    region: "Cundinamarca",
+    majorCities: ["Bogotá", "Soacha", "Chía", "Zipaquirá"],
+    targetAgencies: 12,
+    assignedAgencies: 8,
+    currentLoad: 187,
+    maxCapacity: 350,
+    marketTier: "tier1",
+    tourismScore: 4.2,
+    competitiveness: "high"
+  },
+  {
+    id: "CO-T005", 
+    territoryCode: "T005",
+    territoryName: "Medellín Valley",
+    countryCode: "CO",
+    region: "Antioquia",
+    majorCities: ["Medellín", "Envigado", "Itagüí", "Bello"],
+    targetAgencies: 10,
+    assignedAgencies: 7,
+    currentLoad: 145,
+    maxCapacity: 280,
+    marketTier: "tier1",
+    tourismScore: 4.5,
+    competitiveness: "high"
+  },
+  {
+    id: "CO-T012",
+    territoryCode: "T012",
+    territoryName: "Caribbean Coast",
+    countryCode: "CO", 
+    region: "Atlántico",
+    majorCities: ["Cartagena", "Barranquilla", "Santa Marta"],
+    targetAgencies: 11,
+    assignedAgencies: 9,
+    currentLoad: 203,
+    maxCapacity: 320,
     marketTier: "tier1",
     tourismScore: 4.8,
+    competitiveness: "medium"
+  },
+  {
+    id: "BR-T001",
+    territoryCode: "T001",
+    territoryName: "São Paulo Metro",
+    countryCode: "BR",
+    region: "São Paulo",
+    majorCities: ["São Paulo", "Guarulhos", "Campinas", "Santos"],
+    targetAgencies: 15,
+    assignedAgencies: 12,
+    currentLoad: 298,
+    maxCapacity: 450,
+    marketTier: "tier1",
+    tourismScore: 4.1,
     competitiveness: "high"
   },
   {
-    id: "US-T002", 
-    territoryCode: "T002",
-    territoryName: "Los Angeles Metro",
-    countryCode: "US",
-    region: "California",
-    majorCities: ["Los Angeles", "Beverly Hills", "Santa Monica", "Hollywood"],
-    targetAgencies: 14,
+    id: "BR-T003",
+    territoryCode: "T003",
+    territoryName: "Rio de Janeiro",
+    countryCode: "BR",
+    region: "Rio de Janeiro",
+    majorCities: ["Rio de Janeiro", "Niterói", "Petrópolis"],
+    targetAgencies: 13,
     assignedAgencies: 11,
-    currentLoad: 198,
+    currentLoad: 267,
+    maxCapacity: 400,
+    marketTier: "tier1",
+    tourismScore: 4.9,
+    competitiveness: "high"
+  },
+  {
+    id: "AR-T001",
+    territoryCode: "T001", 
+    territoryName: "Buenos Aires Metro",
+    countryCode: "AR",
+    region: "Buenos Aires",
+    majorCities: ["Buenos Aires", "La Plata", "Mar del Plata"],
+    targetAgencies: 14,
+    assignedAgencies: 10,
+    currentLoad: 234,
     maxCapacity: 380,
     marketTier: "tier1",
-    tourismScore: 4.6,
-    competitiveness: "high"
-  },
-  {
-    id: "US-T015",
-    territoryCode: "T015",
-    territoryName: "Austin Region",
-    countryCode: "US", 
-    region: "Texas",
-    majorCities: ["Austin", "Round Rock", "Cedar Park"],
-    targetAgencies: 8,
-    assignedAgencies: 6,
-    currentLoad: 89,
-    maxCapacity: 200,
-    marketTier: "tier2",
-    tourismScore: 3.9,
+    tourismScore: 4.4,
     competitiveness: "medium"
   }
 ];
@@ -305,12 +395,7 @@ export default function CountryOperations() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Regions</SelectItem>
-                  <SelectItem value="North America">North America</SelectItem>
-                  <SelectItem value="Europe">Europe</SelectItem>
-                  <SelectItem value="Asia">Asia</SelectItem>
                   <SelectItem value="South America">South America</SelectItem>
-                  <SelectItem value="Africa">Africa</SelectItem>
-                  <SelectItem value="Oceania">Oceania</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -488,11 +573,11 @@ export default function CountryOperations() {
                   <p className="text-slate-500 mb-6">
                     Choose a country from the Country Overview tab to view its territory management details
                   </p>
-                  <Button onClick={() => setSelectedCountry("US")} className="mr-2">
-                    View US Territories
+                  <Button onClick={() => setSelectedCountry("CO")} className="mr-2">
+                    View Colombia Territories
                   </Button>
-                  <Button onClick={() => setSelectedCountry("DE")} variant="outline">
-                    View Germany Territories
+                  <Button onClick={() => setSelectedCountry("BR")} variant="outline">
+                    View Brazil Territories
                   </Button>
                 </CardContent>
               </Card>
@@ -511,7 +596,7 @@ export default function CountryOperations() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {["North America", "Europe", "Asia"].map((region, index) => {
+                    {["South America"].map((region, index) => {
                       const regionRevenue = countries
                         .filter(c => c.region === region)
                         .reduce((sum, c) => sum + c.totalRevenue, 0);
