@@ -202,6 +202,19 @@ export const userAgreements = pgTable("user_agreements", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// User favorites system for lotteries, missions, and marketplace items
+export const userFavorites = pgTable("user_favorites", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  itemType: text("item_type").notNull(), // lottery, mission, marketplace_item
+  itemId: varchar("item_id").notNull(), // ID of the favorite item
+  itemTitle: text("item_title").notNull(), // Cached title for display
+  itemDescription: text("item_description"), // Cached description
+  itemImage: text("item_image"), // Cached image URL
+  itemMetadata: text("item_metadata"), // JSON string with additional item data
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Travel Agency Partnership Module
 export const travelAgencies = pgTable("travel_agencies", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -617,6 +630,11 @@ export const insertAffiliateLeaderboardSchema = createInsertSchema(affiliateLead
   createdAt: true,
 });
 
+export const insertUserFavoriteSchema = createInsertSchema(userFavorites).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -680,3 +698,5 @@ export type AffiliateTrackingEvent = typeof affiliateTrackingEvents.$inferSelect
 export type InsertAffiliateTrackingEvent = z.infer<typeof insertAffiliateTrackingEventSchema>;
 export type AffiliateLeaderboard = typeof affiliateLeaderboard.$inferSelect;
 export type InsertAffiliateLeaderboard = z.infer<typeof insertAffiliateLeaderboardSchema>;
+export type UserFavorite = typeof userFavorites.$inferSelect;
+export type InsertUserFavorite = z.infer<typeof insertUserFavoriteSchema>;

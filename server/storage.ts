@@ -7,18 +7,19 @@ import {
   type Prize, type InsertPrize, type PrizeRedemption, type InsertPrizeRedemption,
   type TokenPack, type InsertTokenPack, type TokenPurchase, type InsertTokenPurchase,
   type ServiceCondition, type InsertServiceCondition, type UserAgreement, type InsertUserAgreement,
+  type UserFavorite, type InsertUserFavorite,
   type TravelAgency, type InsertTravelAgency, type AgencyTourPackage, type InsertAgencyTourPackage,
   type PrizeWinner, type InsertPrizeWinner, type AgencyCommission, type InsertAgencyCommission,
   type AgencyAnalytics, type InsertAgencyAnalytics,
   type AffiliateProgram, type InsertAffiliateProgram, type AffiliateReferral, type InsertAffiliateReferral,
   type AffiliatePayout, type InsertAffiliatePayout, type AffiliateTrackingEvent, type InsertAffiliateTrackingEvent,
   type AffiliateLeaderboard, type InsertAffiliateLeaderboard,
-  users, missions, userMissions, lotteries, lotteryTickets, lotteryDraws, missionActivities, nfts, prizes, prizeRedemptions, tokenPacks, tokenPurchases, serviceConditions, userAgreements,
+  users, missions, userMissions, lotteries, lotteryTickets, lotteryDraws, missionActivities, nfts, prizes, prizeRedemptions, tokenPacks, tokenPurchases, serviceConditions, userAgreements, userFavorites,
   travelAgencies, agencyTourPackages, prizeWinners, agencyCommissions, agencyAnalytics,
   affiliatePrograms, affiliateReferrals, affiliatePayouts, affiliateTrackingEvents, affiliateLeaderboard
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import * as crypto from "crypto";
 
@@ -28,8 +29,15 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByWallet(walletAddress: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(userId: string, updateData: Partial<InsertUser>): Promise<User>;
   updateUserTokens(userId: string, tokens: number): Promise<User>;
   incrementUserMissionsCompleted(userId: string): Promise<User>;
+
+  // User Favorites
+  getUserFavorites(userId: string): Promise<UserFavorite[]>;
+  addUserFavorite(favorite: InsertUserFavorite): Promise<UserFavorite>;
+  removeUserFavorite(userId: string, favoriteId: string): Promise<void>;
+  checkUserFavorite(userId: string, itemType: string, itemId: string): Promise<UserFavorite | undefined>;
 
   // Missions
   getMissions(): Promise<Mission[]>;
@@ -368,6 +376,17 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async updateUser(userId: string, updateData: Partial<InsertUser>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set(updateData)
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (!user) throw new Error("User not found");
+    return user;
+  }
+
   async updateUserTokens(userId: string, tokenChange: number): Promise<User> {
     const [user] = await db
       .update(users)
@@ -379,6 +398,61 @@ export class DatabaseStorage implements IStorage {
     
     if (!user) throw new Error("User not found");
     return user;
+  }
+
+  // User Favorites
+  async getUserFavorites(userId: string): Promise<UserFavorite[]> {
+    return await db
+      .select()
+      .from(userFavorites)
+      .where(eq(userFavorites.userId, userId))
+      .orderBy(desc(userFavorites.createdAt));
+  }
+
+  async addUserFavorite(favorite: InsertUserFavorite): Promise<UserFavorite> {
+    // Check if favorite already exists
+    const existing = await this.checkUserFavorite(
+      favorite.userId,
+      favorite.itemType,
+      favorite.itemId
+    );
+    
+    if (existing) {
+      return existing;
+    }
+
+    const [newFavorite] = await db
+      .insert(userFavorites)
+      .values(favorite)
+      .returning();
+    
+    return newFavorite;
+  }
+
+  async removeUserFavorite(userId: string, favoriteId: string): Promise<void> {
+    await db
+      .delete(userFavorites)
+      .where(
+        and(
+          eq(userFavorites.id, favoriteId),
+          eq(userFavorites.userId, userId)
+        )
+      );
+  }
+
+  async checkUserFavorite(userId: string, itemType: string, itemId: string): Promise<UserFavorite | undefined> {
+    const [favorite] = await db
+      .select()
+      .from(userFavorites)
+      .where(
+        and(
+          eq(userFavorites.userId, userId),
+          eq(userFavorites.itemType, itemType),
+          eq(userFavorites.itemId, itemId)
+        )
+      );
+    
+    return favorite;
   }
 
   // Missions

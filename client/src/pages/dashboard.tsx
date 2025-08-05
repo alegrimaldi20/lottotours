@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Coins, Trophy, Map, Star, ArrowRight, Gift, Users, Target, Crown } from "lucide-react";
+import { Coins, Trophy, Map, Star, ArrowRight, Gift, Users, User as UserIcon, Target, Crown } from "lucide-react";
 import TravelImageRenderer from "@/components/travel-image-renderer";
 import MissionVerification from "@/components/mission-verification";
 
@@ -287,6 +287,12 @@ export default function Dashboard() {
                   <Button className="w-full justify-start bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg" data-testid="button-affiliate-program">
                     <Users className="mr-2 h-4 w-4" />
                     Affiliate Program
+                  </Button>
+                </Link>
+                <Link href="/profile">
+                  <Button className="w-full justify-start bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg" data-testid="button-profile">
+                    <UserIcon className="mr-2 h-4 w-4" />
+                    My Account
                   </Button>
                 </Link>
               </CardContent>

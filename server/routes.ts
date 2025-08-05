@@ -56,6 +56,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/users/:id", async (req, res) => {
+    try {
+      const updateData = req.body;
+      const user = await storage.updateUser(req.params.id, updateData);
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update user" });
+    }
+  });
+
   app.patch("/api/users/:id/tokens", async (req, res) => {
     try {
       const { tokens } = req.body;
@@ -66,6 +76,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(user);
     } catch (error) {
       res.status(500).json({ message: "Failed to update user tokens" });
+    }
+  });
+
+  // User favorites routes
+  app.get("/api/users/:userId/favorites", async (req, res) => {
+    try {
+      const favorites = await storage.getUserFavorites(req.params.userId);
+      res.json(favorites);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch favorites" });
+    }
+  });
+
+  app.post("/api/users/:userId/favorites", async (req, res) => {
+    try {
+      const favoriteData = {
+        ...req.body,
+        userId: req.params.userId
+      };
+      const favorite = await storage.addUserFavorite(favoriteData);
+      res.status(201).json(favorite);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to add favorite" });
+    }
+  });
+
+  app.delete("/api/users/:userId/favorites/:favoriteId", async (req, res) => {
+    try {
+      await storage.removeUserFavorite(req.params.userId, req.params.favoriteId);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to remove favorite" });
+    }
+  });
+
+  // Get user token purchases
+  app.get("/api/users/:userId/token-purchases", async (req, res) => {
+    try {
+      const purchases = await storage.getUserTokenPurchases(req.params.userId);
+      res.json(purchases);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch token purchases" });
     }
   });
 
