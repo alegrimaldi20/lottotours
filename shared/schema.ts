@@ -282,23 +282,27 @@ export const agencyAnalytics = pgTable("agency_analytics", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Exclusive Affiliate Program Module
+// Exclusive Affiliate Program Module - Differentiated for Travel Agencies and Individual Users
 export const affiliatePrograms = pgTable("affiliate_programs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   agencyId: varchar("agency_id").notNull().references(() => travelAgencies.id),
   programName: text("program_name").notNull(),
+  partnerType: text("partner_type").notNull().default("travel_agency"), // travel_agency, individual_user
+  businessScale: text("business_scale"), // enterprise, mid_market, small_business, individual
   uniqueCode: text("unique_code").notNull().unique(), // For referral links
   affiliateLink: text("affiliate_link").notNull(), // Generated unique URL
-  commissionTiers: text("commission_tiers").notNull(), // JSON with volume-based tiers
+  commissionTiers: text("commission_tiers").notNull(), // JSON with differentiated volume-based tiers by partner type
   baseCommissionRate: decimal("base_commission_rate", { precision: 5, scale: 4 }).notNull(),
-  bonusThresholds: text("bonus_thresholds"), // JSON with milestone bonuses
+  bonusThresholds: text("bonus_thresholds"), // JSON with milestone bonuses (different thresholds for agencies vs users)
+  volumeRequirements: text("volume_requirements"), // JSON with different volume requirements per partner type
+  specialBenefits: text("special_benefits").array(), // Enhanced benefits for travel agencies (priority support, custom materials, etc.)
   trackingPixel: text("tracking_pixel"), // For advanced analytics
   landingPageCustomization: text("landing_page_customization"), // JSON with custom branding
   promotionalMaterials: text("promotional_materials"), // JSON with banners, copy, etc.
   status: text("status").notNull().default("active"), // active, paused, suspended
   termsAndConditions: text("terms_and_conditions"),
   payoutSchedule: text("payout_schedule").notNull().default("monthly"), // monthly, quarterly, weekly
-  minimumPayout: integer("minimum_payout").notNull().default(5000), // in cents
+  minimumPayout: integer("minimum_payout").notNull().default(5000), // Different minimums for agencies vs users
   isExclusive: boolean("is_exclusive").notNull().default(false),
   exclusivityBonus: decimal("exclusivity_bonus", { precision: 5, scale: 4 }),
   createdAt: timestamp("created_at").defaultNow(),
@@ -361,6 +365,7 @@ export const affiliateLeaderboard = pgTable("affiliate_leaderboard", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   agencyId: varchar("agency_id").notNull().references(() => travelAgencies.id),
   affiliateProgramId: varchar("affiliate_program_id").notNull().references(() => affiliatePrograms.id),
+  partnerType: text("partner_type").notNull(), // travel_agency, individual_user
   period: text("period").notNull(), // monthly, quarterly, yearly
   periodStart: timestamp("period_start").notNull(),
   periodEnd: timestamp("period_end").notNull(),
@@ -368,6 +373,7 @@ export const affiliateLeaderboard = pgTable("affiliate_leaderboard", {
   countryCode: text("country_code"), // For country-specific rankings
   region: text("region"), // For regional rankings
   rank: integer("rank").notNull(),
+  partnerTypeRank: integer("partner_type_rank"), // Ranking within partner type (agency vs user leaderboards)
   nationalRank: integer("national_rank"), // Ranking within country
   regionalRank: integer("regional_rank"), // Ranking within region
   totalReferrals: integer("total_referrals").notNull(),
@@ -376,10 +382,11 @@ export const affiliateLeaderboard = pgTable("affiliate_leaderboard", {
   commissionEarned: integer("commission_earned").notNull(), // in cents
   conversionRate: decimal("conversion_rate", { precision: 5, scale: 4 }),
   averageOrderValue: integer("average_order_value"), // in cents
-  topPerformerBadge: text("top_performer_badge"), // gold, silver, bronze, rising_star
+  topPerformerBadge: text("top_performer_badge"), // gold, silver, bronze, rising_star (different criteria for agencies vs users)
   achievements: text("achievements").array(), // JSON array of earned badges/achievements
   territoryDominance: decimal("territory_dominance", { precision: 5, scale: 4 }), // % market share in territory
   crossBorderReferrals: integer("cross_border_referrals"), // International referrals
+  businessImpactScore: decimal("business_impact_score", { precision: 5, scale: 2 }), // Higher weight for travel agency contributions
   createdAt: timestamp("created_at").defaultNow(),
 });
 

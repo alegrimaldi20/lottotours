@@ -31,6 +31,9 @@ Preferred communication style: Simple, everyday language.
 - Implemented comprehensive geographic distribution strategy with tier-based market segmentation
 - **FOCUSED**: Initial South American expansion targeting nine countries: Colombia, Peru, Ecuador, Bolivia, Chile, Uruguay, Paraguay, Argentina, and Brazil
 - Configured system for strategic market penetration across Latin American tourism markets with local currency and territory support
+- **DIFFERENTIATED**: Enhanced affiliate program with separate tiers for travel agencies and individual users
+- Implemented partner type selector with differentiated commission rates (agencies: 18-28%, users: 10-18%)
+- Added business scale categorization and specialized benefits for enterprise-level travel agency partnerships
 
 **Strategic Travel Agency Partnership Module (August 2025)**
 - **IMPLEMENTED**: Complete external modular system for travel agency partnerships with commission sharing agreements

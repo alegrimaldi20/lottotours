@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
+import PartnerTypeSelector from "@/components/partner-type-selector";
 import { 
   Link as LinkIcon, Users, TrendingUp, DollarSign, Award, Copy,
   Eye, MousePointer, UserPlus, ShoppingCart, Trophy, Calendar,
@@ -155,6 +156,8 @@ const tierIcons = {
 export default function AffiliateDashboard() {
   const [copiedLink, setCopiedLink] = useState(false);
   const [showCampaignCreator, setShowCampaignCreator] = useState(false);
+  const [selectedPartnerType, setSelectedPartnerType] = useState<'travel_agency' | 'individual_user'>('travel_agency');
+  const [showPartnerSelector, setShowPartnerSelector] = useState(false);
   const { toast } = useToast();
 
   // Mock queries - replace with real API calls
@@ -259,10 +262,19 @@ export default function AffiliateDashboard() {
                 <h1 className="text-2xl font-bold text-slate-900">Affiliate Program</h1>
               </div>
             </div>
-            <Badge className={currentTierInfo.color}>
-              {currentTierInfo.icon}
-              <span className="ml-1">{currentTierInfo.name} Partner</span>
-            </Badge>
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowPartnerSelector(true)}
+                className="border-blue-200 hover:border-blue-300"
+              >
+                Switch Partner Type
+              </Button>
+              <Badge className={`${selectedPartnerType === 'travel_agency' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
+                <Trophy className="mr-1 h-4 w-4" />
+                {selectedPartnerType === 'travel_agency' ? 'Travel Agency' : 'Individual User'} • {currentTierInfo.name}
+              </Badge>
+            </div>
           </div>
         </div>
       </div>
@@ -857,6 +869,26 @@ export default function AffiliateDashboard() {
             </div>
           </TabsContent>
         </Tabs>
+
+        {/* Partner Type Selector Dialog */}
+        <Dialog open={showPartnerSelector} onOpenChange={setShowPartnerSelector}>
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Select Your Partnership Level</DialogTitle>
+            </DialogHeader>
+            <PartnerTypeSelector 
+              selectedType={selectedPartnerType}
+              onSelectPartnerType={(type) => {
+                setSelectedPartnerType(type);
+                setShowPartnerSelector(false);
+                toast({
+                  title: "Partnership Type Updated!",
+                  description: `You are now enrolled in the ${type === 'travel_agency' ? 'Travel Agency' : 'Individual User'} affiliate program.`,
+                });
+              }}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
