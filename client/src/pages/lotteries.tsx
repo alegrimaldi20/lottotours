@@ -38,10 +38,13 @@ export default function Lotteries() {
         throw new Error("Insufficient tokens");
       }
       
-      const response = await apiRequest("POST", "/api/lottery-tickets", {
-        lotteryId,
-        userId: SAMPLE_USER_ID,
-        ticketNumber: Math.floor(Math.random() * 1000000) + 1
+      const response = await apiRequest("/api/lottery-tickets", {
+        method: "POST",
+        body: {
+          lotteryId,
+          userId: SAMPLE_USER_ID,
+          ticketNumber: Math.floor(Math.random() * 1000000) + 1
+        }
       });
       return response.json();
     },

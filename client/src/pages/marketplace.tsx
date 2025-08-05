@@ -40,12 +40,11 @@ export default function Marketplace() {
       
       const response = await apiRequest("/api/prize-redemptions", {
         method: "POST",
-        body: JSON.stringify({
+        body: {
           userId: SAMPLE_USER_ID,
           prizeId,
           status: "pending"
-        }),
-        headers: { "Content-Type": "application/json" }
+        }
       });
       return response.json();
     },
