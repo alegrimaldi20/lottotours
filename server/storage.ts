@@ -450,19 +450,23 @@ export class DatabaseStorage implements IStorage {
     let verifiedBy = "system";
     let tokensAwarded = mission.reward;
 
-    // Create mission activity record for completion attempt
-    await this.createMissionActivity({
-      userMissionId: existingMission?.id || '',
-      userId,
-      missionId,
-      activityType: 'completion_attempt',
-      activityData: JSON.stringify({
-        verificationMethod: mission.verificationMethod,
-        timestamp: now.toISOString()
-      }),
-      proofData: verificationData ? JSON.stringify(verificationData) : null,
-      isSignificant: true
-    });
+    // Create mission activity record for completion attempt (only if mission activity table exists)
+    try {
+      await this.createMissionActivity({
+        userMissionId: existingMission?.id || '',
+        userId,
+        missionId,
+        activityType: 'completion_attempt',
+        activityData: JSON.stringify({
+          verificationMethod: mission.verificationMethod,
+          timestamp: now.toISOString()
+        }),
+        proofData: verificationData ? JSON.stringify(verificationData) : null,
+        isSignificant: true
+      });
+    } catch (error) {
+      console.log("Mission activity tracking not yet available:", error);
+    }
 
     // Apply verification method logic
     switch (mission.verificationMethod) {
@@ -635,22 +639,26 @@ export class DatabaseStorage implements IStorage {
       await this.incrementUserMissionsCompleted(userMission.userId);
     }
 
-    // Create verification activity record
-    await this.createMissionActivity({
-      userMissionId: userMissionId,
-      userId: userMission.userId,
-      missionId: userMission.missionId,
-      activityType: approved ? 'verified' : 'failed',
-      activityData: JSON.stringify({
+    // Create verification activity record (only if mission activity table exists)
+    try {
+      await this.createMissionActivity({
+        userMissionId: userMissionId,
+        userId: userMission.userId,
+        missionId: userMission.missionId,
+        activityType: approved ? 'verified' : 'failed',
+        activityData: JSON.stringify({
+          verificationResult: approved ? 'approved' : 'rejected',
+          verifiedBy,
+          tokensAwarded,
+          timestamp: now.toISOString()
+        }),
         verificationResult: approved ? 'approved' : 'rejected',
-        verifiedBy,
-        tokensAwarded,
-        timestamp: now.toISOString()
-      }),
-      verificationResult: approved ? 'approved' : 'rejected',
-      tokenChange: tokensAwarded,
-      isSignificant: true
-    });
+        tokenChange: tokensAwarded,
+        isSignificant: true
+      });
+    } catch (error) {
+      console.log("Mission activity tracking not yet available:", error);
+    }
 
     return updated;
   }
@@ -792,8 +800,7 @@ export class DatabaseStorage implements IStorage {
       .update(lotteries)
       .set({ 
         status: "drawn", 
-        winnerId: winningTicket.userId,
-        drawId: drawId
+        winnerId: winningTicket.userId
       })
       .where(eq(lotteries.id, lotteryId))
       .returning();

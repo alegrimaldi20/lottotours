@@ -62,7 +62,6 @@ export const lotteries = pgTable("lotteries", {
   drawDate: timestamp("draw_date").notNull(),
   status: text("status").notNull().default("active"), // active, drawn, completed
   winnerId: varchar("winner_id").references(() => users.id),
-  drawId: varchar("draw_id").unique(), // Unique ID for each draw execution
   image: text("image").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });

@@ -135,7 +135,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const lotteries = await storage.getActiveLotteries();
       res.json(lotteries);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch lotteries" });
+      console.error("Error fetching lotteries:", error);
+      res.status(500).json({ message: "Failed to fetch lotteries", error: error instanceof Error ? error.message : String(error) });
     }
   });
 

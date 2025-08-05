@@ -33,7 +33,7 @@ export default function UniqueIdsPage() {
 
   // Fetch mission activities for user
   const { data: userActivities = [], isLoading: activitiesLoading } = useQuery({
-    queryKey: ['/api/mission-activities', { userId: selectedUserId }],
+    queryKey: [`/api/mission-activities?userId=${selectedUserId}`],
   });
 
   // Fetch specific activity by ID
