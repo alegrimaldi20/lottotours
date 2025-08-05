@@ -206,6 +206,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Lottery draw tracking endpoints - Always accessible unique IDs
+  app.get("/api/lottery-draws", async (req, res) => {
+    try {
+      const lotteryId = req.query.lotteryId as string;
+      const draws = await storage.getLotteryDraws(lotteryId);
+      res.json(draws);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch lottery draws" });
+    }
+  });
+
+  app.get("/api/lottery-draws/:drawId", async (req, res) => {
+    try {
+      const { drawId } = req.params;
+      const draw = await storage.getLotteryDraw(drawId);
+      if (!draw) {
+        return res.status(404).json({ message: "Draw not found" });
+      }
+      res.json(draw);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch lottery draw" });
+    }
+  });
+
+  // Mission activity tracking endpoints - Always accessible unique IDs
+  app.get("/api/mission-activities", async (req, res) => {
+    try {
+      const { userMissionId, userId } = req.query;
+      const activities = await storage.getMissionActivities(
+        userMissionId as string, 
+        userId as string
+      );
+      res.json(activities);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch mission activities" });
+    }
+  });
+
+  app.get("/api/mission-activities/:activityId", async (req, res) => {
+    try {
+      const { activityId } = req.params;
+      const activity = await storage.getMissionActivity(activityId);
+      if (!activity) {
+        return res.status(404).json({ message: "Activity not found" });
+      }
+      res.json(activity);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch mission activity" });
+    }
+  });
+
   // NFTs routes
   app.get("/api/users/:userId/nfts", async (req, res) => {
     try {

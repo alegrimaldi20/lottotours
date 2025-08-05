@@ -22,6 +22,7 @@ import ServiceConditionsDashboard from "./pages/service-conditions-dashboard";
 import WinnerDashboard from "./pages/winner-dashboard";
 import AffiliateDashboard from "./pages/affiliate-dashboard";
 import CountryOperations from "./pages/country-operations";
+import UniqueIds from "./pages/unique-ids";
 import NotFound from "@/pages/not-found";
 
 export const ToastContext = React.createContext<{
@@ -56,6 +57,7 @@ function Router() {
       <Route path="/winner-dashboard" component={WinnerDashboard} />
       <Route path="/affiliate-dashboard" component={AffiliateDashboard} />
       <Route path="/country-operations" component={CountryOperations} />
+      <Route path="/unique-ids" component={UniqueIds} />
       <Route component={NotFound} />
     </Switch>
   );

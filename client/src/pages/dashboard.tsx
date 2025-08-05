@@ -112,6 +112,9 @@ export default function Dashboard() {
               <Link href="/country-operations">
                 <Button variant="ghost" data-testid="nav-operations">Global Operations</Button>
               </Link>
+              <Link href="/unique-ids">
+                <Button variant="ghost" data-testid="nav-unique-ids">Unique IDs</Button>
+              </Link>
             </nav>
           </div>
         </div>

@@ -2,6 +2,7 @@ import {
   type User, type InsertUser,
   type Mission, type InsertMission, type UserMission,
   type Lottery, type InsertLottery, type LotteryTicket, type InsertLotteryTicket,
+  type LotteryDraw, type InsertLotteryDraw, type MissionActivity, type InsertMissionActivity,
   type NFT, type InsertNFT,
   type Prize, type InsertPrize, type PrizeRedemption, type InsertPrizeRedemption,
   type TokenPack, type InsertTokenPack, type TokenPurchase, type InsertTokenPurchase,
@@ -12,13 +13,14 @@ import {
   type AffiliateProgram, type InsertAffiliateProgram, type AffiliateReferral, type InsertAffiliateReferral,
   type AffiliatePayout, type InsertAffiliatePayout, type AffiliateTrackingEvent, type InsertAffiliateTrackingEvent,
   type AffiliateLeaderboard, type InsertAffiliateLeaderboard,
-  users, missions, userMissions, lotteries, lotteryTickets, nfts, prizes, prizeRedemptions, tokenPacks, tokenPurchases, serviceConditions, userAgreements,
+  users, missions, userMissions, lotteries, lotteryTickets, lotteryDraws, missionActivities, nfts, prizes, prizeRedemptions, tokenPacks, tokenPurchases, serviceConditions, userAgreements,
   travelAgencies, agencyTourPackages, prizeWinners, agencyCommissions, agencyAnalytics,
   affiliatePrograms, affiliateReferrals, affiliatePayouts, affiliateTrackingEvents, affiliateLeaderboard
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
+import * as crypto from "crypto";
 
 export interface IStorage {
   // Users
@@ -36,6 +38,9 @@ export interface IStorage {
   startMission(userId: string, missionId: string): Promise<UserMission>;
   completeMission(userId: string, missionId: string, verificationData?: any): Promise<UserMission>;
   verifyMission(userMissionId: string, approved: boolean, verifiedBy: string): Promise<UserMission>;
+  createMissionActivity(activity: InsertMissionActivity): Promise<MissionActivity>;
+  getMissionActivities(userMissionId?: string, userId?: string): Promise<MissionActivity[]>;
+  getMissionActivity(activityId: string): Promise<MissionActivity | undefined>;
 
   // Lotteries
   getLotteries(): Promise<Lottery[]>;
@@ -43,7 +48,9 @@ export interface IStorage {
   getLottery(id: string): Promise<Lottery | undefined>;
   purchaseLotteryTicket(ticket: InsertLotteryTicket): Promise<LotteryTicket>;
   getUserLotteryTickets(userId: string): Promise<LotteryTicket[]>;
-  drawLottery(lotteryId: string): Promise<Lottery>;
+  drawLottery(lotteryId: string, drawExecutorId?: string): Promise<{lottery: Lottery, draw: LotteryDraw}>;
+  getLotteryDraws(lotteryId?: string): Promise<LotteryDraw[]>;
+  getLotteryDraw(drawId: string): Promise<LotteryDraw | undefined>;
 
   // NFTs
   getUserNFTs(userId: string): Promise<NFT[]>;
@@ -443,6 +450,20 @@ export class DatabaseStorage implements IStorage {
     let verifiedBy = "system";
     let tokensAwarded = mission.reward;
 
+    // Create mission activity record for completion attempt
+    await this.createMissionActivity({
+      userMissionId: existingMission?.id || '',
+      userId,
+      missionId,
+      activityType: 'completion_attempt',
+      activityData: JSON.stringify({
+        verificationMethod: mission.verificationMethod,
+        timestamp: now.toISOString()
+      }),
+      proofData: verificationData ? JSON.stringify(verificationData) : null,
+      isSignificant: true
+    });
+
     // Apply verification method logic
     switch (mission.verificationMethod) {
       case "auto":
@@ -614,7 +635,62 @@ export class DatabaseStorage implements IStorage {
       await this.incrementUserMissionsCompleted(userMission.userId);
     }
 
+    // Create verification activity record
+    await this.createMissionActivity({
+      userMissionId: userMissionId,
+      userId: userMission.userId,
+      missionId: userMission.missionId,
+      activityType: approved ? 'verified' : 'failed',
+      activityData: JSON.stringify({
+        verificationResult: approved ? 'approved' : 'rejected',
+        verifiedBy,
+        tokensAwarded,
+        timestamp: now.toISOString()
+      }),
+      verificationResult: approved ? 'approved' : 'rejected',
+      tokenChange: tokensAwarded,
+      isSignificant: true
+    });
+
     return updated;
+  }
+
+  async createMissionActivity(activity: InsertMissionActivity): Promise<MissionActivity> {
+    const activityId = crypto.randomUUID();
+    const activityHash = crypto.createHash('sha256')
+      .update(`${activity.userId}-${activity.missionId}-${activity.activityType}-${Date.now()}`)
+      .digest('hex');
+
+    const [created] = await db
+      .insert(missionActivities)
+      .values({
+        ...activity,
+        activityId,
+        activityHash
+      })
+      .returning();
+    
+    return created;
+  }
+
+  async getMissionActivities(userMissionId?: string, userId?: string): Promise<MissionActivity[]> {
+    if (userMissionId && userId) {
+      return await db.select().from(missionActivities).where(and(
+        eq(missionActivities.userMissionId, userMissionId),
+        eq(missionActivities.userId, userId)
+      ));
+    } else if (userMissionId) {
+      return await db.select().from(missionActivities).where(eq(missionActivities.userMissionId, userMissionId));
+    } else if (userId) {
+      return await db.select().from(missionActivities).where(eq(missionActivities.userId, userId));
+    }
+    
+    return await db.select().from(missionActivities);
+  }
+
+  async getMissionActivity(activityId: string): Promise<MissionActivity | undefined> {
+    const [activity] = await db.select().from(missionActivities).where(eq(missionActivities.activityId, activityId));
+    return activity;
   }
 
   async incrementUserMissionsCompleted(userId: string): Promise<User> {
@@ -678,7 +754,7 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(lotteryTickets).where(eq(lotteryTickets.userId, userId));
   }
 
-  async drawLottery(lotteryId: string): Promise<Lottery> {
+  async drawLottery(lotteryId: string, drawExecutorId?: string): Promise<{lottery: Lottery, draw: LotteryDraw}> {
     const [lottery] = await db.select().from(lotteries).where(eq(lotteries.id, lotteryId));
     if (!lottery) throw new Error("Lottery not found");
     
@@ -686,13 +762,55 @@ export class DatabaseStorage implements IStorage {
     if (tickets.length === 0) throw new Error("No tickets sold");
     
     const winningTicket = tickets[Math.floor(Math.random() * tickets.length)];
+    
+    // Generate unique draw ID and create draw record
+    const drawId = crypto.randomUUID();
+    const verificationHash = crypto.createHash('sha256')
+      .update(`${lotteryId}-${winningTicket.id}-${Date.now()}`)
+      .digest('hex');
+    
+    const [draw] = await db
+      .insert(lotteryDraws)
+      .values({
+        drawId,
+        lotteryId,
+        winningTicketId: winningTicket.id,
+        winnerId: winningTicket.userId,
+        winningNumbers: winningTicket.selectedNumbers,
+        totalTicketsSold: tickets.length,
+        drawExecutorId: drawExecutorId || 'system',
+        verificationHash,
+        drawData: JSON.stringify({
+          totalParticipants: new Set(tickets.map(t => t.userId)).size,
+          winningTicketNumber: winningTicket.ticketNumber,
+          drawTimestamp: new Date().toISOString()
+        })
+      })
+      .returning();
+    
     const [updatedLottery] = await db
       .update(lotteries)
-      .set({ status: "drawn", winnerId: winningTicket.userId })
+      .set({ 
+        status: "drawn", 
+        winnerId: winningTicket.userId,
+        drawId: drawId
+      })
       .where(eq(lotteries.id, lotteryId))
       .returning();
     
-    return updatedLottery;
+    return { lottery: updatedLottery, draw };
+  }
+
+  async getLotteryDraws(lotteryId?: string): Promise<LotteryDraw[]> {
+    if (lotteryId) {
+      return await db.select().from(lotteryDraws).where(eq(lotteryDraws.lotteryId, lotteryId));
+    }
+    return await db.select().from(lotteryDraws);
+  }
+
+  async getLotteryDraw(drawId: string): Promise<LotteryDraw | undefined> {
+    const [draw] = await db.select().from(lotteryDraws).where(eq(lotteryDraws.drawId, drawId));
+    return draw;
   }
 
   // NFTs
