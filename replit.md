@@ -1,7 +1,24 @@
 # TravelLotto DApp - Blockchain Tourism Lottery Platform
 
 ## Overview
-TravelLotto is a gamified blockchain-based DApp that combines digital lotteries with authentic travel experiences. Users participate in themed missions, lotteries, and challenges to earn tokens and NFTs redeemable for real travel packages, exclusive experiences, and tourism benefits. The platform features modern Web3 integration, a vibrant, tourism-themed UI, transparent blockchain mechanics, and an exclusive affiliate marketing system with unique referral links and scalable commission structures for individual users and travel agencies. It also includes a comprehensive unique ID system for all draws and activities, a strategic travel agency partnership module, and a legal compliance framework. The business vision is to expand into South American markets, initially targeting nine countries, and support multi-country operations for travel agencies.
+TravelLotto is a comprehensive blockchain-based travel platform that combines verified lotteries with authentic travel experiences. The platform currently features:
+
+**Travel Lottery System:** Three active travel lotteries with blockchain-verified draws:
+- Bali Cultural Immersion (8 days) - LT2025-101 
+- Patagonia Wilderness Expedition (10 days) - LT2025-102
+- Morocco Desert & Cities (12 days) - LT2025-103
+
+**Referral & Affiliate System:** Dual-tier partner program with comprehensive tracking:
+- Travel Agency Partners: 18-28% commissions with enterprise features
+- Individual Affiliates: 10-18% commissions with personal referral tools
+- Complete analytics, payout management, and tier progression
+
+**South American Expansion Plan:** Active operations across nine countries:
+- Colombia, Peru, Ecuador, Bolivia, Chile, Uruguay, Paraguay, Argentina, Brazil
+- Country-specific analytics, agency partnerships, and market penetration tracking
+- Multi-currency support and regional customization
+
+**Core Features:** Token-based economy, mission verification system, QR code lottery verification, unique draw ID tracking, multi-language support (EN/ES/PT), and comprehensive user management.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
