@@ -9,8 +9,12 @@ import {
   type TravelAgency, type InsertTravelAgency, type AgencyTourPackage, type InsertAgencyTourPackage,
   type PrizeWinner, type InsertPrizeWinner, type AgencyCommission, type InsertAgencyCommission,
   type AgencyAnalytics, type InsertAgencyAnalytics,
+  type AffiliateProgram, type InsertAffiliateProgram, type AffiliateReferral, type InsertAffiliateReferral,
+  type AffiliatePayout, type InsertAffiliatePayout, type AffiliateTrackingEvent, type InsertAffiliateTrackingEvent,
+  type AffiliateLeaderboard, type InsertAffiliateLeaderboard,
   users, missions, userMissions, lotteries, lotteryTickets, nfts, prizes, prizeRedemptions, tokenPacks, tokenPurchases, serviceConditions, userAgreements,
-  travelAgencies, agencyTourPackages, prizeWinners, agencyCommissions, agencyAnalytics
+  travelAgencies, agencyTourPackages, prizeWinners, agencyCommissions, agencyAnalytics,
+  affiliatePrograms, affiliateReferrals, affiliatePayouts, affiliateTrackingEvents, affiliateLeaderboard
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
@@ -90,6 +94,27 @@ export interface IStorage {
   // Agency Analytics
   getAgencyAnalytics(agencyId: string, dateRange?: { start: Date; end: Date }): Promise<AgencyAnalytics[]>;
   createAgencyAnalytics(analytics: InsertAgencyAnalytics): Promise<AgencyAnalytics>;
+
+  // Exclusive Affiliate Program Module
+  getAffiliatePrograms(agencyId?: string): Promise<AffiliateProgram[]>;
+  getAffiliateProgram(id: string): Promise<AffiliateProgram | null>;
+  createAffiliateProgram(program: InsertAffiliateProgram): Promise<AffiliateProgram>;
+  updateAffiliateProgram(id: string, updates: Partial<AffiliateProgram>): Promise<AffiliateProgram>;
+  
+  // Affiliate Referral Tracking
+  trackAffiliateClick(referralCode: string, userId: string, clickData: any): Promise<AffiliateReferral>;
+  updateAffiliateReferralStatus(referralId: string, status: string, transactionData?: any): Promise<AffiliateReferral>;
+  getAffiliateReferrals(agencyId?: string, affiliateProgramId?: string): Promise<AffiliateReferral[]>;
+  
+  // Affiliate Payouts & Performance
+  calculateAffiliatePayout(affiliateProgramId: string, periodStart: Date, periodEnd: Date): Promise<AffiliatePayout>;
+  getAffiliatePayouts(agencyId?: string): Promise<AffiliatePayout[]>;
+  updatePayoutStatus(payoutId: string, status: string, paymentData?: any): Promise<AffiliatePayout>;
+  
+  // Affiliate Analytics & Leaderboard
+  getAffiliateLeaderboard(period: string, limit?: number): Promise<AffiliateLeaderboard[]>;
+  createTrackingEvent(event: InsertAffiliateTrackingEvent): Promise<AffiliateTrackingEvent>;
+  getAffiliateAnalytics(agencyId: string, period: string): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {

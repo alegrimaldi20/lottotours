@@ -271,6 +271,100 @@ export const agencyAnalytics = pgTable("agency_analytics", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Exclusive Affiliate Program Module
+export const affiliatePrograms = pgTable("affiliate_programs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  agencyId: varchar("agency_id").notNull().references(() => travelAgencies.id),
+  programName: text("program_name").notNull(),
+  uniqueCode: text("unique_code").notNull().unique(), // For referral links
+  affiliateLink: text("affiliate_link").notNull(), // Generated unique URL
+  commissionTiers: text("commission_tiers").notNull(), // JSON with volume-based tiers
+  baseCommissionRate: decimal("base_commission_rate", { precision: 5, scale: 4 }).notNull(),
+  bonusThresholds: text("bonus_thresholds"), // JSON with milestone bonuses
+  trackingPixel: text("tracking_pixel"), // For advanced analytics
+  landingPageCustomization: text("landing_page_customization"), // JSON with custom branding
+  promotionalMaterials: text("promotional_materials"), // JSON with banners, copy, etc.
+  status: text("status").notNull().default("active"), // active, paused, suspended
+  termsAndConditions: text("terms_and_conditions"),
+  payoutSchedule: text("payout_schedule").notNull().default("monthly"), // monthly, quarterly, weekly
+  minimumPayout: integer("minimum_payout").notNull().default(5000), // in cents
+  isExclusive: boolean("is_exclusive").notNull().default(false),
+  exclusivityBonus: decimal("exclusivity_bonus", { precision: 5, scale: 4 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const affiliateReferrals = pgTable("affiliate_referrals", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  affiliateProgramId: varchar("affiliate_program_id").notNull().references(() => affiliatePrograms.id),
+  agencyId: varchar("agency_id").notNull().references(() => travelAgencies.id),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  referralCode: text("referral_code").notNull(),
+  clickedAt: timestamp("clicked_at").notNull(),
+  registeredAt: timestamp("registered_at"),
+  firstTransactionAt: timestamp("first_transaction_at"),
+  firstTransactionAmount: integer("first_transaction_amount"), // in cents
+  totalSpent: integer("total_spent").notNull().default(0), // lifetime value in cents
+  transactionCount: integer("transaction_count").notNull().default(0),
+  status: text("status").notNull().default("clicked"), // clicked, registered, converted, churned
+  userAgent: text("user_agent"),
+  ipAddress: text("ip_address"),
+  source: text("source"), // social media, email, banner, etc.
+  campaign: text("campaign"), // specific marketing campaign
+  conversionData: text("conversion_data"), // JSON with conversion details
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const affiliatePayouts = pgTable("affiliate_payouts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  affiliateProgramId: varchar("affiliate_program_id").notNull().references(() => affiliatePrograms.id),
+  agencyId: varchar("agency_id").notNull().references(() => travelAgencies.id),
+  payoutPeriodStart: timestamp("payout_period_start").notNull(),
+  payoutPeriodEnd: timestamp("payout_period_end").notNull(),
+  totalReferrals: integer("total_referrals").notNull(),
+  convertedReferrals: integer("converted_referrals").notNull(),
+  totalCommissionEarned: integer("total_commission_earned").notNull(), // in cents
+  bonusEarned: integer("bonus_earned").notNull().default(0), // in cents
+  adjustments: integer("adjustments").notNull().default(0), // in cents (can be negative)
+  netPayout: integer("net_payout").notNull(), // in cents
+  status: text("status").notNull().default("pending"), // pending, approved, paid, disputed
+  paymentMethod: text("payment_method"), // bank_transfer, paypal, check
+  paymentReference: text("payment_reference"),
+  notes: text("notes"),
+  approvedAt: timestamp("approved_at"),
+  paidAt: timestamp("paid_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const affiliateTrackingEvents = pgTable("affiliate_tracking_events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  affiliateReferralId: varchar("affiliate_referral_id").notNull().references(() => affiliateReferrals.id),
+  eventType: text("event_type").notNull(), // click, register, first_purchase, repeat_purchase, milestone
+  eventValue: integer("event_value"), // transaction amount or milestone value in cents
+  eventData: text("event_data"), // JSON with additional event information
+  sessionId: text("session_id"),
+  userId: varchar("user_id").references(() => users.id),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+});
+
+export const affiliateLeaderboard = pgTable("affiliate_leaderboard", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  agencyId: varchar("agency_id").notNull().references(() => travelAgencies.id),
+  affiliateProgramId: varchar("affiliate_program_id").notNull().references(() => affiliatePrograms.id),
+  period: text("period").notNull(), // monthly, quarterly, yearly
+  periodStart: timestamp("period_start").notNull(),
+  periodEnd: timestamp("period_end").notNull(),
+  rank: integer("rank").notNull(),
+  totalReferrals: integer("total_referrals").notNull(),
+  convertedReferrals: integer("converted_referrals").notNull(),
+  totalRevenue: integer("total_revenue").notNull(), // in cents
+  commissionEarned: integer("commission_earned").notNull(), // in cents
+  conversionRate: decimal("conversion_rate", { precision: 5, scale: 4 }),
+  averageOrderValue: integer("average_order_value"), // in cents
+  topPerformerBadge: text("top_performer_badge"), // gold, silver, bronze, rising_star
+  achievements: text("achievements").array(), // JSON array of earned badges/achievements
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -383,6 +477,36 @@ export const insertAgencyAnalyticsSchema = createInsertSchema(agencyAnalytics).o
   createdAt: true,
 });
 
+export const insertAffiliateProgramSchema = createInsertSchema(affiliatePrograms).omit({
+  id: true,
+  createdAt: true,
+  affiliateLink: true, // Generated automatically
+  uniqueCode: true, // Generated automatically
+});
+
+export const insertAffiliateReferralSchema = createInsertSchema(affiliateReferrals).omit({
+  id: true,
+  createdAt: true,
+  clickedAt: true, // Set automatically
+});
+
+export const insertAffiliatePayoutSchema = createInsertSchema(affiliatePayouts).omit({
+  id: true,
+  createdAt: true,
+  approvedAt: true,
+  paidAt: true,
+});
+
+export const insertAffiliateTrackingEventSchema = createInsertSchema(affiliateTrackingEvents).omit({
+  id: true,
+  timestamp: true, // Set automatically
+});
+
+export const insertAffiliateLeaderboardSchema = createInsertSchema(affiliateLeaderboard).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -419,3 +543,13 @@ export type AgencyCommission = typeof agencyCommissions.$inferSelect;
 export type InsertAgencyCommission = z.infer<typeof insertAgencyCommissionSchema>;
 export type AgencyAnalytics = typeof agencyAnalytics.$inferSelect;
 export type InsertAgencyAnalytics = z.infer<typeof insertAgencyAnalyticsSchema>;
+export type AffiliateProgram = typeof affiliatePrograms.$inferSelect;
+export type InsertAffiliateProgram = z.infer<typeof insertAffiliateProgramSchema>;
+export type AffiliateReferral = typeof affiliateReferrals.$inferSelect;
+export type InsertAffiliateReferral = z.infer<typeof insertAffiliateReferralSchema>;
+export type AffiliatePayout = typeof affiliatePayouts.$inferSelect;
+export type InsertAffiliatePayout = z.infer<typeof insertAffiliatePayoutSchema>;
+export type AffiliateTrackingEvent = typeof affiliateTrackingEvents.$inferSelect;
+export type InsertAffiliateTrackingEvent = z.infer<typeof insertAffiliateTrackingEventSchema>;
+export type AffiliateLeaderboard = typeof affiliateLeaderboard.$inferSelect;
+export type InsertAffiliateLeaderboard = z.infer<typeof insertAffiliateLeaderboardSchema>;

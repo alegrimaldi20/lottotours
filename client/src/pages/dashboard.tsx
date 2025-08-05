@@ -106,6 +106,9 @@ export default function Dashboard() {
               <Link href="/winner-dashboard">
                 <Button variant="ghost" data-testid="nav-winners">My Prizes</Button>
               </Link>
+              <Link href="/affiliate-dashboard">
+                <Button variant="ghost" data-testid="nav-affiliate">Affiliate Program</Button>
+              </Link>
             </nav>
           </div>
         </div>
@@ -274,10 +277,12 @@ export default function Dashboard() {
                     Buy Token Packs
                   </Button>
                 </Link>
-                <Button variant="outline" className="w-full justify-start border-lottery-purple text-lottery-purple hover:bg-lottery-purple hover:text-white shadow-lg" data-testid="button-invite-friends">
-                  <Users className="mr-2 h-4 w-4" />
-                  Invite Friends
-                </Button>
+                <Link href="/affiliate-dashboard">
+                  <Button className="w-full justify-start bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg" data-testid="button-affiliate-program">
+                    <Users className="mr-2 h-4 w-4" />
+                    Affiliate Program
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 
