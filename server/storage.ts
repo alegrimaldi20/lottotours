@@ -859,8 +859,7 @@ export class DatabaseStorage implements IStorage {
     
     const winningTicket = tickets[Math.floor(Math.random() * tickets.length)];
     
-    // Generate unique draw ID and create draw record
-    const drawId = crypto.randomUUID();
+    // Generate verification hash
     const verificationHash = crypto.createHash('sha256')
       .update(`${lotteryId}-${winningTicket.id}-${Date.now()}`)
       .digest('hex');
@@ -926,7 +925,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getLotteryDraw(drawId: string): Promise<LotteryDraw | undefined> {
-    const [draw] = await db.select().from(lotteryDraws).where(eq(lotteryDraws.drawId, drawId));
+    const [draw] = await db.select().from(lotteryDraws).where(eq(lotteryDraws.id, drawId));
     return draw;
   }
 
