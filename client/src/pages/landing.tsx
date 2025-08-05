@@ -4,6 +4,7 @@ import { Star, MapPin, Gift, Trophy, Coins, Users, Sparkles } from "lucide-react
 import { Button } from "@/components/ui/button";
 import TravelImageRenderer from "@/components/travel-image-renderer";
 import Footer from "@/components/footer";
+import LanguageSelector from "@/components/language-selector";
 
 export default function Landing() {
   const scrollToSection = (sectionId: string) => {
@@ -27,7 +28,7 @@ export default function Landing() {
                 TravelLotto
               </div>
             </div>
-            <nav className="hidden md:flex space-x-8">
+            <nav className="hidden md:flex items-center space-x-8">
               <button 
                 onClick={() => scrollToSection('features')}
                 className="text-slate-600 hover:text-lottery-gold transition-colors"
@@ -42,12 +43,18 @@ export default function Landing() {
               >
                 How It Works
               </button>
+              <LanguageSelector variant="ghost" size="sm" />
               <Link href="/dashboard">
                 <Button className="btn-lottery shadow-lg" data-testid="button-get-started">
                   Get Started
                 </Button>
               </Link>
             </nav>
+            
+            {/* Mobile Menu */}
+            <div className="md:hidden flex items-center space-x-2">
+              <LanguageSelector variant="ghost" size="sm" />
+            </div>
           </div>
         </div>
       </header>
