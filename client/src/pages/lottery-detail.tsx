@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRoute, Link } from "wouter";
-import { ArrowLeft, Calendar, Users, Trophy, MapPin, Clock, Coins, Shuffle } from "lucide-react";
+import { ArrowLeft, Calendar, Users, Trophy, MapPin, Clock, Coins, Shuffle, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ import TravelImageRenderer from "@/components/travel-image-renderer";
 import LotteryNumberSelector from "@/components/lottery-number-selector";
 import React from "react";
 import { showSuccess, showError } from "@/utils/native-notifications";
+import { useToast } from "@/hooks/use-toast";
 
 import WalletConnector from "@/components/wallet-connector";
 import type { Lottery, User } from "@shared/schema";
@@ -23,6 +24,22 @@ export default function LotteryDetail() {
   const [, params] = useRoute("/lottery/:id");
   const queryClient = useQueryClient();
   const [ticketCart, setTicketCart] = useState<LotteryTicketCart[]>([]);
+  const { toast } = useToast();
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast({
+        title: "Copied!",
+        description: `${label} copied to clipboard`,
+      })
+    }).catch(() => {
+      toast({
+        title: "Copy failed",
+        description: "Please copy manually",
+        variant: "destructive"
+      })
+    })
+  }
 
   const { data: lottery, isLoading } = useQuery<Lottery>({
     queryKey: [`/api/lotteries/${params?.id}`],
@@ -136,9 +153,28 @@ export default function LotteryDetail() {
                 Back to Lotteries
               </Button>
             </Link>
-            <Badge variant="secondary" className="bg-lottery-gold text-white">
-              Draw #{lottery.id.slice(-8)}
-            </Badge>
+            <div className="flex items-center gap-3">
+              <Badge variant="secondary" className="bg-lottery-gold text-white">
+                Draw #{lottery.id.slice(-8)}
+              </Badge>
+              {lottery.lotteryCode && (
+                <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 px-3 py-2 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Lottery ID:</span>
+                  <code className="font-mono font-bold text-blue-800 dark:text-blue-200" data-testid="lottery-identification-code">
+                    {lottery.lotteryCode}
+                  </code>
+                  <Button
+                    data-testid="button-copy-lottery-id"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(lottery.lotteryCode!, "Lottery ID")}
+                    className="h-6 w-6 p-0 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
+                  >
+                    <Copy className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
           
           <div className="grid lg:grid-cols-3 gap-8">

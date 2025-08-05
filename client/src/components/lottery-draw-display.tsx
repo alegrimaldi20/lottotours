@@ -2,10 +2,11 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Calendar, Hash, Trophy, QrCode, CheckCircle, User, Ticket } from "lucide-react"
+import { Calendar, Hash, Trophy, QrCode, CheckCircle, User, Ticket, Copy } from "lucide-react"
 import { format } from "date-fns"
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
+import { useToast } from "@/hooks/use-toast"
 
 interface LotteryDraw {
   id: string
@@ -38,6 +39,22 @@ interface DrawDisplayProps {
 
 export function LotteryDrawDisplay({ drawCode, lotteryCode, showFullDetails = true }: DrawDisplayProps) {
   const [verifyingQR, setVerifyingQR] = useState(false)
+  const { toast } = useToast()
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast({
+        title: "Copied!",
+        description: `${label} copied to clipboard`,
+      })
+    }).catch(() => {
+      toast({
+        title: "Copy failed",
+        description: "Please copy manually",
+        variant: "destructive"
+      })
+    })
+  }
 
   // Fetch draw by draw code
   const { data: draw, isLoading: drawLoading } = useQuery<LotteryDraw>({
@@ -70,14 +87,25 @@ export function LotteryDrawDisplay({ drawCode, lotteryCode, showFullDetails = tr
       <Card data-testid="draw-details-card" className="w-full max-w-2xl mx-auto">
         <CardHeader className="bg-gradient-to-r from-orange-50 to-pink-50 dark:from-orange-900/20 dark:to-pink-900/20">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1">
               <CardTitle className="flex items-center gap-2 text-xl">
                 <Trophy className="h-5 w-5 text-orange-500" />
                 Draw Results
               </CardTitle>
-              <CardDescription data-testid="text-draw-code" className="font-mono text-lg">
-                {draw.drawCode}
-              </CardDescription>
+              <div className="flex items-center gap-2 mt-2">
+                <CardDescription data-testid="text-draw-code" className="font-mono text-lg font-bold text-orange-600 dark:text-orange-400">
+                  {draw.drawCode}
+                </CardDescription>
+                <Button
+                  data-testid="button-copy-draw-code"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => copyToClipboard(draw.drawCode, "Draw code")}
+                  className="h-8 w-8 p-0"
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
               <CheckCircle className="h-3 w-3 mr-1" />
@@ -188,9 +216,20 @@ export function LotteryDrawDisplay({ drawCode, lotteryCode, showFullDetails = tr
             <Trophy className="h-5 w-5 text-blue-500" />
             {lottery.title}
           </CardTitle>
-          <CardDescription data-testid="text-lottery-code" className="font-mono text-lg">
-            {lottery.lotteryCode}
-          </CardDescription>
+          <div className="flex items-center gap-2 mt-2">
+            <CardDescription data-testid="text-lottery-code" className="font-mono text-lg font-bold text-blue-600 dark:text-blue-400">
+              {lottery.lotteryCode}
+            </CardDescription>
+            <Button
+              data-testid="button-copy-lottery-code"
+              variant="ghost"
+              size="sm"
+              onClick={() => copyToClipboard(lottery.lotteryCode, "Lottery code")}
+              className="h-8 w-8 p-0"
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
         </CardHeader>
 
         <CardContent className="p-6 space-y-4">
