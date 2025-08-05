@@ -109,6 +109,9 @@ export default function Dashboard() {
               <Link href="/affiliate-dashboard">
                 <Button variant="ghost" data-testid="nav-affiliate">Affiliate Program</Button>
               </Link>
+              <Link href="/country-operations">
+                <Button variant="ghost" data-testid="nav-operations">Global Operations</Button>
+              </Link>
             </nav>
           </div>
         </div>

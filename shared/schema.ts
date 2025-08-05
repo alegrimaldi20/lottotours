@@ -175,7 +175,18 @@ export const travelAgencies = pgTable("travel_agencies", {
   email: text("email").notNull(),
   phone: text("phone"),
   address: text("address"),
-  country: text("country"),
+  city: text("city"),
+  region: text("region"), // State/Province/Region within country
+  country: text("country").notNull(),
+  countryCode: text("country_code").notNull(), // ISO country code (US, CA, MX, etc.)
+  timeZone: text("time_zone"), // Agency's local timezone
+  coordinates: text("coordinates"), // JSON with lat/lng for geographic distribution
+  coverageRadius: integer("coverage_radius"), // Service area radius in kilometers
+  territoryCode: text("territory_code"), // Specific territory/zone code within country (T001-T360)
+  nationalRanking: integer("national_ranking"), // Agency ranking within country (1-360)
+  marketTier: text("market_tier").notNull().default("tier3"), // tier1 (major cities), tier2 (regional), tier3 (local)
+  populationDensity: text("population_density"), // high, medium, low - affects capacity and reach
+  capacityLimit: integer("capacity_limit").notNull().default(50), // Max concurrent users they can handle
   specialties: text("specialties").array(), // ["adventure", "cultural", "luxury", "budget"]
   rating: decimal("rating", { precision: 3, scale: 2 }), // 0.00 to 5.00
   totalBookings: integer("total_bookings").notNull().default(0),
@@ -353,7 +364,12 @@ export const affiliateLeaderboard = pgTable("affiliate_leaderboard", {
   period: text("period").notNull(), // monthly, quarterly, yearly
   periodStart: timestamp("period_start").notNull(),
   periodEnd: timestamp("period_end").notNull(),
+  scope: text("scope").notNull().default("global"), // global, country, region, territory
+  countryCode: text("country_code"), // For country-specific rankings
+  region: text("region"), // For regional rankings
   rank: integer("rank").notNull(),
+  nationalRank: integer("national_rank"), // Ranking within country
+  regionalRank: integer("regional_rank"), // Ranking within region
   totalReferrals: integer("total_referrals").notNull(),
   convertedReferrals: integer("converted_referrals").notNull(),
   totalRevenue: integer("total_revenue").notNull(), // in cents
@@ -362,6 +378,56 @@ export const affiliateLeaderboard = pgTable("affiliate_leaderboard", {
   averageOrderValue: integer("average_order_value"), // in cents
   topPerformerBadge: text("top_performer_badge"), // gold, silver, bronze, rising_star
   achievements: text("achievements").array(), // JSON array of earned badges/achievements
+  territoryDominance: decimal("territory_dominance", { precision: 5, scale: 4 }), // % market share in territory
+  crossBorderReferrals: integer("cross_border_referrals"), // International referrals
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Country Operations Management
+export const countryOperations = pgTable("country_operations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  countryCode: text("country_code").notNull().unique(),
+  countryName: text("country_name").notNull(),
+  region: text("region").notNull(), // North America, Europe, Asia, etc.
+  currency: text("currency").notNull(), // USD, EUR, JPY, etc.
+  timezone: text("timezone").notNull(),
+  language: text("language").notNull(),
+  totalAgencies: integer("total_agencies").notNull().default(0),
+  targetAgencies: integer("target_agencies").notNull().default(360),
+  activeAgencies: integer("active_agencies").notNull().default(0),
+  territoryDivisions: integer("territory_divisions").notNull().default(36), // 36 territories of ~10 agencies each
+  marketPenetration: decimal("market_penetration", { precision: 5, scale: 4 }), // 0.0000 to 1.0000
+  averageCommissionRate: decimal("average_commission_rate", { precision: 5, scale: 4 }),
+  totalRevenue: integer("total_revenue").notNull().default(0), // in cents
+  monthlyGrowth: decimal("monthly_growth", { precision: 5, scale: 4 }),
+  competitorAnalysis: text("competitor_analysis"), // JSON with market insights
+  regulatoryStatus: text("regulatory_status").notNull().default("compliant"), // compliant, pending, restricted
+  launchDate: timestamp("launch_date"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Territory Management for Geographic Distribution
+export const territoryManagement = pgTable("territory_management", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  countryCode: text("country_code").notNull().references(() => countryOperations.countryCode),
+  territoryCode: text("territory_code").notNull(), // T001-T360 per country
+  territoryName: text("territory_name").notNull(),
+  region: text("region"), // State/Province/Region
+  majorCities: text("major_cities").array(), // ["New York", "Brooklyn", "Queens"]
+  coordinates: text("coordinates"), // JSON with territory boundaries
+  populationSize: integer("population_size"),
+  targetAgencies: integer("target_agencies").notNull().default(10), // ~10 agencies per territory
+  assignedAgencies: integer("assigned_agencies").notNull().default(0),
+  maxCapacity: integer("max_capacity").notNull().default(500), // Max users this territory can serve
+  currentLoad: integer("current_load").notNull().default(0),
+  marketTier: text("market_tier").notNull(), // tier1, tier2, tier3
+  competitiveness: text("competitiveness").notNull(), // high, medium, low
+  averageIncome: integer("average_income"), // Territory demographic data
+  tourismScore: decimal("tourism_score", { precision: 3, scale: 2 }), // Tourism activity rating
+  seasonalPeaks: text("seasonal_peaks").array(), // ["summer", "winter", "holidays"]
+  territoryManager: text("territory_manager"), // Assigned manager contact
+  isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -82,7 +82,7 @@ export default function CampaignCreator({ onCreateCampaign, onClose }: CampaignC
   const watchedType = form.watch("campaignType");
 
   // Generate campaign link when name or type changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (watchedName && watchedType) {
       const slug = watchedName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       const code = `${watchedType.toUpperCase()}-${slug.substring(0, 10)}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
