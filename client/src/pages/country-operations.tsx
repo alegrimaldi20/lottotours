@@ -253,17 +253,17 @@ export default function CountryOperations() {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
 
   // Mock queries
-  const { data: countries = sampleCountries } = useQuery({
+  const { data: countries = sampleCountries } = useQuery<any>({
     queryKey: ['/api/country-operations'],
     enabled: true
   });
 
-  const { data: territories = sampleTerritories } = useQuery({
+  const { data: territories = sampleTerritories } = useQuery<any>({
     queryKey: ['/api/territories', selectedCountry],
     enabled: !!selectedCountry
   });
 
-  const filteredCountries = countries.filter(country => {
+  const filteredCountries = countries.filter((country: any) => {
     const matchesRegion = selectedRegion === "all" || country.region === selectedRegion;
     const matchesSearch = country.countryName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          country.countryCode.toLowerCase().includes(searchQuery.toLowerCase());
@@ -338,7 +338,7 @@ export default function CountryOperations() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-green-100 text-sm font-medium">Total Agencies</p>
-                  <p className="text-2xl font-bold">{countries.reduce((sum, c) => sum + c.totalAgencies, 0).toLocaleString()}</p>
+                  <p className="text-2xl font-bold">{countries.reduce((sum: any, c: any) => sum + c.totalAgencies, 0).toLocaleString()}</p>
                 </div>
                 <Building2 className="h-8 w-8 text-green-200" />
               </div>
@@ -351,7 +351,7 @@ export default function CountryOperations() {
                 <div>
                   <p className="text-purple-100 text-sm font-medium">Global Revenue</p>
                   <p className="text-2xl font-bold">
-                    {formatCurrency(countries.reduce((sum, c) => sum + c.totalRevenue, 0))}
+                    {formatCurrency(countries.reduce((sum: any, c: any) => sum + c.totalRevenue, 0))}
                   </p>
                 </div>
                 <DollarSign className="h-8 w-8 text-purple-200" />
@@ -365,7 +365,7 @@ export default function CountryOperations() {
                 <div>
                   <p className="text-orange-100 text-sm font-medium">Avg. Growth</p>
                   <p className="text-2xl font-bold">
-                    {((countries.reduce((sum, c) => sum + c.monthlyGrowth, 0) / countries.length) * 100).toFixed(1)}%
+                    {((countries.reduce((sum: any, c: any) => sum + c.monthlyGrowth, 0) / countries.length) * 100).toFixed(1)}%
                   </p>
                 </div>
                 <TrendingUp className="h-8 w-8 text-orange-200" />
@@ -412,7 +412,7 @@ export default function CountryOperations() {
           {/* Countries Tab */}
           <TabsContent value="countries" className="space-y-6">
             <div className="grid gap-6">
-              {filteredCountries.map((country) => (
+              {filteredCountries.map((country: any) => (
                 <Card key={country.countryCode} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-4">
@@ -501,14 +501,14 @@ export default function CountryOperations() {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold">
-                    Territory Management - {countries.find(c => c.countryCode === selectedCountry)?.countryName}
+                    Territory Management - {countries.find((c: any) => c.countryCode === selectedCountry)?.countryName}
                   </h2>
                   <Button onClick={() => setSelectedCountry(null)} variant="outline">
                     Back to Countries
                   </Button>
                 </div>
                 <div className="grid gap-4">
-                  {territories.map((territory) => {
+                  {territories.map((territory: any) => {
                     const tierInfo = getTierBadge(territory.marketTier);
                     return (
                       <Card key={territory.id}>
@@ -598,9 +598,9 @@ export default function CountryOperations() {
                   <div className="space-y-4">
                     {["South America"].map((region, index) => {
                       const regionRevenue = countries
-                        .filter(c => c.region === region)
-                        .reduce((sum, c) => sum + c.totalRevenue, 0);
-                      const totalRevenue = countries.reduce((sum, c) => sum + c.totalRevenue, 0);
+                        .filter((c: any) => c.region === region)
+                        .reduce((sum: any, c: any) => sum + c.totalRevenue, 0);
+                      const totalRevenue = countries.reduce((sum: any, c: any) => sum + c.totalRevenue, 0);
                       const percentage = (regionRevenue / totalRevenue) * 100;
                       
                       return (
@@ -630,7 +630,7 @@ export default function CountryOperations() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {countries.slice(0, 5).map((country) => (
+                    {countries.slice(0, 5).map((country: any) => (
                       <div key={country.countryCode} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <span className="text-xl">{country.flag}</span>

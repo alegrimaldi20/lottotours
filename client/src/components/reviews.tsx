@@ -17,8 +17,6 @@ const reviewFormSchema = insertReviewSchema.extend({
   rating: z.number().min(1, "Please select a rating").max(5),
 });
 
-type ReviewFormData = z.infer<typeof reviewFormSchema>;
-
 const StarRating = ({ rating, onRatingChange, interactive = false }: { 
   rating: number; 
   onRatingChange?: (rating: number) => void;
@@ -64,20 +62,25 @@ export default function Reviews() {
     queryKey: ["/api/services"],
   });
 
-  const form = useForm<ReviewFormData>({
+  const form = useForm({
     resolver: zodResolver(reviewFormSchema),
     defaultValues: {
-      reviewerName: "",
+      userId: "",
       serviceId: "",
       rating: 0,
-      content: "",
+      title: "",
+      comment: "",
+      isVerified: false,
+      isAnonymous: false,
     },
   });
 
   const createReviewMutation = useMutation({
-    mutationFn: async (data: ReviewFormData) => {
-      const response = await apiRequest("POST", "/api/reviews", data);
-      return response.json();
+    mutationFn: async (data: any) => {
+      return await apiRequest("/api/reviews", {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
     },
     onSuccess: () => {
       toast({
@@ -97,7 +100,7 @@ export default function Reviews() {
     },
   });
 
-  const onSubmit = (data: ReviewFormData) => {
+  const onSubmit = (data: any) => {
     createReviewMutation.mutate({ ...data, rating: selectedRating });
   };
 
@@ -183,15 +186,15 @@ export default function Reviews() {
                     </span>
                   </div>
                   <p className="text-slate-700 mb-4" data-testid={`review-content-${review.id}`}>
-                    "{review.content}"
+                    "{review.comment}"
                   </p>
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-primary-custom rounded-full flex items-center justify-center text-white font-semibold mr-3">
-                      {review.reviewerName.charAt(0).toUpperCase()}
+                      U
                     </div>
                     <div>
                       <div className="font-medium text-slate-900" data-testid={`review-author-${review.id}`}>
-                        {review.reviewerName}
+                        {review.isAnonymous ? "Anonymous User" : `User ${review.userId.slice(-4)}`}
                       </div>
                       <div className="text-sm text-slate-500" data-testid={`review-service-${review.id}`}>
                         {service?.name || 'Service'}
@@ -216,17 +219,17 @@ export default function Reviews() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="reviewerName" className="block text-sm font-semibold text-slate-700 mb-2">
-                  Your Name
+                <Label htmlFor="title" className="block text-sm font-semibold text-slate-700 mb-2">
+                  Review Title
                 </Label>
                 <Input
-                  id="reviewerName"
-                  {...form.register("reviewerName")}
-                  placeholder="Enter your name"
-                  data-testid="input-reviewer-name"
+                  id="title"
+                  {...form.register("title")}
+                  placeholder="Give your review a title"
+                  data-testid="input-review-title"
                 />
-                {form.formState.errors.reviewerName && (
-                  <p className="text-sm text-red-500 mt-1">{form.formState.errors.reviewerName.message}</p>
+                {form.formState.errors.title && (
+                  <p className="text-sm text-red-500 mt-1">{form.formState.errors.title.message}</p>
                 )}
               </div>
               <div>
@@ -266,18 +269,18 @@ export default function Reviews() {
             </div>
 
             <div>
-              <Label htmlFor="content" className="block text-sm font-semibold text-slate-700 mb-2">
+              <Label htmlFor="comment" className="block text-sm font-semibold text-slate-700 mb-2">
                 Your Review
               </Label>
               <Textarea
-                id="content"
-                {...form.register("content")}
+                id="comment"
+                {...form.register("comment")}
                 rows={4}
                 placeholder="Share your experience with our service..."
-                data-testid="input-review-content"
+                data-testid="input-review-comment"
               />
-              {form.formState.errors.content && (
-                <p className="text-sm text-red-500 mt-1">{form.formState.errors.content.message}</p>
+              {form.formState.errors.comment && (
+                <p className="text-sm text-red-500 mt-1">{form.formState.errors.comment.message}</p>
               )}
             </div>
 

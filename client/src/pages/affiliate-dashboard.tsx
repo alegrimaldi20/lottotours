@@ -161,32 +161,32 @@ export default function AffiliateDashboard() {
   const { toast } = useToast();
 
   // Mock queries - replace with real API calls
-  const { data: affiliateProgram = sampleAffiliateProgram } = useQuery({
+  const { data: affiliateProgram = sampleAffiliateProgram } = useQuery<any>({
     queryKey: ['/api/affiliate-programs/agency-1'],
     enabled: true
   });
 
-  const { data: referralStats = sampleReferralStats } = useQuery({
+  const { data: referralStats = sampleReferralStats } = useQuery<any>({
     queryKey: ['/api/affiliate/agency-1/stats'],
     enabled: true
   });
 
-  const { data: recentReferrals = sampleRecentReferrals } = useQuery({
+  const { data: recentReferrals = sampleRecentReferrals } = useQuery<any>({
     queryKey: ['/api/affiliate/agency-1/referrals'],
     enabled: true
   });
 
-  const { data: leaderboard = sampleLeaderboard } = useQuery({
+  const { data: leaderboard = sampleLeaderboard } = useQuery<any>({
     queryKey: ['/api/affiliate/leaderboard/monthly'],
     enabled: true
   });
 
-  const { data: trafficSources = sampleTrafficSources } = useQuery({
+  const { data: trafficSources = sampleTrafficSources } = useQuery<any>({
     queryKey: ['/api/affiliate/agency-1/traffic-sources'],
     enabled: true
   });
 
-  const { data: campaignPerformance = sampleCampaignPerformance } = useQuery({
+  const { data: campaignPerformance = sampleCampaignPerformance } = useQuery<any>({
     queryKey: ['/api/affiliate/agency-1/campaigns'],
     enabled: true
   });
@@ -416,7 +416,7 @@ export default function AffiliateDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recentReferrals.map((referral) => (
+                  {recentReferrals.map((referral: any) => (
                     <div key={referral.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
@@ -482,7 +482,7 @@ export default function AffiliateDashboard() {
                 </div>
 
                 <div className="space-y-3">
-                  {Object.entries(affiliateProgram.commissionTiers).map(([tier, data]) => (
+                  {Object.entries(affiliateProgram.commissionTiers).map(([tier, data]: [string, any]) => (
                     <div key={tier} className={`p-3 rounded-lg border ${
                       tier === referralStats.currentTier 
                         ? 'border-blue-500 bg-blue-50' 
@@ -612,7 +612,7 @@ export default function AffiliateDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {leaderboard.map((entry, index) => (
+                  {leaderboard.map((entry: any, index: number) => (
                     <div key={index} className={`p-4 rounded-lg border ${
                       entry.rank === 1 ? 'border-yellow-500 bg-yellow-50' :
                       entry.rank === 2 ? 'border-gray-400 bg-gray-50' :
@@ -666,7 +666,7 @@ export default function AffiliateDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {trafficSources.map((source, index) => (
+                    {trafficSources.map((source: any, index: number) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                         <div>
                           <p className="font-medium">{source.source}</p>
@@ -760,7 +760,7 @@ export default function AffiliateDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {campaignPerformance.map((campaign, index) => (
+                  {campaignPerformance.map((campaign: any, index: number) => (
                     <div key={index} className="p-4 border rounded-lg">
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="font-semibold">{campaign.name}</h3>

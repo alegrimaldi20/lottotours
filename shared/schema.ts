@@ -489,6 +489,31 @@ export const territoryManagement = pgTable("territory_management", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Service reviews system
+export const services = pgTable("services", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(), // travel_agency, tour_package, affiliate_program
+  providerId: varchar("provider_id"), // Generic provider ID (agency, user, etc.)
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const reviews = pgTable("reviews", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  serviceId: varchar("service_id").notNull().references(() => services.id),
+  rating: integer("rating").notNull(), // 1-5 stars
+  title: text("title"),
+  comment: text("comment"),
+  isVerified: boolean("is_verified").notNull().default(false),
+  isAnonymous: boolean("is_anonymous").notNull().default(false),
+  helpfulVotes: integer("helpful_votes").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -572,6 +597,18 @@ export const insertUserAgreementSchema = createInsertSchema(userAgreements).omit
   createdAt: true,
 });
 
+export const insertServiceSchema = createInsertSchema(services).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertReviewSchema = createInsertSchema(reviews).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  helpfulVotes: true,
+});
+
 export const insertTravelAgencySchema = createInsertSchema(travelAgencies).omit({
   id: true,
   createdAt: true,
@@ -650,9 +687,7 @@ export type InsertUserMission = z.infer<typeof insertUserMissionSchema>;
 
 export const insertLotteryDrawSchema = createInsertSchema(lotteryDraws).omit({
   id: true,
-  drawId: true,
   drawnAt: true,
-  createdAt: true,
 });
 export type LotteryDraw = typeof lotteryDraws.$inferSelect;
 export type InsertLotteryDraw = z.infer<typeof insertLotteryDrawSchema>;
@@ -683,6 +718,10 @@ export type ServiceCondition = typeof serviceConditions.$inferSelect;
 export type InsertServiceCondition = z.infer<typeof insertServiceConditionSchema>;
 export type UserAgreement = typeof userAgreements.$inferSelect;
 export type InsertUserAgreement = z.infer<typeof insertUserAgreementSchema>;
+export type Service = typeof services.$inferSelect;
+export type InsertService = z.infer<typeof insertServiceSchema>;
+export type Review = typeof reviews.$inferSelect;
+export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type TravelAgency = typeof travelAgencies.$inferSelect;
 export type InsertTravelAgency = z.infer<typeof insertTravelAgencySchema>;
 export type AgencyTourPackage = typeof agencyTourPackages.$inferSelect;
