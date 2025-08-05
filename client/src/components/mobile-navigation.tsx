@@ -14,6 +14,7 @@ import {
   Users,
   MapPin,
   Fingerprint,
+  Globe,
   X
 } from "lucide-react";
 
@@ -32,6 +33,7 @@ const navigationItems: NavigationItem[] = [
   { href: "/profile", labelKey: "profile", icon: User },
   { href: "/winner-dashboard", labelKey: "myPrizes", icon: Trophy },
   { href: "/affiliate-dashboard", labelKey: "affiliateProgram", icon: Users, badge: "New" },
+  { href: "/country-operations", labelKey: "countryOperations", icon: Globe, badge: "Expansion" },
   { href: "/unique-ids", labelKey: "uniqueIds", icon: Fingerprint },
 ];
 

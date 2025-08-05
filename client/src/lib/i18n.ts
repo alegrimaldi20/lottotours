@@ -11,6 +11,7 @@ export interface Translations {
   profile: string;
   myPrizes: string;
   affiliateProgram: string;
+  countryOperations: string;
   uniqueIds: string;
   menu: string;
   
@@ -110,6 +111,7 @@ const translations: Record<Language, Translations> = {
     profile: 'Profile',
     myPrizes: 'My Prizes',
     affiliateProgram: 'Affiliate Program',
+    countryOperations: 'Country Operations',
     uniqueIds: 'Unique IDs',
     menu: 'Menu',
     
@@ -207,6 +209,7 @@ const translations: Record<Language, Translations> = {
     profile: 'Perfil',
     myPrizes: 'Mis Premios',
     affiliateProgram: 'Programa de Afiliados',
+    countryOperations: 'Operaciones por País',
     uniqueIds: 'IDs Únicos',
     menu: 'Menú',
     
@@ -304,6 +307,7 @@ const translations: Record<Language, Translations> = {
     profile: 'Perfil',
     myPrizes: 'Meus Prêmios',
     affiliateProgram: 'Programa de Afiliados',
+    countryOperations: 'Operações por País',
     uniqueIds: 'IDs Únicos',
     menu: 'Menu',
     

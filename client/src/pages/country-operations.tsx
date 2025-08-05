@@ -282,12 +282,28 @@ export default function CountryOperations() {
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
+      case 'compliant':
       case 'active': return 'bg-green-100 text-green-800';
       case 'expanding': return 'bg-blue-100 text-blue-800';
       case 'launching': return 'bg-yellow-100 text-yellow-800';
       default: return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const getCountryFlag = (countryCode: string) => {
+    const flags: { [key: string]: string } = {
+      'CO': '🇨🇴',
+      'PE': '🇵🇪',
+      'EC': '🇪🇨',
+      'BO': '🇧🇴',
+      'CL': '🇨🇱',
+      'UY': '🇺🇾',
+      'PY': '🇵🇾',
+      'AR': '🇦🇷',
+      'BR': '🇧🇷'
+    };
+    return flags[countryCode] || '🌍';
   };
 
   const getTierBadge = (tier: string) => {
@@ -436,15 +452,15 @@ export default function CountryOperations() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-4">
-                        <div className="text-4xl">{country.flag}</div>
+                        <div className="text-4xl">{getCountryFlag(country.countryCode)}</div>
                         <div>
                           <h3 className="text-xl font-bold">{country.countryName}</h3>
                           <p className="text-slate-500">{country.region} • {country.currency}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge className={getStatusColor(country.status)}>
-                          {country.status.charAt(0).toUpperCase() + country.status.slice(1)}
+                        <Badge className={getStatusColor(country.regulatoryStatus || 'active')}>
+                          {(country.regulatoryStatus || 'active').charAt(0).toUpperCase() + (country.regulatoryStatus || 'active').slice(1)}
                         </Badge>
                         <Button 
                           variant="outline" 
@@ -661,7 +677,7 @@ export default function CountryOperations() {
                     {displayCountries.slice(0, 5).map((country: any) => (
                       <div key={country.countryCode} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="text-xl">{country.flag}</span>
+                          <span className="text-xl">{getCountryFlag(country.countryCode)}</span>
                           <span className="font-medium">{country.countryName}</span>
                         </div>
                         <div className="flex items-center gap-3">
