@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Clock, MapPin, Camera, FileText, Award, AlertCircle } from "lucide-react";
+import FavoriteHeart from "@/components/favorite-heart";
 import type { Mission, UserMission } from "@shared/schema";
 
 interface MissionVerificationProps {
@@ -192,7 +193,22 @@ export default function MissionVerification({ mission, userMission, userId }: Mi
             <span className="text-2xl">{mission.icon}</span>
             {mission.title}
           </CardTitle>
-          {getStatusBadge()}
+          <div className="flex items-center gap-2">
+            <FavoriteHeart
+              itemType="mission"
+              itemId={mission.id}
+              itemTitle={mission.title}
+              itemDescription={mission.description}
+              itemMetadata={{ 
+                reward: mission.reward,
+                difficulty: mission.difficulty,
+                location: mission.location,
+                type: mission.type
+              }}
+              size="md"
+            />
+            {getStatusBadge()}
+          </div>
         </div>
         <div className="flex items-center gap-4 text-sm text-slate-600">
           <div className="flex items-center gap-1">

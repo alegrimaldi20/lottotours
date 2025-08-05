@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 import MissionVerification from "@/components/mission-verification";
+import FavoriteHeart from "@/components/favorite-heart";
 import type { Mission, UserMission } from "@shared/schema";
 
 const SAMPLE_USER_ID = "sample-user";

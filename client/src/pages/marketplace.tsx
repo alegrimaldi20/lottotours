@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Coins, Gift, MapPin, Package, Percent, Clock, Check } from "lucide-react";
 import TravelImageRenderer from "@/components/travel-image-renderer";
+import FavoriteHeart from "@/components/favorite-heart";
 
 // Using sample user for demo
 const SAMPLE_USER_ID = "sample-user";
@@ -204,9 +205,24 @@ export default function Marketplace() {
                       </div>
 
                       <CardHeader>
-                        <CardTitle className="text-lg mb-2" data-testid={`prize-title-${prize.id}`}>
-                          {prize.title}
-                        </CardTitle>
+                        <div className="flex items-center justify-between mb-2">
+                          <CardTitle className="text-lg" data-testid={`prize-title-${prize.id}`}>
+                            {prize.title}
+                          </CardTitle>
+                          <FavoriteHeart
+                            itemType="marketplace_item"
+                            itemId={prize.id}
+                            itemTitle={prize.title}
+                            itemDescription={prize.description}
+                            itemMetadata={{ 
+                              category: prize.category,
+                              tokensRequired: prize.tokensRequired,
+                              availability: prize.availability,
+                              destination: prize.destination
+                            }}
+                            size="md"
+                          />
+                        </div>
                         <CardDescription className="text-sm" data-testid={`prize-description-${prize.id}`}>
                           {prize.description}
                         </CardDescription>

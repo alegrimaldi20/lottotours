@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Trophy, Clock, Users, Ticket, Coins, Calendar, MapPin } from "lucide-react";
 import TravelImageRenderer from "@/components/travel-image-renderer";
+import FavoriteHeart from "@/components/favorite-heart";
 
 // Using sample user for demo
 const SAMPLE_USER_ID = "sample-user";
@@ -178,9 +179,24 @@ export default function Lotteries() {
                 </div>
 
                 <CardHeader>
-                  <CardTitle className="text-2xl mb-2" data-testid={`lottery-title-${lottery.id}`}>
-                    {lottery.title}
-                  </CardTitle>
+                  <div className="flex items-center justify-between mb-2">
+                    <CardTitle className="text-2xl" data-testid={`lottery-title-${lottery.id}`}>
+                      {lottery.title}
+                    </CardTitle>
+                    <FavoriteHeart
+                      itemType="lottery"
+                      itemId={lottery.id}
+                      itemTitle={lottery.title}
+                      itemDescription={lottery.description}
+                      itemMetadata={{ 
+                        drawDate: lottery.drawDate,
+                        prizeTitle: lottery.prizeTitle,
+                        prizeValue: lottery.prizeValue,
+                        ticketPrice: lottery.ticketPrice 
+                      }}
+                      size="lg"
+                    />
+                  </div>
                   <CardDescription className="text-base" data-testid={`lottery-description-${lottery.id}`}>
                     {lottery.description}
                   </CardDescription>
