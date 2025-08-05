@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Coins, Trophy, Map, Star, ArrowRight, Gift, Users, Target } from "lucide-react";
+import { Coins, Trophy, Map, Star, ArrowRight, Gift, Users, Target, Crown } from "lucide-react";
 import TravelImageRenderer from "@/components/travel-image-renderer";
 import MissionVerification from "@/components/mission-verification";
 
@@ -102,6 +102,9 @@ export default function Dashboard() {
               </Link>
               <Link href="/marketplace">
                 <Button variant="ghost" data-testid="nav-marketplace">Marketplace</Button>
+              </Link>
+              <Link href="/winner-dashboard">
+                <Button variant="ghost" data-testid="nav-winners">My Prizes</Button>
               </Link>
             </nav>
           </div>
@@ -275,6 +278,41 @@ export default function Dashboard() {
                   <Users className="mr-2 h-4 w-4" />
                   Invite Friends
                 </Button>
+              </CardContent>
+            </Card>
+
+            {/* Winner Dashboard Quick Access */}
+            <Card className="bg-gradient-to-br from-lottery-gold/10 to-yellow-50 border-lottery-gold/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2" data-testid="prizes-title">
+                  <Crown className="h-5 w-5 text-lottery-gold" />
+                  Prize Winners
+                </CardTitle>
+                <CardDescription>
+                  Manage your won prizes and coordinate with travel agencies
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600">Active Prizes</span>
+                    <Badge className="bg-lottery-gold/10 text-lottery-gold">2</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600">Total Prize Value</span>
+                    <span className="font-semibold text-lottery-gold">$2,250</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600">Completed</span>
+                    <span className="text-sm text-green-600">1 trip</span>
+                  </div>
+                </div>
+                <Link href="/winner-dashboard">
+                  <Button className="w-full mt-4 btn-lottery" data-testid="button-view-prizes">
+                    <Crown className="mr-2 h-4 w-4" />
+                    View Prize Dashboard
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 

@@ -165,6 +165,112 @@ export const userAgreements = pgTable("user_agreements", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Travel Agency Partnership Module
+export const travelAgencies = pgTable("travel_agencies", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description"),
+  logo: text("logo"),
+  website: text("website"),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  address: text("address"),
+  country: text("country"),
+  specialties: text("specialties").array(), // ["adventure", "cultural", "luxury", "budget"]
+  rating: decimal("rating", { precision: 3, scale: 2 }), // 0.00 to 5.00
+  totalBookings: integer("total_bookings").notNull().default(0),
+  commissionRate: decimal("commission_rate", { precision: 5, scale: 4 }).notNull(), // 0.0000 to 1.0000 (percentage)
+  status: text("status").notNull().default("active"), // active, suspended, pending
+  partnershipType: text("partnership_type").notNull().default("standard"), // standard, premium, exclusive
+  apiKey: text("api_key").unique(), // For external system integration
+  webhookUrl: text("webhook_url"), // For prize notifications
+  contactPersonName: text("contact_person_name"),
+  contactPersonEmail: text("contact_person_email"),
+  paymentDetails: text("payment_details"), // JSON string with bank/payment info
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const agencyTourPackages = pgTable("agency_tour_packages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  agencyId: varchar("agency_id").notNull().references(() => travelAgencies.id),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  destination: text("destination").notNull(),
+  duration: integer("duration").notNull(), // days
+  price: integer("price").notNull(), // USD in cents
+  originalPrice: integer("original_price"), // For discount display
+  maxParticipants: integer("max_participants").notNull(),
+  difficulty: text("difficulty").notNull(), // easy, medium, hard
+  category: text("category").notNull(), // cultural, adventure, relaxation, business
+  inclusions: text("inclusions").array(), // ["flights", "hotels", "meals", "guide"]
+  images: text("images").array(),
+  itinerary: text("itinerary"), // JSON string with daily schedule
+  requirements: text("requirements"), // special requirements or restrictions
+  cancellationPolicy: text("cancellation_policy"),
+  seasonality: text("seasonality"), // when available (all-year, summer, winter, etc)
+  isActive: boolean("is_active").notNull().default(true),
+  isFeatured: boolean("is_featured").notNull().default(false),
+  bookingUrl: text("booking_url"), // Direct booking link
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const prizeWinners = pgTable("prize_winners", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  lotteryId: varchar("lottery_id").references(() => lotteries.id),
+  prizeId: varchar("prize_id").references(() => prizes.id),
+  prizeType: text("prize_type").notNull(), // lottery, mission_reward, marketplace_redemption
+  prizeTitle: text("prize_title").notNull(),
+  prizeDescription: text("prize_description"),
+  prizeValue: integer("prize_value"), // USD in cents
+  assignedAgencyId: varchar("assigned_agency_id").references(() => travelAgencies.id),
+  tourPackageId: varchar("tour_package_id").references(() => agencyTourPackages.id),
+  status: text("status").notNull().default("pending"), // pending, assigned, contacted, booked, completed, cancelled
+  contactInfo: text("contact_info"), // JSON with winner's contact details
+  preferredDates: text("preferred_dates"), // JSON array of date ranges
+  specialRequests: text("special_requests"),
+  bookingReference: text("booking_reference"), // From agency booking system
+  agencyNotes: text("agency_notes"), // Internal notes from agency
+  communicationLog: text("communication_log"), // JSON array of communications
+  claimedAt: timestamp("claimed_at"),
+  assignedAt: timestamp("assigned_at"),
+  contactedAt: timestamp("contacted_at"),
+  bookedAt: timestamp("booked_at"),
+  completedAt: timestamp("completed_at"),
+  expiresAt: timestamp("expires_at"), // Prize claim deadline
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const agencyCommissions = pgTable("agency_commissions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  agencyId: varchar("agency_id").notNull().references(() => travelAgencies.id),
+  sourceType: text("source_type").notNull(), // tour_package, token_purchase, referral
+  sourceId: varchar("source_id").notNull(), // ID of the related record
+  userId: varchar("user_id").references(() => users.id), // Customer who made the purchase
+  transactionAmount: integer("transaction_amount").notNull(), // Original amount in cents
+  commissionRate: decimal("commission_rate", { precision: 5, scale: 4 }).notNull(),
+  commissionAmount: integer("commission_amount").notNull(), // Commission in cents
+  status: text("status").notNull().default("pending"), // pending, approved, paid, disputed
+  paymentReference: text("payment_reference"), // Reference for commission payment
+  notes: text("notes"),
+  approvedAt: timestamp("approved_at"),
+  paidAt: timestamp("paid_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const agencyAnalytics = pgTable("agency_analytics", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  agencyId: varchar("agency_id").notNull().references(() => travelAgencies.id),
+  date: timestamp("date").notNull(),
+  prizesAssigned: integer("prizes_assigned").notNull().default(0),
+  prizesCompleted: integer("prizes_completed").notNull().default(0),
+  totalCommissions: integer("total_commissions").notNull().default(0), // in cents
+  customerSatisfactionScore: decimal("customer_satisfaction_score", { precision: 3, scale: 2 }),
+  responseTime: integer("response_time"), // average hours to respond
+  conversionRate: decimal("conversion_rate", { precision: 5, scale: 4 }), // assigned to completed
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -244,6 +350,39 @@ export const insertUserAgreementSchema = createInsertSchema(userAgreements).omit
   createdAt: true,
 });
 
+export const insertTravelAgencySchema = createInsertSchema(travelAgencies).omit({
+  id: true,
+  createdAt: true,
+  totalBookings: true,
+});
+
+export const insertAgencyTourPackageSchema = createInsertSchema(agencyTourPackages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPrizeWinnerSchema = createInsertSchema(prizeWinners).omit({
+  id: true,
+  createdAt: true,
+  claimedAt: true,
+  assignedAt: true,
+  contactedAt: true,
+  bookedAt: true,
+  completedAt: true,
+});
+
+export const insertAgencyCommissionSchema = createInsertSchema(agencyCommissions).omit({
+  id: true,
+  createdAt: true,
+  approvedAt: true,
+  paidAt: true,
+});
+
+export const insertAgencyAnalyticsSchema = createInsertSchema(agencyAnalytics).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -270,3 +409,13 @@ export type ServiceCondition = typeof serviceConditions.$inferSelect;
 export type InsertServiceCondition = z.infer<typeof insertServiceConditionSchema>;
 export type UserAgreement = typeof userAgreements.$inferSelect;
 export type InsertUserAgreement = z.infer<typeof insertUserAgreementSchema>;
+export type TravelAgency = typeof travelAgencies.$inferSelect;
+export type InsertTravelAgency = z.infer<typeof insertTravelAgencySchema>;
+export type AgencyTourPackage = typeof agencyTourPackages.$inferSelect;
+export type InsertAgencyTourPackage = z.infer<typeof insertAgencyTourPackageSchema>;
+export type PrizeWinner = typeof prizeWinners.$inferSelect;
+export type InsertPrizeWinner = z.infer<typeof insertPrizeWinnerSchema>;
+export type AgencyCommission = typeof agencyCommissions.$inferSelect;
+export type InsertAgencyCommission = z.infer<typeof insertAgencyCommissionSchema>;
+export type AgencyAnalytics = typeof agencyAnalytics.$inferSelect;
+export type InsertAgencyAnalytics = z.infer<typeof insertAgencyAnalyticsSchema>;

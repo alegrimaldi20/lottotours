@@ -6,7 +6,11 @@ import {
   type Prize, type InsertPrize, type PrizeRedemption, type InsertPrizeRedemption,
   type TokenPack, type InsertTokenPack, type TokenPurchase, type InsertTokenPurchase,
   type ServiceCondition, type InsertServiceCondition, type UserAgreement, type InsertUserAgreement,
-  users, missions, userMissions, lotteries, lotteryTickets, nfts, prizes, prizeRedemptions, tokenPacks, tokenPurchases, serviceConditions, userAgreements
+  type TravelAgency, type InsertTravelAgency, type AgencyTourPackage, type InsertAgencyTourPackage,
+  type PrizeWinner, type InsertPrizeWinner, type AgencyCommission, type InsertAgencyCommission,
+  type AgencyAnalytics, type InsertAgencyAnalytics,
+  users, missions, userMissions, lotteries, lotteryTickets, nfts, prizes, prizeRedemptions, tokenPacks, tokenPurchases, serviceConditions, userAgreements,
+  travelAgencies, agencyTourPackages, prizeWinners, agencyCommissions, agencyAnalytics
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
@@ -54,6 +58,38 @@ export interface IStorage {
   updateTokenPurchaseStatus(paymentIntentId: string, status: string): Promise<TokenPurchase>;
   getUserTokenPurchases(userId: string): Promise<TokenPurchase[]>;
   updateUserStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User>;
+
+  // Service Conditions & User Agreements
+  getServiceConditions(): Promise<ServiceCondition[]>;
+  createServiceCondition(condition: InsertServiceCondition): Promise<ServiceCondition>;
+  createUserAgreement(agreement: InsertUserAgreement): Promise<UserAgreement>;
+  getUserAgreements(userId: string): Promise<UserAgreement[]>;
+  
+  // Travel Agency Partnership Module
+  getTravelAgencies(): Promise<TravelAgency[]>;
+  getTravelAgency(id: string): Promise<TravelAgency | null>;
+  createTravelAgency(agency: InsertTravelAgency): Promise<TravelAgency>;  
+  updateTravelAgency(id: string, updates: Partial<InsertTravelAgency>): Promise<TravelAgency>;
+
+  getAgencyTourPackages(agencyId?: string): Promise<AgencyTourPackage[]>;
+  getAgencyTourPackage(id: string): Promise<AgencyTourPackage | null>;
+  createAgencyTourPackage(tourPackage: InsertAgencyTourPackage): Promise<AgencyTourPackage>;
+
+  // Prize Winners Management
+  getPrizeWinners(userId?: string): Promise<PrizeWinner[]>;
+  getPrizeWinner(id: string): Promise<PrizeWinner | null>;
+  createPrizeWinner(prizeWinner: InsertPrizeWinner): Promise<PrizeWinner>;
+  updatePrizeWinner(id: string, updates: Partial<PrizeWinner>): Promise<PrizeWinner>;
+  getUserPrizeWinners(userId: string): Promise<PrizeWinner[]>;
+
+  // Agency Commission Management
+  getAgencyCommissions(agencyId?: string): Promise<AgencyCommission[]>;
+  createAgencyCommission(commission: InsertAgencyCommission): Promise<AgencyCommission>;
+  updateAgencyCommissionStatus(id: string, status: string): Promise<AgencyCommission>;
+
+  // Agency Analytics
+  getAgencyAnalytics(agencyId: string, dateRange?: { start: Date; end: Date }): Promise<AgencyAnalytics[]>;
+  createAgencyAnalytics(analytics: InsertAgencyAnalytics): Promise<AgencyAnalytics>;
 }
 
 export class DatabaseStorage implements IStorage {
