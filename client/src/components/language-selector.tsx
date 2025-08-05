@@ -1,127 +1,66 @@
-import React, { useState, useEffect } from 'react';
+import React from "react";
+import { useLanguage, type Language } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Globe, Languages } from "lucide-react";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { Globe, Check } from "lucide-react";
+
+const languages: { code: Language; name: string; flag: string }[] = [
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'pt', name: 'Português', flag: '🇧🇷' },
+];
 
 interface LanguageSelectorProps {
-  onLanguageChange?: (locale: string) => void;
+  variant?: "default" | "ghost" | "outline";
+  size?: "sm" | "default" | "lg";
+  showLabel?: boolean;
 }
 
-export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
-  onLanguageChange
-}) => {
-  const [currentLocale, setCurrentLocale] = useState<string>('en');
-
-  useEffect(() => {
-    // Detect browser language on mount
-    const browserLocale = navigator.language || navigator.languages?.[0] || 'en';
-    const detectedLocale = browserLocale.startsWith('es') ? 'es' : 'en';
-    setCurrentLocale(detectedLocale);
-  }, []);
-
-  const changeLanguage = (locale: string) => {
-    try {
-      setCurrentLocale(locale);
-      
-      // Update document language
-      document.documentElement.lang = locale;
-      
-      // Update browser locale for testing
-      if (locale === 'es') {
-        // Set Spanish locale context
-        document.documentElement.setAttribute('data-locale', 'es-ES');
-      } else {
-        // Set English locale context
-        document.documentElement.setAttribute('data-locale', 'en-US');
-      }
-      
-      onLanguageChange?.(locale);
-      
-      // Log for debugging
-      console.log(`Language changed to: ${locale}`, {
-        documentLang: document.documentElement.lang,
-        navigatorLanguage: navigator.language,
-        dataLocale: document.documentElement.getAttribute('data-locale')
-      });
-      
-    } catch (error) {
-      console.warn('Language change error:', error);
-    }
-  };
+export default function LanguageSelector({ 
+  variant = "ghost", 
+  size = "default",
+  showLabel = false 
+}: LanguageSelectorProps) {
+  const { language, setLanguage, t } = useLanguage();
+  const currentLang = languages.find(lang => lang.code === language);
 
   return (
-    <Card className="w-full max-w-md border-2 border-lottery-gold shadow-lg bg-gradient-to-r from-lottery-gold/5 to-adventure-orange/5">
-      <CardHeader className="pb-3 bg-gradient-to-r from-lottery-gold/10 to-adventure-orange/10">
-        <CardTitle className="flex items-center gap-2 text-lg font-bold text-lottery-gold">
-          <Globe className="h-5 w-5" />
-          Language / Idioma
-        </CardTitle>
-        <p className="text-sm text-slate-600">
-          {currentLocale === 'es' 
-            ? 'Selecciona el idioma para probar la funcionalidad' 
-            : 'Select language to test functionality'
-          }
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="flex gap-2">
-          <Button
-            variant={currentLocale === 'en' ? 'default' : 'outline'}
-            onClick={() => changeLanguage('en')}
-            className="flex-1 gap-2"
-            data-testid="language-en"
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button 
+          variant={variant} 
+          size={size}
+          className="gap-2"
+          data-testid="language-selector"
+        >
+          <Globe className="h-4 w-4" />
+          {showLabel && <span className="hidden sm:inline">{t('language')}</span>}
+          <span className="font-medium">{currentLang?.flag}</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        {languages.map((lang) => (
+          <DropdownMenuItem
+            key={lang.code}
+            className="flex items-center justify-between cursor-pointer"
+            onClick={() => setLanguage(lang.code)}
+            data-testid={`language-option-${lang.code}`}
           >
-            <Languages className="h-4 w-4" />
-            English
-          </Button>
-          <Button
-            variant={currentLocale === 'es' ? 'default' : 'outline'}
-            onClick={() => changeLanguage('es')}
-            className="flex-1 gap-2"
-            data-testid="language-es"
-          >
-            <Languages className="h-4 w-4" />
-            Español
-          </Button>
-        </div>
-        
-        <div className="p-3 bg-slate-50 rounded-lg text-sm">
-          <div className="font-medium mb-1">
-            {currentLocale === 'es' ? 'Estado actual:' : 'Current status:'}
-          </div>
-          <div className="space-y-1 text-slate-600">
-            <div>
-              {currentLocale === 'es' ? 'Idioma:' : 'Language:'} {currentLocale.toUpperCase()}
+            <div className="flex items-center gap-2">
+              <span className="text-lg">{lang.flag}</span>
+              <span>{lang.name}</span>
             </div>
-            <div>
-              {currentLocale === 'es' ? 'Navegador:' : 'Browser:'} {navigator.language}
-            </div>
-            <div>
-              {currentLocale === 'es' ? 'Documento:' : 'Document:'} {document.documentElement.lang}
-            </div>
-          </div>
-        </div>
-
-        {currentLocale === 'es' && (
-          <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
-            <div className="font-medium text-yellow-800 mb-1">⚠️ Modo de prueba</div>
-            <div className="text-yellow-700">
-              Ahora puedes probar la selección manual de números para reproducir el error DOM.
-            </div>
-          </div>
-        )}
-
-        {currentLocale === 'en' && (
-          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
-            <div className="font-medium text-blue-800 mb-1">ℹ️ Test Mode</div>
-            <div className="text-blue-700">
-              You can now test manual number selection to check for DOM errors.
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+            {language === lang.code && (
+              <Check className="h-4 w-4 text-blue-600" />
+            )}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
-};
-
-export default LanguageSelector;
+}

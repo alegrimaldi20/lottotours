@@ -12,6 +12,9 @@ import { Coins, Trophy, Map, Star, ArrowRight, Gift, Users, User as UserIcon, Ta
 import TravelImageRenderer from "@/components/travel-image-renderer";
 import MissionVerification from "@/components/mission-verification";
 import MobileNavigation from "@/components/mobile-navigation";
+import ProfileDropdown from "@/components/profile-dropdown";
+import LanguageSelector from "@/components/language-selector";
+import { useLanguage } from "@/lib/i18n";
 
 
 // Using sample user for demo
@@ -19,6 +22,7 @@ const SAMPLE_USER_ID = "sample-user";
 
 export default function Dashboard() {
   const { toast } = useToast();
+  const { t } = useLanguage();
 
 
   const { data: user, isLoading: userLoading } = useQuery<User>({

@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { InlineToaster } from "@/components/inline-toast";
 import { useLocaleSafeToast } from "@/hooks/use-locale-safe-toast";
+import { LanguageProvider } from "@/lib/i18n";
 
 import Landing from "./pages/landing";
 import Dashboard from "./pages/dashboard";
@@ -70,14 +71,16 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <ErrorBoundary>
-          <ToastProvider>
-            <Router />
-            <InlineToaster toasts={toasts} onRemove={removeToast} />
-          </ToastProvider>
-        </ErrorBoundary>
-      </TooltipProvider>
+      <LanguageProvider>
+        <TooltipProvider>
+          <ErrorBoundary>
+            <ToastProvider>
+              <Router />
+              <InlineToaster toasts={toasts} onRemove={removeToast} />
+            </ToastProvider>
+          </ErrorBoundary>
+        </TooltipProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }

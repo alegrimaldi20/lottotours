@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/lib/i18n";
 import { 
   Menu, 
   Home, 
@@ -18,20 +19,20 @@ import {
 
 interface NavigationItem {
   href: string;
-  label: string;
+  labelKey: keyof import("@/lib/i18n").Translations;
   icon: React.ComponentType<{ className?: string }>;
   badge?: string;
 }
 
 const navigationItems: NavigationItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: Home },
-  { href: "/lotteries", label: "Lotteries", icon: Gamepad2 },
-  { href: "/marketplace", label: "Marketplace", icon: ShoppingBag },
-  { href: "/missions", label: "Missions", icon: MapPin },
-  { href: "/profile", label: "Profile", icon: User },
-  { href: "/winner-dashboard", label: "My Prizes", icon: Trophy },
-  { href: "/affiliate-dashboard", label: "Affiliate Program", icon: Users, badge: "New" },
-  { href: "/unique-ids", label: "Unique IDs", icon: Fingerprint },
+  { href: "/dashboard", labelKey: "dashboard", icon: Home },
+  { href: "/lotteries", labelKey: "lotteries", icon: Gamepad2 },
+  { href: "/marketplace", labelKey: "marketplace", icon: ShoppingBag },
+  { href: "/missions", labelKey: "missions", icon: MapPin },
+  { href: "/profile", labelKey: "profile", icon: User },
+  { href: "/winner-dashboard", labelKey: "myPrizes", icon: Trophy },
+  { href: "/affiliate-dashboard", labelKey: "affiliateProgram", icon: Users, badge: "New" },
+  { href: "/unique-ids", labelKey: "uniqueIds", icon: Fingerprint },
 ];
 
 interface MobileNavigationProps {
@@ -41,6 +42,7 @@ interface MobileNavigationProps {
 export default function MobileNavigation({ currentPath }: MobileNavigationProps) {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useLanguage();
   const current = currentPath || location;
 
   const closeMenu = () => setIsOpen(false);
@@ -87,7 +89,7 @@ export default function MobileNavigation({ currentPath }: MobileNavigationProps)
                     data-testid={`mobile-nav-${item.href.replace("/", "")}`}
                   >
                     <Icon className="h-5 w-5" />
-                    <span className="font-medium">{item.label}</span>
+                    <span className="font-medium">{t(item.labelKey)}</span>
                     {item.badge && (
                       <Badge variant="secondary" className="ml-auto text-xs">
                         {item.badge}

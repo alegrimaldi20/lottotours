@@ -12,12 +12,16 @@ import { Trophy, Clock, Users, Ticket, Coins, Calendar, MapPin } from "lucide-re
 import TravelImageRenderer from "@/components/travel-image-renderer";
 import FavoriteHeart from "@/components/favorite-heart";
 import MobileNavigation from "@/components/mobile-navigation";
+import ProfileDropdown from "@/components/profile-dropdown";
+import LanguageSelector from "@/components/language-selector";
+import { useLanguage } from "@/lib/i18n";
 
 // Using sample user for demo
 const SAMPLE_USER_ID = "sample-user";
 
 export default function Lotteries() {
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const { data: user } = useQuery<User>({
     queryKey: ["/api/users", SAMPLE_USER_ID],
