@@ -3,10 +3,15 @@
 ## Overview
 TravelLotto is a comprehensive blockchain-based travel platform that combines verified lotteries with authentic travel experiences. The platform currently features:
 
-**Travel Lottery System:** Three active travel lotteries with blockchain-verified draws:
+**Travel Lottery System:** Three active travel lotteries with blockchain-verified draws (all restored and permanently active):
 - Bali Cultural Immersion (8 days) - LT2025-101 
 - Patagonia Wilderness Expedition (10 days) - LT2025-102
 - Morocco Desert & Cities (12 days) - LT2025-103
+
+**Token Shop System:** Three-tier token pack structure with Stripe integration:
+- Starter Pack: 54 tokens for $3.00 (teal theme)
+- Adventure Pack: 189 tokens for $9.00 (gold theme, most popular)
+- Explorer Pack: 360 tokens for $15.00 (purple theme)
 
 **Referral & Affiliate System:** Dual-tier partner program with comprehensive tracking:
 - Travel Agency Partners: 18-28% commissions with enterprise features
@@ -18,7 +23,7 @@ TravelLotto is a comprehensive blockchain-based travel platform that combines ve
 - Country-specific analytics, agency partnerships, and market penetration tracking
 - Multi-currency support and regional customization
 
-**Core Features:** Token-based economy, mission verification system, QR code lottery verification, unique draw ID tracking, multi-language support (EN/ES/PT), and comprehensive user management.
+**Core Features:** Token-based economy with three-tier token pack system, mission verification system, QR code lottery verification, unique draw ID tracking, multi-language support (EN/ES/PT), comprehensive user management, and complete South American expansion program with 9 countries.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
