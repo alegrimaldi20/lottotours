@@ -334,7 +334,7 @@ export default function Dashboard() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-slate-600">Total Prize Value</span>
-                    <span className="font-semibold text-lottery-gold">$2,250</span>
+                    <span className="font-semibold text-lottery-gold">$2,250 USD</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-slate-600">Completed</span>

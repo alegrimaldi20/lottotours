@@ -33,12 +33,12 @@ export default function PartnerTypeSelector({ onSelectPartnerType, selectedType 
         'Bulk booking capabilities'
       ],
       tiers: [
-        { name: 'Bronze Agency', rate: '18%', volume: '$5K+/month' },
-        { name: 'Silver Agency', rate: '22%', volume: '$15K+/month' },
-        { name: 'Gold Agency', rate: '25%', volume: '$35K+/month' },
-        { name: 'Platinum Agency', rate: '28%', volume: '$75K+/month' }
+        { name: 'Bronze Agency', rate: '18%', volume: '$5K USD+/month' },
+        { name: 'Silver Agency', rate: '22%', volume: '$15K USD+/month' },
+        { name: 'Gold Agency', rate: '25%', volume: '$35K USD+/month' },
+        { name: 'Platinum Agency', rate: '28%', volume: '$75K USD+/month' }
       ],
-      minimumPayout: '$100',
+      minimumPayout: '$100 USD',
       payoutSchedule: 'Weekly or Monthly',
       specialBenefits: [
         'API integration access',
@@ -63,12 +63,12 @@ export default function PartnerTypeSelector({ onSelectPartnerType, selectedType 
         'Mobile-friendly tracking'
       ],
       tiers: [
-        { name: 'Bronze User', rate: '10%', volume: '$500+/month' },
-        { name: 'Silver User', rate: '13%', volume: '$1.5K+/month' },
-        { name: 'Gold User', rate: '15%', volume: '$3K+/month' },
-        { name: 'Platinum User', rate: '18%', volume: '$6K+/month' }
+        { name: 'Bronze User', rate: '10%', volume: '$500 USD+/month' },
+        { name: 'Silver User', rate: '13%', volume: '$1.5K USD+/month' },
+        { name: 'Gold User', rate: '15%', volume: '$3K USD+/month' },
+        { name: 'Platinum User', rate: '18%', volume: '$6K USD+/month' }
       ],
-      minimumPayout: '$25',
+      minimumPayout: '$25 USD',
       payoutSchedule: 'Monthly',
       specialBenefits: [
         'Social sharing tools',

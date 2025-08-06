@@ -73,7 +73,7 @@ const samplePrizeWinners = [
     userId: "sample-user",
     prizeType: "mission_reward",
     prizeTitle: "Adventure Travel Gear Set",
-    prizeDescription: "Complete travel backpack with hiking essentials worth $250",
+    prizeDescription: "Complete travel backpack with hiking essentials worth $250 USD",
     prizeValue: 25000,
     status: "completed",
     assignedAgency: {

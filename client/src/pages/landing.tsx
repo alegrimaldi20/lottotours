@@ -110,7 +110,7 @@ export default function Landing() {
                 <div className="text-slate-600">Active Explorers</div>
               </div>
               <div className="text-center" data-testid="stat-prizes">
-                <div className="text-3xl font-bold text-gradient-gold">$2M+</div>
+                <div className="text-3xl font-bold text-gradient-gold">$2M+ USD</div>
                 <div className="text-slate-600">Prizes Given</div>
               </div>
             </div>

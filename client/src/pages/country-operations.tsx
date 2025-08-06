@@ -26,7 +26,7 @@ const sampleCountries = [
     targetAgencies: 360,
     activeAgencies: 72,
     marketPenetration: 0.25,
-    totalRevenue: 2890000, // $28,900
+    totalRevenue: 2890000, // $28,900 USD
     monthlyGrowth: 0.32,
     averageCommissionRate: 0.22,
     flag: "🇨🇴",
@@ -41,7 +41,7 @@ const sampleCountries = [
     targetAgencies: 360,
     activeAgencies: 54,
     marketPenetration: 0.19,
-    totalRevenue: 2340000, // $23,400
+    totalRevenue: 2340000, // $23,400 USD
     monthlyGrowth: 0.28,
     averageCommissionRate: 0.20,
     flag: "🇵🇪",
@@ -56,7 +56,7 @@ const sampleCountries = [
     targetAgencies: 360,
     activeAgencies: 38,
     marketPenetration: 0.13,
-    totalRevenue: 1560000, // $15,600
+    totalRevenue: 1560000, // $15,600 USD
     monthlyGrowth: 0.25,
     averageCommissionRate: 0.21,
     flag: "🇪🇨",
@@ -71,7 +71,7 @@ const sampleCountries = [
     targetAgencies: 360,
     activeAgencies: 26,
     marketPenetration: 0.09,
-    totalRevenue: 890000, // $8,900
+    totalRevenue: 890000, // $8,900 USD
     monthlyGrowth: 0.35,
     averageCommissionRate: 0.23,
     flag: "🇧🇴",
@@ -86,7 +86,7 @@ const sampleCountries = [
     targetAgencies: 360,
     activeAgencies: 65,
     marketPenetration: 0.22,
-    totalRevenue: 3450000, // $34,500
+    totalRevenue: 3450000, // $34,500 USD
     monthlyGrowth: 0.18,
     averageCommissionRate: 0.19,
     flag: "🇨🇱",
@@ -101,7 +101,7 @@ const sampleCountries = [
     targetAgencies: 360,
     activeAgencies: 23,
     marketPenetration: 0.08,
-    totalRevenue: 780000, // $7,800
+    totalRevenue: 780000, // $7,800 USD
     monthlyGrowth: 0.42,
     averageCommissionRate: 0.24,
     flag: "🇺🇾",
@@ -116,7 +116,7 @@ const sampleCountries = [
     targetAgencies: 360,
     activeAgencies: 19,
     marketPenetration: 0.07,
-    totalRevenue: 650000, // $6,500
+    totalRevenue: 650000, // $6,500 USD
     monthlyGrowth: 0.38,
     averageCommissionRate: 0.25,
     flag: "🇵🇾",
@@ -131,7 +131,7 @@ const sampleCountries = [
     targetAgencies: 360,
     activeAgencies: 89,
     marketPenetration: 0.31,
-    totalRevenue: 4670000, // $46,700
+    totalRevenue: 4670000, // $46,700 USD
     monthlyGrowth: 0.15,
     averageCommissionRate: 0.18,
     flag: "🇦🇷",
@@ -146,7 +146,7 @@ const sampleCountries = [
     targetAgencies: 360,
     activeAgencies: 134,
     marketPenetration: 0.43,
-    totalRevenue: 6890000, // $68,900
+    totalRevenue: 6890000, // $68,900 USD
     monthlyGrowth: 0.22,
     averageCommissionRate: 0.17,
     flag: "🇧🇷",

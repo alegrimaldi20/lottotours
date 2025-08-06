@@ -36,10 +36,10 @@ const sampleAffiliateProgram = {
     platinum: { threshold: 50, rate: 0.28 }
   },
   bonusThresholds: {
-    firstConversion: 5000, // $50 bonus
-    monthlyTarget: { referrals: 10, bonus: 10000 } // $100 bonus
+    firstConversion: 5000, // $50 USD bonus
+    monthlyTarget: { referrals: 10, bonus: 10000 } // $100 USD bonus
   },
-  minimumPayout: 5000, // $50
+  minimumPayout: 5000, // $50 USD
   payoutSchedule: "monthly",
   status: "active"
 };
@@ -48,10 +48,10 @@ const sampleReferralStats = {
   totalClicks: 1247,
   totalRegistrations: 89,  
   totalConversions: 23,
-  totalRevenue: 345600, // $3,456 in cents
-  commissionEarned: 51840, // $518.40 in cents
+  totalRevenue: 345600, // $3,456 USD in cents
+  commissionEarned: 51840, // $518.40 USD in cents
   conversionRate: 0.0184, // 1.84%
-  averageOrderValue: 15026, // $150.26 in cents
+  averageOrderValue: 15026, // $150.26 USD in cents
   currentTier: "silver",
   nextTierProgress: 0.6 // 60% to gold
 };
@@ -63,7 +63,7 @@ const sampleRecentReferrals = [
     username: "traveler_alex",
     registeredAt: new Date("2025-01-20T14:30:00Z"),
     firstTransactionAt: new Date("2025-01-21T10:15:00Z"),
-    firstTransactionAmount: 18900, // $189
+    firstTransactionAmount: 18900, // $189 USD
     totalSpent: 18900,
     status: "converted",
     source: "social_media",
@@ -84,8 +84,8 @@ const sampleRecentReferrals = [
     username: "adventure_seeker",
     registeredAt: new Date("2025-01-18T09:20:00Z"),
     firstTransactionAt: new Date("2025-01-19T11:30:00Z"),
-    firstTransactionAmount: 12500, // $125
-    totalSpent: 24800, // $248 (repeat customer)
+    firstTransactionAmount: 12500, // $125 USD
+    totalSpent: 24800, // $248 USD (repeat customer)
     status: "converted",
     source: "banner",
     campaign: "winter_promo"
@@ -98,8 +98,8 @@ const sampleLeaderboard = [
     agencyName: "European Adventures",
     totalReferrals: 156,
     convertedReferrals: 42,
-    totalRevenue: 127800, // $1,278
-    commissionEarned: 25560, // $255.60
+    totalRevenue: 127800, // $1,278 USD
+    commissionEarned: 25560, // $255.60 USD
     conversionRate: 0.269,
     badge: "platinum"
   },
@@ -108,8 +108,8 @@ const sampleLeaderboard = [
     agencyName: "Nordic Expeditions", 
     totalReferrals: 134,
     convertedReferrals: 31,
-    totalRevenue: 98500, // $985
-    commissionEarned: 19700, // $197
+    totalRevenue: 98500, // $985 USD
+    commissionEarned: 19700, // $197 USD
     conversionRate: 0.231,
     badge: "gold"
   },
@@ -118,8 +118,8 @@ const sampleLeaderboard = [
     agencyName: "Mediterranean Tours",
     totalReferrals: 89,
     convertedReferrals: 23,
-    totalRevenue: 76300, // $763
-    commissionEarned: 13734, // $137.34
+    totalRevenue: 76300, // $763 USD
+    commissionEarned: 13734, // $137.34 USD
     conversionRate: 0.258,
     badge: "silver"
   }

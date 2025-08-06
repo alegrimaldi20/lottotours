@@ -67,7 +67,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ tokenPack, onSuccess, onCan
               {tokenPack.tokenAmount} Tokens
             </div>
             <div className="text-lg text-slate-600">
-              ${tokenPack.priceUsd}
+              ${tokenPack.priceUsd} USD
             </div>
           </div>
         </CardHeader>
@@ -269,7 +269,7 @@ export default function TokenShop() {
                   
                   <div className="border-t pt-4">
                     <div className="text-2xl font-bold text-slate-900 mb-4">
-                      ${pack.priceUsd}
+                      ${pack.priceUsd} USD
                     </div>
                     <Button
                       onClick={() => handlePurchase(pack)}

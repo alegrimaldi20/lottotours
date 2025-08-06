@@ -64,7 +64,7 @@ export default function Services() {
             <h3 className="text-xl font-semibold mb-3 text-slate-900">Bali Cultural Immersion</h3>
             <p className="text-slate-600 mb-4">8-day spiritual journey through temples, rice terraces, and pristine beaches</p>
             <div className="flex justify-between items-center text-sm text-slate-500">
-              <span>Prize Value: $3,200</span>
+              <span>Prize Value: $3,200 USD</span>
               <span>15 tokens/ticket</span>
             </div>
           </div>
@@ -74,7 +74,7 @@ export default function Services() {
             <h3 className="text-xl font-semibold mb-3 text-slate-900">Patagonia Wilderness</h3>
             <p className="text-slate-600 mb-4">10-day adventure with glacier trekking and wildlife encounters</p>
             <div className="flex justify-between items-center text-sm text-slate-500">
-              <span>Prize Value: $4,500</span>
+              <span>Prize Value: $4,500 USD</span>
               <span>35 tokens/ticket</span>
             </div>
           </div>
@@ -84,7 +84,7 @@ export default function Services() {
             <h3 className="text-xl font-semibold mb-3 text-slate-900">Morocco Desert & Cities</h3>
             <p className="text-slate-600 mb-4">12-day imperial cities tour with Sahara desert camel trekking</p>
             <div className="flex justify-between items-center text-sm text-slate-500">
-              <span>Prize Value: $3,800</span>
+              <span>Prize Value: $3,800 USD</span>
               <span>25 tokens/ticket</span>
             </div>
           </div>
