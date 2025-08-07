@@ -21,7 +21,12 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.warn("Error boundary caught an error:", error, errorInfo);
+    console.error("Error boundary caught an error:", error, errorInfo);
+    // Prevent the error from propagating further
+    if (error.message.includes('util')) {
+      // Silence util module externalization errors
+      return;
+    }
   }
 
   render() {

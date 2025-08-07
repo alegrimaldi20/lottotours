@@ -249,6 +249,15 @@ const sampleTerritories = [
 
 export default function CountryOperations() {
   const [, navigate] = useLocation();
+  
+  const handleNavigation = (path: string) => {
+    try {
+      navigate(path);
+    } catch (error) {
+      console.error('Navigation error:', error);
+      window.location.href = path; // Fallback to direct navigation
+    }
+  };
   const [selectedRegion, setSelectedRegion] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
@@ -324,7 +333,7 @@ export default function CountryOperations() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <button 
-                onClick={() => navigate('/dashboard')}
+                onClick={() => handleNavigation('/dashboard')}
                 className="text-slate-600 hover:text-blue-600 transition-colors mr-4 bg-transparent border-none cursor-pointer" 
                 data-testid="nav-dashboard"
               >
