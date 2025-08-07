@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { type User } from "@shared/schema";
+import { type User, type Prize } from "@shared/schema";
+import { queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { 
-  Coins, Target, Zap, ShoppingBag, Star, Gift, 
-  Search, Filter, Plane, MapPin, Trophy 
+  Coins, Target, ShoppingBag, 
+  Search, Filter, Plane, Gift 
 } from "lucide-react";
 import MobileNavigation from "@/components/mobile-navigation";
 import NavigationDropdown from "@/components/navigation-dropdown";
@@ -19,87 +21,99 @@ import { useLanguage } from "@/lib/i18n";
 
 const SAMPLE_USER_ID = "sample-user";
 
-// Mock marketplace items for demonstration
-const marketplaceItems = [
-  {
-    id: "item-1",
-    name: "Tokyo Gourmet Experience",
-    description: "Exclusive access to hidden local restaurants and food tours",
-    price: 150,
-    currency: "Kairos",
-    category: "experiences",
-    image: "🍣",
-    rarity: "rare",
-    availability: 25
-  },
-  {
-    id: "item-2", 
-    name: "Bali Wellness Retreat Voucher",
-    description: "3-day spa and meditation retreat in beautiful Bali",
-    price: 200,
-    currency: "Kairos", 
-    category: "wellness",
-    image: "🌺",
-    rarity: "epic",
-    availability: 10
-  },
-  {
-    id: "item-3",
-    name: "Patagonia Adventure Kit",
-    description: "Professional hiking gear and camping equipment rental",
-    price: 75,
-    currency: "Kairos",
-    category: "gear",
-    image: "🎒",
-    rarity: "common",
-    availability: 50
-  },
-  {
-    id: "item-4",
-    name: "Morocco Cultural Guide Service", 
-    description: "Personal guide for authentic Moroccan cultural experiences",
-    price: 100,
-    currency: "Kairos",
-    category: "services",
-    image: "🏺",
-    rarity: "rare",
-    availability: 15
-  },
-  {
-    id: "item-5",
-    name: "Premium Travel Photography Session",
-    description: "Professional photographer for your travel memories",
-    price: 120,
-    currency: "Kairos", 
-    category: "services",
-    image: "📸",
-    rarity: "rare",
-    availability: 20
-  }
-];
-
 export default function Marketplace() {
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const { data: user } = useQuery<User>({
     queryKey: ["/api/users", SAMPLE_USER_ID],
   });
 
-  const filteredItems = marketplaceItems.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const { data: prizes = [], isLoading } = useQuery<Prize[]>({
+    queryKey: ["/api/prizes"],
+  });
+
+  const filteredItems = prizes.filter(item => {
+    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "all" || item.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const getRarityColor = (rarity: string) => {
-    switch (rarity) {
-      case "legendary": return "text-yellow-600 border-yellow-200 bg-yellow-50";
-      case "epic": return "text-purple-600 border-purple-200 bg-purple-50";
-      case "rare": return "text-blue-600 border-blue-200 bg-blue-50";
-      default: return "text-gray-600 border-gray-200 bg-gray-50";
+  const handlePurchase = async (prize: Prize) => {
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    
+    try {
+      if (!user || (user.kairosTokens || 0) < prize.tokensRequired) {
+        toast({
+          title: "Insuficientes tokens",
+          description: "No tienes suficientes tokens Kairos para esta compra",
+          variant: "destructive",
+        });
+        setIsProcessing(false);
+        return;
+      }
+
+      if (prize.availability <= 0) {
+        toast({
+          title: "Producto agotado",
+          description: "Este producto no está disponible actualmente",
+          variant: "destructive",
+        });
+        setIsProcessing(false);
+        return;
+      }
+      
+      const response = await fetch("/api/prize-redemptions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: SAMPLE_USER_ID,
+          prizeId: prize.id,
+        }),
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const redemption = await response.json();
+        
+        // Update user tokens immediately
+        if (user) {
+          const updatedUser = {
+            ...user,
+            kairosTokens: Math.max(0, (user.kairosTokens || 0) - prize.tokensRequired)
+          };
+          queryClient.setQueryData(["/api/users", SAMPLE_USER_ID], updatedUser);
+        }
+        
+        toast({
+          title: "¡Compra exitosa!",
+          description: `Código de canje: ${redemption.redemptionCode}`,
+        });
+        
+        // Refresh data
+        queryClient.invalidateQueries({ queryKey: ["/api/prizes"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/users", SAMPLE_USER_ID] });
+        
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Error en la compra");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error en la compra",
+        description: error?.message || "No se pudo completar la compra. Intenta de nuevo.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -153,7 +167,7 @@ export default function Marketplace() {
             🛍️ Travel Marketplace
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Discover amazing travel experiences, services, and gear. Use your Kairos tokens to unlock exclusive offerings from around the world.
+            Descubre experiencias de viaje increíbles, servicios y productos. Usa tus tokens Kairos para desbloquear ofertas exclusivas de todo el mundo.
           </p>
         </div>
 
@@ -197,7 +211,7 @@ export default function Marketplace() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Search experiences, services, and gear..."
+                placeholder="Buscar experiencias, servicios y productos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -207,7 +221,7 @@ export default function Marketplace() {
           </div>
           
           <div className="flex flex-wrap gap-2">
-            {["all", "experiences", "wellness", "gear", "services"].map((category) => (
+            {["all", "experience", "travel_package", "product", "discount"].map((category) => (
               <Button
                 key={category}
                 variant={selectedCategory === category ? "default" : "outline"}
@@ -216,280 +230,154 @@ export default function Marketplace() {
                 data-testid={`filter-${category}`}
               >
                 <Filter className="h-3 w-3 mr-1" />
-                {category.charAt(0).toUpperCase() + category.slice(1)}
+                {category === "all" ? "Todos" :
+                 category === "experience" ? "Experiencias" :
+                 category === "travel_package" ? "Paquetes" :
+                 category === "product" ? "Productos" : "Descuentos"}
               </Button>
             ))}
           </div>
         </div>
 
-        {/* Marketplace Items */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Travel Experience Card */}
-          <Card className="hover:shadow-lg transition-shadow overflow-hidden">
-            <div className="relative h-48">
-              <TravelImageRenderer 
-                type="marketplace" 
-                theme="experiences"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <Badge className="absolute top-4 right-4 bg-golden-luck text-white">
-                Popular
-              </Badge>
-              <div className="absolute bottom-4 left-4 text-white">
-                <h3 className="text-lg font-bold">Cultural City Tours</h3>
-                <p className="text-sm">Authentic local experiences</p>
-              </div>
-            </div>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>City Experience Package</span>
-                <span className="text-ocean-pulse">150 Kairos</span>
-              </CardTitle>
-              <CardDescription>
-                Discover hidden gems with local guides in major cities worldwide
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <Button className="w-full" data-testid="buy-experience">
-                <ShoppingBag className="h-4 w-4 mr-2" />
-                Purchase Experience
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Wellness Package Card */}
-          <Card className="hover:shadow-lg transition-shadow overflow-hidden">
-            <div className="relative h-48">
-              <TravelImageRenderer 
-                type="marketplace" 
-                theme="wellness"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <Badge className="absolute top-4 right-4 bg-travel-mint text-white">
-                Relaxing
-              </Badge>
-              <div className="absolute bottom-4 left-4 text-white">
-                <h3 className="text-lg font-bold">Spa & Wellness Retreat</h3>
-                <p className="text-sm">Rejuvenation packages</p>
-              </div>
-            </div>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Wellness Package</span>
-                <span className="text-travel-mint">200 Kairos</span>
-              </CardTitle>
-              <CardDescription>
-                Premium spa treatments and wellness experiences at luxury resorts
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <Button className="w-full" data-testid="buy-wellness">
-                <Star className="h-4 w-4 mr-2" />
-                Purchase Package
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Adventure Gear Card */}
-          <Card className="hover:shadow-lg transition-shadow overflow-hidden">
-            <div className="relative h-48">
-              <TravelImageRenderer 
-                type="marketplace" 
-                theme="gear"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <Badge className="absolute top-4 right-4 bg-explore-blue text-white">
-                Essential
-              </Badge>
-              <div className="absolute bottom-4 left-4 text-white">
-                <h3 className="text-lg font-bold">Adventure Gear Set</h3>
-                <p className="text-sm">Premium travel equipment</p>
-              </div>
-            </div>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Adventure Equipment</span>
-                <span className="text-explore-blue">120 Kairos</span>
-              </CardTitle>
-              <CardDescription>
-                High-quality backpacks, gear, and travel accessories for adventurers
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <Button className="w-full" data-testid="buy-gear">
-                <Plane className="h-4 w-4 mr-2" />
-                Purchase Gear
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Featured Travel Packages */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Featured Travel Packages</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Paris Getaway Package */}
-            <Card className="hover:shadow-lg transition-shadow overflow-hidden">
-              <div className="relative h-64">
-                <TravelImageRenderer 
-                  type="paris"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                <Badge className="absolute top-4 right-4 bg-golden-luck text-white">
-                  Premium
-                </Badge>
-                <div className="absolute bottom-4 left-4 text-white">
-                  <h3 className="text-xl font-bold">Paris City Break</h3>
-                  <p className="text-sm">3 Days • Eiffel Tower • Seine River</p>
-                </div>
-              </div>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Paris Romance Package</span>
-                  <span className="text-golden-luck">500 Kairos</span>
-                </CardTitle>
-                <CardDescription>
-                  Experience the City of Light with guided tours, luxury accommodation, and authentic French dining
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <Button className="w-full" data-testid="buy-paris-package">
-                  <Plane className="h-4 w-4 mr-2" />
-                  Book Paris Experience
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Tokyo Adventure Package */}
-            <Card className="hover:shadow-lg transition-shadow overflow-hidden">
-              <div className="relative h-64">
-                <TravelImageRenderer 
-                  type="tokyo"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                <Badge className="absolute top-4 right-4 bg-explore-blue text-white">
-                  Adventure
-                </Badge>
-                <div className="absolute bottom-4 left-4 text-white">
-                  <h3 className="text-xl font-bold">Tokyo Discovery</h3>
-                  <p className="text-sm">5 Days • Mount Fuji • Traditional Culture</p>
-                </div>
-              </div>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Tokyo Cultural Journey</span>
-                  <span className="text-explore-blue">650 Kairos</span>
-                </CardTitle>
-                <CardDescription>
-                  Immerse yourself in Japanese culture with temple visits, traditional cuisine, and modern city exploration
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <Button className="w-full" data-testid="buy-tokyo-package">
-                  <MapPin className="h-4 w-4 mr-2" />
-                  Book Tokyo Adventure
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Dynamic Marketplace Items */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Marketplace Items</h2>
+        {/* Real Marketplace Items from API */}
+        {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredItems.map((item) => (
-            <Card key={item.id} className={`hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${getRarityColor(item.rarity)} border-2 overflow-hidden`}>
-              <div className="relative h-48">
-                <TravelImageRenderer 
-                  type="marketplace" 
-                  theme={item.category}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                <Badge className={`absolute top-4 right-4 ${item.rarity === "rare" ? "bg-red-500" : item.rarity === "uncommon" ? "bg-blue-500" : "bg-gray-500"} text-white`}>
-                  {item.rarity.toUpperCase()}
-                </Badge>
-                <div className="absolute bottom-4 left-4 text-white">
-                  <h3 className="text-lg font-bold">{item.name}</h3>
-                  <p className="text-sm opacity-90 capitalize">{item.category}</p>
-                </div>
-              </div>
-              <CardHeader className="pb-4">
-                <CardDescription className="mt-2 text-gray-700">
-                  {item.description}
-                </CardDescription>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                {/* Price and Availability */}
-                <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg">
-                  <div className="flex items-center space-x-2">
-                    <Target className="h-4 w-4 text-purple-600" />
-                    <span className="font-bold text-purple-600 text-xl">
-                      {item.price} Kairos
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium text-gray-600">Available</div>
-                    <div className="text-sm font-bold text-green-600">{item.availability} left</div>
-                  </div>
-                </div>
-
-                {/* Purchase Button */}
-                <Button 
-                  className="w-full" 
-                  disabled={(user?.kairosTokens || 0) < item.price || item.availability === 0}
-                  data-testid={`purchase-${item.id}`}
-                >
-                  {(user?.kairosTokens || 0) < item.price ? (
-                    <>
-                      <Coins className="h-4 w-4 mr-2" />
-                      Need More Kairos
-                    </>
-                  ) : item.availability === 0 ? (
-                    "Sold Out"
-                  ) : (
-                    <>
-                      <ShoppingBag className="h-4 w-4 mr-2" />
-                      Purchase Now
-                    </>
-                  )}
-                </Button>
-
-                {/* Item Details */}
-                <div className="text-xs text-gray-500 space-y-1">
-                  <div className="flex justify-between">
-                    <span>Category:</span>
-                    <span className="font-medium capitalize">{item.category}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Rarity:</span>
-                    <span className="font-medium capitalize">{item.rarity}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <Card key={n} className="animate-pulse">
+                <div className="h-48 bg-gray-300 rounded-t-lg"></div>
+                <CardHeader>
+                  <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-10 bg-gray-300 rounded"></div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        </div>
-
-        {/* No Results */}
-        {filteredItems.length === 0 && (
+        ) : filteredItems.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredItems.map((prize) => (
+              <Card key={prize.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+                <div className="relative h-48">
+                  <TravelImageRenderer 
+                    type="marketplace" 
+                    theme={prize.category === 'experience' ? 'experiences' : 
+                           prize.category === 'travel_package' ? 'packages' :
+                           prize.category === 'discount' ? 'wellness' : 'gear'}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                  <Badge className="absolute top-4 right-4 bg-golden-luck text-white">
+                    {prize.availability} left
+                  </Badge>
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <h3 className="text-lg font-bold">{prize.title}</h3>
+                    <p className="text-sm">{prize.destination || prize.provider}</p>
+                  </div>
+                </div>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="truncate">{prize.title}</span>
+                    <span className="text-ocean-pulse text-sm font-bold whitespace-nowrap ml-2">
+                      {prize.tokensRequired} Kairos
+                    </span>
+                  </CardTitle>
+                  <CardDescription>
+                    {prize.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm text-gray-500">
+                      Valor: ${(prize.value / 100).toFixed(2)} USD
+                    </span>
+                    <Badge variant={prize.availability > 5 ? "default" : "destructive"}>
+                      {prize.availability > 5 ? "Available" : "Limited"}
+                    </Badge>
+                  </div>
+                  <Button 
+                    className="w-full" 
+                    data-testid={`buy-prize-${prize.id}`}
+                    onClick={() => handlePurchase(prize)}
+                    disabled={isProcessing || prize.availability <= 0 || (user?.kairosTokens || 0) < prize.tokensRequired}
+                  >
+                    <ShoppingBag className="h-4 w-4 mr-2" />
+                    {prize.availability <= 0 ? "Agotado" : 
+                     (user?.kairosTokens || 0) < prize.tokensRequired ? "Insuficientes tokens" :
+                     isProcessing ? "Procesando..." : "Comprar"}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
           <div className="text-center py-12">
             <Gift className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Items Found</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No se encontraron productos</h3>
             <p className="text-gray-600 mb-6">
-              Try adjusting your search or filter criteria to find amazing travel experiences.
+              {searchTerm || selectedCategory !== "all" ? 
+                "Intenta ajustar tu búsqueda o filtros para encontrar experiencias increíbles." :
+                "No hay productos disponibles en el marketplace actualmente."}
             </p>
-            <Button variant="outline" onClick={() => { setSearchTerm(""); setSelectedCategory("all"); }}>
-              Clear Filters
-            </Button>
+            {(searchTerm || selectedCategory !== "all") && (
+              <Button variant="outline" onClick={() => { setSearchTerm(""); setSelectedCategory("all"); }}>
+                Limpiar Filtros
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* Featured Travel Packages */}
+        {filteredItems.filter(prize => prize.category === 'travel_package').length > 0 && (
+          <div className="mt-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Paquetes de Viaje Destacados</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {filteredItems
+                .filter(prize => prize.category === 'travel_package')
+                .slice(0, 2)
+                .map((prize) => (
+                <Card key={`featured-${prize.id}`} className="hover:shadow-lg transition-shadow overflow-hidden">
+                  <div className="relative h-64">
+                    <TravelImageRenderer 
+                      type="marketplace"
+                      theme="packages"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                    <Badge className="absolute top-4 right-4 bg-golden-luck text-white">
+                      Premium
+                    </Badge>
+                    <div className="absolute bottom-4 left-4 text-white">
+                      <h3 className="text-xl font-bold">{prize.title}</h3>
+                      <p className="text-sm">{prize.destination}</p>
+                    </div>
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span>{prize.title}</span>
+                      <span className="text-golden-luck">{prize.tokensRequired} Kairos</span>
+                    </CardTitle>
+                    <CardDescription>
+                      {prize.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <Button 
+                      className="w-full" 
+                      data-testid={`buy-featured-${prize.id}`}
+                      onClick={() => handlePurchase(prize)}
+                      disabled={isProcessing || prize.availability <= 0 || (user?.kairosTokens || 0) < prize.tokensRequired}
+                    >
+                      <Plane className="h-4 w-4 mr-2" />
+                      {prize.availability <= 0 ? "Agotado" : 
+                       (user?.kairosTokens || 0) < prize.tokensRequired ? "Insuficientes tokens" :
+                       isProcessing ? "Procesando..." : "Reservar Experiencia"}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         )}
       </main>
