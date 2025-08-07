@@ -530,7 +530,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/users/:userId/token-conversions", async (req, res) => {
     try {
-      const conversionData = insertTokenConversionSchema.parse({
+      const conversionData = insertRaivanConversionSchema.parse({
         ...req.body,
         userId: req.params.userId
       });
@@ -743,7 +743,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/users/:userId/viator-tokens", async (req, res) => {
     try {
       const { viatorTokens } = req.body;
-      const user = await storage.updateUserViatorTokens(req.params.userId, viatorTokens);
+      const user = await storage.updateUser(req.params.userId, { viatorTokens });
       res.json(user);
     } catch (error) {
       res.status(500).json({ message: "Failed to update Viator tokens" });
@@ -753,7 +753,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/users/:userId/kairos-tokens", async (req, res) => {
     try {
       const { kairosTokens } = req.body;
-      const user = await storage.updateUserKairosTokens(req.params.userId, kairosTokens);
+      const user = await storage.updateUser(req.params.userId, { kairosTokens });
       res.json(user);
     } catch (error) {
       res.status(500).json({ message: "Failed to update Kairos tokens" });
@@ -763,7 +763,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/users/:userId/raivan-tokens", async (req, res) => {
     try {
       const { raivanTokens } = req.body;
-      const user = await storage.updateUserRaivanTokens(req.params.userId, raivanTokens);
+      const user = await storage.updateUser(req.params.userId, { raivanTokens });
       res.json(user);
     } catch (error) {
       res.status(500).json({ message: "Failed to update Raivan tokens" });
@@ -784,6 +784,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Marketplace listings error:', error);
       res.status(500).json({ message: "Failed to fetch marketplace listings" });
+    }
+  });
+
+  // Create new marketplace listing
+  app.post("/api/marketplace/listings", async (req, res) => {
+    try {
+      const listingData = req.body;
+      
+      // Validate required fields
+      if (!listingData.title || !listingData.description || !listingData.sellerId) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      // Generate unique listing ID
+      listingData.id = `listing-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      listingData.status = 'active';
+      listingData.totalWatchers = 0;
+      listingData.totalViews = 0;
+      listingData.createdAt = new Date().toISOString();
+      listingData.updatedAt = new Date().toISOString();
+      
+      // Set verification hash for platform-derived items
+      listingData.verificationHash = `verified-${listingData.sourceId}-${Date.now()}`;
+
+      const newListing = await storage.createMarketplaceListing(listingData);
+      res.status(201).json(newListing);
+    } catch (error) {
+      console.error('Create listing error:', error);
+      res.status(500).json({ message: "Failed to create listing" });
+    }
+  });
+
+  // Get user's available assets for selling
+  app.get("/api/users/:userId/assets", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      
+      // Mock user assets - in real implementation, this would come from user's inventory
+      const mockAssets = [
+        {
+          id: "asset-bali-001",
+          type: "lottery_prize",
+          name: "Bali Cultural Experience Winner",
+          description: "8-day authentic Bali cultural immersion experience from VoyageLotto lottery LT2025-101",
+          verificationHash: "verified-bali-cultural-001",
+          category: "travel_experiences",
+          isAvailable: true,
+          estimatedValue: 125000
+        },
+        {
+          id: "asset-nft-001",
+          type: "platform_nft",
+          name: "VoyageLotto Premium NFT",
+          description: "Exclusive digital collectible from VoyageLotto platform events",
+          verificationHash: "verified-nft-premium-001",
+          category: "digital_collectibles",
+          isAvailable: true,
+          estimatedValue: 45000
+        },
+        {
+          id: "asset-token-pack-001",
+          type: "token_pack",
+          name: "Adventure Token Pack Voucher",
+          description: "Unused Adventure pack voucher with 189 Kairos tokens",
+          verificationHash: "verified-token-adventure-001",
+          category: "token_vouchers",
+          isAvailable: true,
+          estimatedValue: 900
+        }
+      ];
+
+      res.json(mockAssets);
+    } catch (error) {
+      console.error('User assets error:', error);
+      res.status(500).json({ message: "Failed to fetch user assets" });
     }
   });
 

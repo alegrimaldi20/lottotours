@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Eye, Heart, MapPin, Calendar, DollarSign, Verified, Trophy, Star, Clock } from 'lucide-react';
+import { Eye, Heart, MapPin, Calendar, DollarSign, Verified, Trophy, Star, Clock, Plus } from 'lucide-react';
+import { Link } from 'wouter';
 
 interface MarketplaceListing {
   id: string;
@@ -110,9 +111,17 @@ export default function MarketplacePage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">VoyageLotto Marketplace</h1>
-        <p className="text-gray-600">Discover authentic travel experiences and platform-verified collectibles</p>
+      <div className="mb-8 flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">VoyageLotto Marketplace</h1>
+          <p className="text-gray-600">Discover authentic travel experiences and platform-verified collectibles</p>
+        </div>
+        <Link href="/sell">
+          <Button className="bg-green-600 hover:bg-green-700 text-white" data-testid="button-sell-now">
+            <Plus className="h-4 w-4 mr-2" />
+            Sell Item
+          </Button>
+        </Link>
       </div>
 
       {/* Search and Filter Controls */}

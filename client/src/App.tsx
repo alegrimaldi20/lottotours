@@ -12,6 +12,7 @@ import { setupErrorSuppression } from "@/utils/error-suppression";
 import Landing from "./pages/landing";
 import Dashboard from "./pages/dashboard";
 import Marketplace from "./pages/marketplace";
+import SellPage from "./pages/sell";
 import Lotteries from "./pages/lotteries";
 import LotteryDetail from "./pages/lottery-detail";
 import TokenShop from "./pages/token-shop";
@@ -52,6 +53,7 @@ function Router() {
       <Route path="/lotteries" component={Lotteries} />
       <Route path="/lottery/:id" component={LotteryDetail} />
       <Route path="/marketplace" component={Marketplace} />
+      <Route path="/sell" component={SellPage} />
       <Route path="/token-shop" component={TokenShop} />
       <Route path="/missions" component={Missions} />
       <Route path="/verification-demo" component={VerificationDemo} />
