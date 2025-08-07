@@ -15,10 +15,10 @@ import {
   type AffiliatePayout, type InsertAffiliatePayout, type AffiliateTrackingEvent, type InsertAffiliateTrackingEvent,
   type AffiliateLeaderboard, type InsertAffiliateLeaderboard,
   type CountryOperation, type InsertCountryOperation, type TerritoryManagement, type InsertTerritoryManagement,
-  // New token system types
-  type TokenConversion, type InsertTokenConversion,
-  type NewTokenPack, type InsertNewTokenPack,
-  type XpActivity, type InsertXpActivity,
+  // New Viator/Kairos/Raivan token system types
+  type RaivanConversion, type InsertRaivanConversion,
+  type ViatorTokenPack, type InsertViatorTokenPack,
+  type RaivanActivity, type InsertRaivanActivity,
   type UserConversionLimit, type InsertUserConversionLimit,
   type Achievement, type InsertAchievement,
   type UserAchievement, type InsertUserAchievement,
@@ -26,8 +26,8 @@ import {
   travelAgencies, agencyTourPackages, prizeWinners, agencyCommissions, agencyAnalytics,
   affiliatePrograms, affiliateReferrals, affiliatePayouts, affiliateTrackingEvents, affiliateLeaderboard,
   countryOperations, territoryManagement,
-  // New token system tables
-  tokenConversions, newTokenPacks, xpActivities, userConversionLimits, achievements, userAchievements
+  // New Viator/Kairos/Raivan token system tables
+  raivanConversions, viatorTokenPacks, raivanActivities, userConversionLimits, achievements, userAchievements
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql } from "drizzle-orm";
@@ -42,10 +42,10 @@ export interface IStorage {
   getUserByWallet(walletAddress: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(userId: string, updateData: Partial<InsertUser>): Promise<User>;
-  updateUserTokens(userId: string, tokens: number): Promise<User>;
-  updateUserEXPLRTokens(userId: string, explrTokens: string): Promise<User>;
-  updateUserTKTTokens(userId: string, tktTokens: number): Promise<User>;
-  updateUserXPTokens(userId: string, xpTokens: number): Promise<User>;
+  // New token system methods
+  updateUserViatorTokens(userId: string, viatorTokens: string): Promise<User>;
+  updateUserKairosTokens(userId: string, kairosTokens: number): Promise<User>;
+  updateUserRaivanTokens(userId: string, raivanTokens: number): Promise<User>;
   incrementUserMissionsCompleted(userId: string): Promise<User>;
 
   // User Favorites
@@ -166,30 +166,30 @@ export interface IStorage {
   createTerritoryManagement(territory: InsertTerritoryManagement): Promise<TerritoryManagement>;
   updateTerritoryManagement(id: string, updates: Partial<TerritoryManagement>): Promise<TerritoryManagement>;
 
-  // New Token System
-  // Token Conversions
-  createTokenConversion(conversion: InsertTokenConversion): Promise<TokenConversion>;
-  getUserTokenConversions(userId: string): Promise<TokenConversion[]>;
-  getTokenConversionRates(): Promise<{ xpToTkt: number; xpToExplr: number }>;
-  validateConversionLimits(userId: string, conversionType: string, amount: number): Promise<boolean>;
+  // New Viator/Kairos/Raivan Token System
+  // Raivan Conversions (18 Raivan = 1 Kairos)
+  createRaivanConversion(conversion: InsertRaivanConversion): Promise<RaivanConversion>;
+  getUserRaivanConversions(userId: string): Promise<RaivanConversion[]>;
+  getRaivanConversionRate(): Promise<{ raivanToKairos: number }>; // Fixed rate: 18 Raivan = 1 Kairos
+  validateRaivanConversionLimits(userId: string, raivanAmount: number): Promise<boolean>;
   
-  // New Token Packs
-  getNewTokenPacks(): Promise<NewTokenPack[]>;
-  getActiveNewTokenPacks(): Promise<NewTokenPack[]>;
-  getNewTokenPack(id: string): Promise<NewTokenPack | undefined>;
-  purchaseNewTokenPack(userId: string, packId: string, paymentMethod: 'explr' | 'usd'): Promise<{ success: boolean; error?: string }>;
+  // Viator Token Packs (Kairos purchasable with Viator)
+  getViatorTokenPacks(): Promise<ViatorTokenPack[]>;
+  getActiveViatorTokenPacks(): Promise<ViatorTokenPack[]>;
+  getViatorTokenPack(id: string): Promise<ViatorTokenPack | undefined>;
+  purchaseViatorTokenPack(userId: string, packId: string, paymentMethod: 'viator' | 'usd'): Promise<{ success: boolean; error?: string }>;
   
-  // XP Activities and Tracking
-  createXpActivity(activity: InsertXpActivity): Promise<XpActivity>;
-  getUserXpActivities(userId: string): Promise<XpActivity[]>;
-  awardXP(userId: string, activityType: string, xpAmount: number, activityId?: string, activityData?: any): Promise<XpActivity>;
+  // Raivan Activities and Tracking
+  createRaivanActivity(activity: InsertRaivanActivity): Promise<RaivanActivity>;
+  getUserRaivanActivities(userId: string): Promise<RaivanActivity[]>;
+  awardRaivan(userId: string, activityType: string, raivanAmount: number, activityId?: string, activityData?: any): Promise<RaivanActivity>;
   
   // User Conversion Limits
   getUserConversionLimits(userId: string): Promise<UserConversionLimit[]>;
   createUserConversionLimit(limit: InsertUserConversionLimit): Promise<UserConversionLimit>;
-  resetDailyConversionLimits(userId: string): Promise<void>;
+  resetDailyRaivanConversionLimits(userId: string): Promise<void>;
   
-  // Achievements System
+  // Achievements System (rewards in Raivan tokens)
   getAchievements(): Promise<Achievement[]>;
   getActiveAchievements(): Promise<Achievement[]>;
   getUserAchievements(userId: string): Promise<UserAchievement[]>;

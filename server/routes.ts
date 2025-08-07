@@ -6,7 +6,7 @@ import {
   insertUserSchema, 
   insertLotteryTicketSchema, 
   insertPrizeRedemptionSchema,
-  insertTokenConversionSchema
+  insertRaivanConversionSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -650,34 +650,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // User Token Balance Routes
-  app.patch("/api/users/:userId/explr-tokens", async (req, res) => {
+  // New Viator Token System Routes
+  app.get("/api/viator-token-packs", async (req, res) => {
     try {
-      const { explrTokens } = req.body;
-      const user = await storage.updateUserEXPLRTokens(req.params.userId, explrTokens);
-      res.json(user);
+      const packs = [
+        {
+          id: "starter-pack",
+          name: "Starter Pack",
+          description: "Perfect for new travelers starting their journey with 54 Kairos tokens",
+          kairosAmount: 54,
+          viatorPrice: "3.00",
+          usdPrice: "3.00",
+          packType: "starter",
+          popularBadge: false
+        },
+        {
+          id: "adventure-pack",
+          name: "Adventure Pack",
+          description: "Most popular choice with 189 Kairos tokens for the serious traveler",
+          kairosAmount: 189,
+          viatorPrice: "9.00",
+          usdPrice: "9.00",
+          packType: "adventure",
+          popularBadge: true
+        },
+        {
+          id: "explorer-pack",
+          name: "Explorer Pack",
+          description: "Premium pack with 360 Kairos tokens for unlimited adventures",
+          kairosAmount: 360,
+          viatorPrice: "15.00",
+          usdPrice: "15.00",
+          packType: "explorer",
+          popularBadge: false
+        }
+      ];
+      res.json(packs);
     } catch (error) {
-      res.status(500).json({ message: "Failed to update EXPLR tokens" });
+      res.status(500).json({ message: "Failed to fetch Viator token packs" });
     }
   });
 
-  app.patch("/api/users/:userId/tkt-tokens", async (req, res) => {
+  app.get("/api/users/:userId/raivan-conversions", async (req, res) => {
     try {
-      const { tktTokens } = req.body;
-      const user = await storage.updateUserTKTTokens(req.params.userId, tktTokens);
-      res.json(user);
+      // Return empty array for now - will be implemented when storage methods are complete
+      res.json([]);
     } catch (error) {
-      res.status(500).json({ message: "Failed to update TKT tokens" });
+      res.status(500).json({ message: "Failed to fetch Raivan conversions" });
     }
   });
 
-  app.patch("/api/users/:userId/xp-tokens", async (req, res) => {
+  app.post("/api/raivan-conversions", async (req, res) => {
     try {
-      const { xpTokens } = req.body;
-      const user = await storage.updateUserXPTokens(req.params.userId, xpTokens);
+      const { userId, raivanAmount, kairosAmount } = req.body;
+      // For now, just simulate a successful conversion
+      res.json({
+        id: "conversion-" + Date.now(),
+        userId,
+        raivanAmount,
+        kairosAmount,
+        conversionRate: "18.0",
+        status: "completed",
+        createdAt: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to convert Raivan tokens" });
+    }
+  });
+
+  app.post("/api/viator-token-packs/purchase", async (req, res) => {
+    try {
+      const { userId, packId, paymentMethod } = req.body;
+      // For now, just simulate a successful purchase
+      res.json({
+        success: true,
+        message: "Token pack purchased successfully"
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to purchase token pack" });
+    }
+  });
+
+  // User Token Balance Routes - New Viator System
+  app.patch("/api/users/:userId/viator-tokens", async (req, res) => {
+    try {
+      const { viatorTokens } = req.body;
+      const user = await storage.updateUserViatorTokens(req.params.userId, viatorTokens);
       res.json(user);
     } catch (error) {
-      res.status(500).json({ message: "Failed to update XP tokens" });
+      res.status(500).json({ message: "Failed to update Viator tokens" });
+    }
+  });
+
+  app.patch("/api/users/:userId/kairos-tokens", async (req, res) => {
+    try {
+      const { kairosTokens } = req.body;
+      const user = await storage.updateUserKairosTokens(req.params.userId, kairosTokens);
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update Kairos tokens" });
+    }
+  });
+
+  app.patch("/api/users/:userId/raivan-tokens", async (req, res) => {
+    try {
+      const { raivanTokens } = req.body;
+      const user = await storage.updateUserRaivanTokens(req.params.userId, raivanTokens);
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update Raivan tokens" });
     }
   });
 

@@ -8,10 +8,15 @@ TravelLotto is a comprehensive blockchain-based travel platform that combines ve
 - Patagonia Wilderness Expedition (10 days) - LT2025-102
 - Morocco Desert & Cities (12 days) - LT2025-103
 
-**Token Shop System:** Three-tier token pack structure with Stripe integration:
-- Starter Pack: 54 tokens for $3.00 (teal theme)
-- Adventure Pack: 189 tokens for $9.00 (gold theme, most popular)
-- Explorer Pack: 360 tokens for $15.00 (purple theme)
+**Viator Token Economy:** Three-token ecosystem with blockchain integration:
+- Viator: Strong token ($1 USD value) for purchasing Kairos packs
+- Kairos: Raffle ticket tokens (18 Raivan = 1 Kairos) for lottery entries
+- Raivan: Reward tokens earned from activities and achievements
+
+**Token Pack System:** Three Viator-purchasable Kairos packs:
+- Starter Pack: 54 Kairos for 3 Viator ($3.00)
+- Adventure Pack: 189 Kairos for 9 Viator ($9.00, most popular)
+- Explorer Pack: 360 Kairos for 15 Viator ($15.00)
 
 **Referral & Affiliate System:** Dual-tier partner program with comprehensive tracking:
 - Travel Agency Partners: 18-28% commissions with enterprise features

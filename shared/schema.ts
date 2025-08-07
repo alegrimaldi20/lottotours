@@ -9,10 +9,10 @@ export const users = pgTable("users", {
   username: text("username").notNull(),
   email: text("email"),
   avatar: text("avatar"),
-  tokens: integer("tokens").notNull().default(0), // Legacy tokens - will be phased out
-  explrTokens: decimal("explr_tokens", { precision: 18, scale: 8 }).notNull().default("0"), // $EXPLR - Strong Token
-  tktTokens: integer("tkt_tokens").notNull().default(0), // $TKT - Participation Token  
-  xpTokens: integer("xp_tokens").notNull().default(0), // $XP - Experience Points
+  // New three-token economy: Viator ($1), Kairos (raffle tickets), Raivan (rewards)
+  viatorTokens: decimal("viator_tokens", { precision: 10, scale: 2 }).notNull().default("0"), // Strong token ($1 USD value)
+  kairosTokens: integer("kairos_tokens").notNull().default(0), // Raffle ticket tokens (18 Raivan = 1 Kairos)
+  raivanTokens: integer("raivan_tokens").notNull().default(0), // Reward tokens earned from activities
   level: integer("level").notNull().default(1),
   totalMissionsCompleted: integer("total_missions_completed").notNull().default(0),
   stripeCustomerId: text("stripe_customer_id").unique(),
@@ -181,40 +181,40 @@ export const tokenPurchases = pgTable("token_purchases", {
 });
 
 // Token conversion tracking and limits
-export const tokenConversions = pgTable("token_conversions", {
+export const raivanConversions = pgTable("raivan_conversions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id),
-  fromTokenType: text("from_token_type").notNull(), // xp, tkt, explr
-  toTokenType: text("to_token_type").notNull(), // xp, tkt, explr
-  fromAmount: decimal("from_amount", { precision: 18, scale: 8 }).notNull(),
-  toAmount: decimal("to_amount", { precision: 18, scale: 8 }).notNull(),
-  conversionRate: decimal("conversion_rate", { precision: 10, scale: 6 }).notNull(),
+  conversionType: text("conversion_type").notNull(), // "raivan_to_kairos" (18 Raivan = 1 Kairos)
+  raivanAmount: integer("raivan_amount").notNull(), // Amount of Raivan tokens converted
+  kairosAmount: integer("kairos_amount").notNull(), // Amount of Kairos tokens received
+  conversionRate: decimal("conversion_rate", { precision: 10, scale: 6 }).notNull().default("18"), // 18 Raivan = 1 Kairos
   transactionHash: text("transaction_hash"), // For blockchain transactions
   status: text("status").notNull().default("completed"), // pending, completed, failed
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Token Pack configuration - Updated for new three-token system
-export const newTokenPacks = pgTable("new_token_packs", {
+// New Token Economy: Viator ($1 USD), Kairos (raffle tickets, 18 Raivan value), Raivan (reward tokens)
+export const viatorTokenPacks = pgTable("viator_token_packs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   description: text("description").notNull(),
-  tktAmount: integer("tkt_amount").notNull(), // $TKT tokens included in pack
-  explrCost: decimal("explr_cost", { precision: 18, scale: 8 }).notNull(), // $EXPLR cost to purchase
-  usdPrice: decimal("usd_price", { precision: 10, scale: 2 }).notNull(), // USD price for direct purchase
-  packType: text("pack_type").notNull().default("basic"), // basic, medium, premium
+  kairosAmount: integer("kairos_amount").notNull(), // Number of Kairos (raffle ticket) tokens
+  viatorPrice: decimal("viator_price", { precision: 10, scale: 2 }).notNull(), // Price in Viator tokens
+  usdPrice: decimal("usd_price", { precision: 10, scale: 2 }).notNull(), // USD equivalent (1 Viator = $1)
+  packType: text("pack_type").notNull(), // "starter", "adventure", "explorer"
   isActive: boolean("is_active").notNull().default(true),
   popularBadge: boolean("popular_badge").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 // XP earning activities and achievements
-export const xpActivities = pgTable("xp_activities", {
+export const raivanActivities = pgTable("raivan_activities", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id),
-  activityType: text("activity_type").notNull(), // mission_complete, referral, daily_login, lottery_participate
-  activityId: varchar("activity_id"), // Mission ID, lottery ID, etc.
-  xpEarned: integer("xp_earned").notNull(),
+  activityType: text("activity_type").notNull(), // mission_complete, referral, daily_login, lottery_participate, achievement_unlock
+  activityId: varchar("activity_id"), // Mission ID, lottery ID, achievement ID, etc.
+  raivanEarned: integer("raivan_earned").notNull(), // Raivan tokens earned from activity
   activityData: text("activity_data"), // JSON with activity details
   isSignificant: boolean("is_significant").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
@@ -224,8 +224,8 @@ export const xpActivities = pgTable("xp_activities", {
 export const userConversionLimits = pgTable("user_conversion_limits", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id),
-  conversionType: text("conversion_type").notNull(), // xp_to_tkt, xp_to_explr
-  dailyLimit: integer("daily_limit").notNull(),
+  conversionType: text("conversion_type").notNull(), // "raivan_to_kairos"
+  dailyLimit: integer("daily_limit").notNull().default(360), // Max Raivan convertible per day (20 Kairos worth)
   currentDayUsage: integer("current_day_usage").notNull().default(0),
   lastResetDate: timestamp("last_reset_date").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
@@ -236,11 +236,9 @@ export const achievements = pgTable("achievements", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   description: text("description").notNull(),
-  type: text("type").notNull(), // mission_based, conversion_based, participation_based
+  type: text("type").notNull(), // mission_based, conversion_based, participation_based, travel_based
   criteria: text("criteria").notNull(), // JSON with unlock criteria
-  xpReward: integer("xp_reward").notNull().default(0),
-  tktReward: integer("tkt_reward").notNull().default(0),
-  explrReward: decimal("explr_reward", { precision: 18, scale: 8 }).notNull().default("0"),
+  raivanReward: integer("raivan_reward").notNull().default(0), // Raivan tokens earned
   icon: text("icon").notNull(),
   rarity: text("rarity").notNull().default("common"), // common, rare, epic, legendary
   isActive: boolean("is_active").notNull().default(true),
@@ -671,18 +669,18 @@ export const insertTokenPurchaseSchema = createInsertSchema(tokenPurchases).omit
   purchasedAt: true,
 });
 
-// New token system Zod schemas
-export const insertTokenConversionSchema = createInsertSchema(tokenConversions).omit({
+// New Viator/Kairos/Raivan token system Zod schemas
+export const insertRaivanConversionSchema = createInsertSchema(raivanConversions).omit({
   id: true,
   createdAt: true,
 });
 
-export const insertNewTokenPackSchema = createInsertSchema(newTokenPacks).omit({
+export const insertViatorTokenPackSchema = createInsertSchema(viatorTokenPacks).omit({
   id: true,
   createdAt: true,
 });
 
-export const insertXpActivitySchema = createInsertSchema(xpActivities).omit({
+export const insertRaivanActivitySchema = createInsertSchema(raivanActivities).omit({
   id: true,
   createdAt: true,
 });
@@ -830,15 +828,15 @@ export type InsertTokenPack = z.infer<typeof insertTokenPackSchema>;
 export type TokenPurchase = typeof tokenPurchases.$inferSelect;
 export type InsertTokenPurchase = z.infer<typeof insertTokenPurchaseSchema>;
 
-// New token system types
-export type TokenConversion = typeof tokenConversions.$inferSelect;
-export type InsertTokenConversion = z.infer<typeof insertTokenConversionSchema>;
+// New Viator/Kairos/Raivan token system types
+export type RaivanConversion = typeof raivanConversions.$inferSelect;
+export type InsertRaivanConversion = z.infer<typeof insertRaivanConversionSchema>;
 
-export type NewTokenPack = typeof newTokenPacks.$inferSelect;
-export type InsertNewTokenPack = z.infer<typeof insertNewTokenPackSchema>;
+export type ViatorTokenPack = typeof viatorTokenPacks.$inferSelect;
+export type InsertViatorTokenPack = z.infer<typeof insertViatorTokenPackSchema>;
 
-export type XpActivity = typeof xpActivities.$inferSelect;
-export type InsertXpActivity = z.infer<typeof insertXpActivitySchema>;
+export type RaivanActivity = typeof raivanActivities.$inferSelect;
+export type InsertRaivanActivity = z.infer<typeof insertRaivanActivitySchema>;
 
 export type UserConversionLimit = typeof userConversionLimits.$inferSelect;
 export type InsertUserConversionLimit = z.infer<typeof insertUserConversionLimitSchema>;
