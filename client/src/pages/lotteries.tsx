@@ -316,37 +316,55 @@ export default function Lotteries() {
                   </CardHeader>
                   
                   <CardContent className="space-y-4">
-                    {/* Prize Value */}
-                    <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <Trophy className="h-5 w-5 text-yellow-600" />
-                        <span className="font-medium">Prize Value</span>
+                    {/* Prize Value - Prominent Display */}
+                    <div className="text-center p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border-2 border-yellow-200">
+                      <div className="flex items-center justify-center space-x-2 mb-2">
+                        <Trophy className="h-6 w-6 text-yellow-600" />
+                        <span className="text-lg font-semibold text-yellow-700">Grand Prize</span>
                       </div>
-                      <span className="text-2xl font-bold text-green-600">
+                      <div className="text-3xl font-bold text-green-600">
                         {formatPrizeValue(lottery.prizeValue)}
-                      </span>
+                      </div>
                     </div>
 
-                    {/* Entry Cost */}
-                    <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <Target className="h-5 w-5 text-purple-600" />
-                        <span className="font-medium">Entry Cost</span>
+                    {/* Quick Stats Grid */}
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div className="text-center p-3 bg-purple-50 rounded-lg">
+                        <div className="flex items-center justify-center space-x-1 mb-1">
+                          <Target className="h-4 w-4 text-purple-600" />
+                          <span className="font-medium text-purple-700">Entry Cost</span>
+                        </div>
+                        <div className="text-lg font-bold text-purple-600">
+                          {lottery.ticketPrice} Kairos
+                        </div>
                       </div>
-                      <span className="text-xl font-bold text-purple-600">
-                        {lottery.ticketPrice} Kairos
-                      </span>
+                      <div className="text-center p-3 bg-blue-50 rounded-lg">
+                        <div className="flex items-center justify-center space-x-1 mb-1">
+                          <Timer className="h-4 w-4 text-blue-600" />
+                          <span className="font-medium text-blue-700">Time Left</span>
+                        </div>
+                        <div className="text-lg font-bold text-blue-600">
+                          {timeRemaining}
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Draw Date */}
-                    <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <Timer className="h-5 w-5 text-blue-600" />
-                        <span className="font-medium">Time Remaining</span>
+                    {/* Ticket Statistics */}
+                    <div className="bg-slate-50 p-3 rounded-lg text-sm space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Draw Date:</span>
+                        <span className="font-medium">{new Date(lottery.drawDate).toLocaleDateString()}</span>
                       </div>
-                      <span className="text-sm font-semibold text-blue-600">
-                        {timeRemaining}
-                      </span>
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Tickets Sold:</span>
+                        <span className="font-medium">{lottery.soldTickets}/{lottery.maxTickets}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Days Remaining:</span>
+                        <span className="font-medium text-blue-600">
+                          {Math.ceil((new Date(lottery.drawDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days
+                        </span>
+                      </div>
                     </div>
 
                     {/* Entry Button */}
@@ -355,6 +373,7 @@ export default function Lotteries() {
                       disabled={!userCanAfford || buyTicketMutation.isPending}
                       onClick={() => handleBuyTicket(lottery)}
                       data-testid={`enter-lottery-${lottery.id}`}
+                      size="lg"
                     >
                       {!userCanAfford ? (
                         <>
@@ -370,14 +389,6 @@ export default function Lotteries() {
                         </>
                       )}
                     </Button>
-
-                    {/* Lottery Details Link */}
-                    <Link href={`/lottery/${lottery.id}`}>
-                      <Button variant="outline" className="w-full" size="sm" data-testid={`lottery-details-${lottery.id}`}>
-                        View Full Details
-                        <ArrowRight className="h-3 w-3 ml-2" />
-                      </Button>
-                    </Link>
                   </CardContent>
                 </Card>
               );
