@@ -1151,7 +1151,7 @@ export class DatabaseStorage implements IStorage {
     }
     
     // Generate ticket code
-    const ticketCode = generateTicketCode(lottery.lotteryCode || undefined);
+    const ticketCode = `TK-${lottery.lotteryCode || lottery.id}-${String(lottery.soldTickets + 1).padStart(4, '0')}`;
     
     // Deduct Kairos tokens from user
     await db

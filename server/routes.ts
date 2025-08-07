@@ -539,7 +539,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isValid = await storage.validateConversionLimits(
         req.params.userId,
         conversionData.conversionType,
-        conversionData.fromAmount
+        conversionData.raivanAmount
       );
       
       if (!isValid) {

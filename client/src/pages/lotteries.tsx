@@ -115,9 +115,11 @@ export default function Lotteries() {
         
       } else {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "Error en la compra");
+        throw new Error(errorData.message || "Error en la compra del ticket");
       }
     } catch (error: any) {
+      console.error("Ticket purchase error:", error);
+      
       if (error?.name === 'AbortError') {
         toast({
           title: "Tiempo agotado",
@@ -127,7 +129,7 @@ export default function Lotteries() {
       } else {
         toast({
           title: "Error en la compra",
-          description: error?.message || "No se pudo completar la compra. Intenta de nuevo.",
+          description: error?.message || "No se pudo completar la compra del ticket. Verifica tu balance de tokens Kairos.",
           variant: "destructive",
         });
       }
