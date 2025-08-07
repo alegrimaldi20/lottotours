@@ -74,10 +74,7 @@ function Router() {
 function App() {
   const { toasts, removeToast } = useLocaleSafeToast();
 
-  useEffect(() => {
-    // Initialize error suppression system on app start
-    setupErrorSuppression();
-  }, []);
+
 
   return (
     <QueryClientProvider client={queryClient}>

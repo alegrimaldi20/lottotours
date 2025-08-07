@@ -117,8 +117,8 @@ export default function Lotteries() {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || "Error en la compra");
       }
-    } catch (error) {
-      if (error.name === 'AbortError') {
+    } catch (error: any) {
+      if (error?.name === 'AbortError') {
         toast({
           title: "Tiempo agotado",
           description: "La compra tardó demasiado. Intenta de nuevo.",
@@ -127,7 +127,7 @@ export default function Lotteries() {
       } else {
         toast({
           title: "Error en la compra",
-          description: error.message || "No se pudo completar la compra. Intenta de nuevo.",
+          description: error?.message || "No se pudo completar la compra. Intenta de nuevo.",
           variant: "destructive",
         });
       }
