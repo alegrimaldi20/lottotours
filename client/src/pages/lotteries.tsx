@@ -383,31 +383,46 @@ export default function Lotteries() {
                       </div>
                     </div>
 
-                    {/* Entry Button */}
-                    <Button 
-                      className={`w-full mt-4 ${!userCanAfford ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'}`}
-                      disabled={!userCanAfford || isProcessing}
-                      onClick={() => handleBuyTicket(lottery)}
-                      data-testid={`enter-lottery-${lottery.id}`}
-                      size="lg"
-                    >
-                      {!userCanAfford ? (
-                        <>
-                          <Coins className="h-4 w-4 mr-2" />
-                          Necesitas Más Kairos
-                        </>
-                      ) : isProcessing ? (
-                        <>
-                          <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent mr-2"></div>
-                          Comprando Ticket...
-                        </>
-                      ) : (
-                        <>
-                          <Ticket className="h-4 w-4 mr-2" />
-                          🎫 COMPRAR TICKET ({lottery.ticketPrice} Kairos)
-                        </>
-                      )}
-                    </Button>
+                    {/* Entry Buttons */}
+                    <div className="space-y-3">
+                      {/* Primary: Go to Number Selection */}
+                      <Link href={`/lottery/${lottery.id}`}>
+                        <Button 
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                          size="lg"
+                          data-testid={`select-numbers-${lottery.id}`}
+                        >
+                          <Target className="h-4 w-4 mr-2" />
+                          🎯 SELECCIONAR NÚMEROS
+                        </Button>
+                      </Link>
+                      
+                      {/* Secondary: Quick Buy */}
+                      <Button 
+                        className={`w-full ${!userCanAfford ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'}`}
+                        disabled={!userCanAfford || isProcessing}
+                        onClick={() => handleBuyTicket(lottery)}
+                        data-testid={`quick-buy-${lottery.id}`}
+                        variant="outline"
+                      >
+                        {!userCanAfford ? (
+                          <>
+                            <Coins className="h-4 w-4 mr-2" />
+                            Necesitas Más Kairos
+                          </>
+                        ) : isProcessing ? (
+                          <>
+                            <div className="animate-spin h-4 w-4 border-2 border-current rounded-full border-t-transparent mr-2"></div>
+                            Comprando...
+                          </>
+                        ) : (
+                          <>
+                            <Ticket className="h-4 w-4 mr-2" />
+                            🎲 Compra Rápida ({lottery.ticketPrice} Kairos)
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               );
