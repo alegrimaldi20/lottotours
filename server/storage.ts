@@ -22,15 +22,25 @@ import {
   type UserConversionLimit, type InsertUserConversionLimit,
   type Achievement, type InsertAchievement,
   type UserAchievement, type InsertUserAchievement,
+  // Marketplace selling and auction types
+  type MarketplaceListing, type InsertMarketplaceListing,
+  type MarketplaceBid, type InsertMarketplaceBid,
+  type MarketplacePurchase, type InsertMarketplacePurchase,
+  type MarketplaceWatcher, type InsertMarketplaceWatcher,
+  type SellerProfile, type InsertSellerProfile,
+  type MarketplaceDispute, type InsertMarketplaceDispute,
+  type ItemVerification, type InsertItemVerification,
   users, missions, userMissions, lotteries, lotteryTickets, lotteryDraws, missionActivities, nfts, prizes, prizeRedemptions, tokenPacks, tokenPurchases, serviceConditions, userAgreements, userFavorites,
   travelAgencies, agencyTourPackages, prizeWinners, agencyCommissions, agencyAnalytics,
   affiliatePrograms, affiliateReferrals, affiliatePayouts, affiliateTrackingEvents, affiliateLeaderboard,
   countryOperations, territoryManagement,
   // New Viator/Kairos/Raivan token system tables
-  raivanConversions, viatorTokenPacks, raivanActivities, userConversionLimits, achievements, userAchievements
+  raivanConversions, viatorTokenPacks, raivanActivities, userConversionLimits, achievements, userAchievements,
+  // Marketplace selling and auction tables
+  marketplaceListings, marketplaceBids, marketplacePurchases, marketplaceWatchers, sellerProfiles, marketplaceDisputes, itemVerifications
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc, sql, inArray, or, isNull, gte, lte, count } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import * as crypto from "crypto";
 import { generateLotteryCode, generateDrawCode, generateTicketCode, generateWinnerQrCode, verifyQrCode } from "./utils/lottery-codes";
@@ -195,6 +205,48 @@ export interface IStorage {
   getUserAchievements(userId: string): Promise<UserAchievement[]>;
   checkAndUnlockAchievements(userId: string): Promise<UserAchievement[]>;
   claimAchievementReward(userId: string, achievementId: string): Promise<UserAchievement>;
+
+  // Marketplace Selling and Auction methods
+  getMarketplaceListings(filters?: {category?: string; sellerId?: string; status?: string}): Promise<MarketplaceListing[]>;
+  getMarketplaceListing(id: string): Promise<MarketplaceListing | undefined>;
+  createMarketplaceListing(listing: InsertMarketplaceListing): Promise<MarketplaceListing>;
+  updateMarketplaceListing(id: string, updates: Partial<InsertMarketplaceListing>): Promise<MarketplaceListing>;
+  deleteMarketplaceListing(id: string): Promise<void>;
+
+  // Marketplace Bidding methods
+  getMarketplaceBids(listingId: string): Promise<MarketplaceBid[]>;
+  createMarketplaceBid(bid: InsertMarketplaceBid): Promise<MarketplaceBid>;
+  updateMarketplaceBid(id: string, updates: Partial<InsertMarketplaceBid>): Promise<MarketplaceBid>;
+  getHighestBid(listingId: string): Promise<MarketplaceBid | undefined>;
+
+  // Marketplace Purchase methods
+  createMarketplacePurchase(purchase: InsertMarketplacePurchase): Promise<MarketplacePurchase>;
+  getMarketplacePurchases(userId?: string): Promise<MarketplacePurchase[]>;
+  updateMarketplacePurchase(id: string, updates: Partial<InsertMarketplacePurchase>): Promise<MarketplacePurchase>;
+  completeMarketplacePurchase(purchaseId: string, transferCode: string): Promise<MarketplacePurchase>;
+
+  // Marketplace Watcher methods
+  addMarketplaceWatcher(watcher: InsertMarketplaceWatcher): Promise<MarketplaceWatcher>;
+  removeMarketplaceWatcher(userId: string, listingId: string): Promise<void>;
+  getMarketplaceWatchers(listingId: string): Promise<MarketplaceWatcher[]>;
+  isUserWatching(userId: string, listingId: string): Promise<boolean>;
+
+  // Seller Profile methods
+  getSellerProfile(userId: string): Promise<SellerProfile | undefined>;
+  createSellerProfile(profile: InsertSellerProfile): Promise<SellerProfile>;
+  updateSellerProfile(userId: string, updates: Partial<InsertSellerProfile>): Promise<SellerProfile>;
+
+  // Item Verification methods
+  createItemVerification(verification: InsertItemVerification): Promise<ItemVerification>;
+  getItemVerification(itemId: string, itemType: string): Promise<ItemVerification | undefined>;
+  updateItemVerification(id: string, updates: Partial<InsertItemVerification>): Promise<ItemVerification>;
+  verifyPlatformDerivedItem(itemId: string, itemType: string, ownerId: string): Promise<ItemVerification>;
+
+  // Marketplace Dispute methods
+  createMarketplaceDispute(dispute: InsertMarketplaceDispute): Promise<MarketplaceDispute>;
+  getMarketplaceDisputes(userId?: string): Promise<MarketplaceDispute[]>;
+  updateMarketplaceDispute(id: string, updates: Partial<InsertMarketplaceDispute>): Promise<MarketplaceDispute>;
+  resolveMarketplaceDispute(id: string, resolution: string, resolvedBy: string): Promise<MarketplaceDispute>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1752,6 +1804,371 @@ export class DatabaseStorage implements IStorage {
       .returning();
 
     return updatedAchievement;
+  }
+
+  // Marketplace Selling and Auction implementations
+  async getMarketplaceListings(filters?: {category?: string; sellerId?: string; status?: string}): Promise<MarketplaceListing[]> {
+    let query = db.select().from(marketplaceListings);
+    
+    if (filters) {
+      const conditions = [];
+      if (filters.category) conditions.push(eq(marketplaceListings.category, filters.category));
+      if (filters.sellerId) conditions.push(eq(marketplaceListings.sellerId, filters.sellerId));
+      if (filters.status) conditions.push(eq(marketplaceListings.status, filters.status));
+      
+      if (conditions.length > 0) {
+        query = query.where(and(...conditions));
+      }
+    }
+    
+    return await query.orderBy(desc(marketplaceListings.createdAt));
+  }
+
+  async getMarketplaceListing(id: string): Promise<MarketplaceListing | undefined> {
+    const [listing] = await db
+      .select()
+      .from(marketplaceListings)
+      .where(eq(marketplaceListings.id, id));
+    return listing;
+  }
+
+  async createMarketplaceListing(listing: InsertMarketplaceListing): Promise<MarketplaceListing> {
+    // Verify platform-derived item ownership
+    const verification = await this.verifyPlatformDerivedItem(
+      listing.sourceId, 
+      listing.sourceType, 
+      listing.sellerId
+    );
+
+    const [newListing] = await db
+      .insert(marketplaceListings)
+      .values({
+        ...listing,
+        verificationHash: verification.verificationHash,
+        currentPrice: listing.startPrice, // Initialize current price
+      })
+      .returning();
+    return newListing;
+  }
+
+  async updateMarketplaceListing(id: string, updates: Partial<InsertMarketplaceListing>): Promise<MarketplaceListing> {
+    const [listing] = await db
+      .update(marketplaceListings)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(marketplaceListings.id, id))
+      .returning();
+    
+    if (!listing) {
+      throw new Error("Listing not found");
+    }
+    return listing;
+  }
+
+  async deleteMarketplaceListing(id: string): Promise<void> {
+    await db.delete(marketplaceListings).where(eq(marketplaceListings.id, id));
+  }
+
+  // Marketplace Bidding implementations
+  async getMarketplaceBids(listingId: string): Promise<MarketplaceBid[]> {
+    return db
+      .select()
+      .from(marketplaceBids)
+      .where(eq(marketplaceBids.listingId, listingId))
+      .orderBy(desc(marketplaceBids.bidAmount));
+  }
+
+  async createMarketplaceBid(bid: InsertMarketplaceBid): Promise<MarketplaceBid> {
+    const [newBid] = await db.insert(marketplaceBids).values(bid).returning();
+    
+    // Update listing current price if this is the highest bid
+    const highestBid = await this.getHighestBid(bid.listingId);
+    if (highestBid && highestBid.id === newBid.id) {
+      await this.updateMarketplaceListing(bid.listingId, {
+        currentPrice: bid.bidAmount
+      });
+    }
+    
+    return newBid;
+  }
+
+  async updateMarketplaceBid(id: string, updates: Partial<InsertMarketplaceBid>): Promise<MarketplaceBid> {
+    const [bid] = await db
+      .update(marketplaceBids)
+      .set(updates)
+      .where(eq(marketplaceBids.id, id))
+      .returning();
+    
+    if (!bid) {
+      throw new Error("Bid not found");
+    }
+    return bid;
+  }
+
+  async getHighestBid(listingId: string): Promise<MarketplaceBid | undefined> {
+    const [highestBid] = await db
+      .select()
+      .from(marketplaceBids)
+      .where(and(
+        eq(marketplaceBids.listingId, listingId),
+        eq(marketplaceBids.status, "active")
+      ))
+      .orderBy(desc(marketplaceBids.bidAmount))
+      .limit(1);
+    return highestBid;
+  }
+
+  // Marketplace Purchase implementations
+  async createMarketplacePurchase(purchase: InsertMarketplacePurchase): Promise<MarketplacePurchase> {
+    const transferCode = `TR-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+    const platformFee = Math.floor(purchase.finalPrice * 0.05); // 5% platform fee
+    const sellerEarnings = purchase.finalPrice - platformFee;
+
+    const [newPurchase] = await db
+      .insert(marketplacePurchases)
+      .values({
+        ...purchase,
+        platformFee,
+        sellerEarnings,
+        transferCode,
+      })
+      .returning();
+    return newPurchase;
+  }
+
+  async getMarketplacePurchases(userId?: string): Promise<MarketplacePurchase[]> {
+    let query = db.select().from(marketplacePurchases);
+    
+    if (userId) {
+      query = query.where(
+        sql`${marketplacePurchases.buyerId} = ${userId} OR ${marketplacePurchases.sellerId} = ${userId}`
+      );
+    }
+    
+    return query.orderBy(desc(marketplacePurchases.createdAt));
+  }
+
+  async updateMarketplacePurchase(id: string, updates: Partial<InsertMarketplacePurchase>): Promise<MarketplacePurchase> {
+    const [purchase] = await db
+      .update(marketplacePurchases)
+      .set(updates)
+      .where(eq(marketplacePurchases.id, id))
+      .returning();
+    
+    if (!purchase) {
+      throw new Error("Purchase not found");
+    }
+    return purchase;
+  }
+
+  async completeMarketplacePurchase(purchaseId: string, transferCode: string): Promise<MarketplacePurchase> {
+    const [purchase] = await db
+      .update(marketplacePurchases)
+      .set({
+        status: "completed",
+        transferStatus: "completed",
+        completedAt: new Date(),
+      })
+      .where(and(
+        eq(marketplacePurchases.id, purchaseId),
+        eq(marketplacePurchases.transferCode, transferCode)
+      ))
+      .returning();
+    
+    if (!purchase) {
+      throw new Error("Purchase not found or invalid transfer code");
+    }
+    
+    // Update seller profile stats
+    await this.updateSellerProfile(purchase.sellerId, {
+      totalSales: sql`${sellerProfiles.totalSales} + 1`,
+    });
+    
+    return purchase;
+  }
+
+  // Marketplace Watcher implementations
+  async addMarketplaceWatcher(watcher: InsertMarketplaceWatcher): Promise<MarketplaceWatcher> {
+    const [newWatcher] = await db.insert(marketplaceWatchers).values(watcher).returning();
+    
+    // Increment watcher count on listing
+    await db
+      .update(marketplaceListings)
+      .set({ totalWatchers: sql`${marketplaceListings.totalWatchers} + 1` })
+      .where(eq(marketplaceListings.id, watcher.listingId));
+    
+    return newWatcher;
+  }
+
+  async removeMarketplaceWatcher(userId: string, listingId: string): Promise<void> {
+    await db
+      .delete(marketplaceWatchers)
+      .where(and(
+        eq(marketplaceWatchers.userId, userId),
+        eq(marketplaceWatchers.listingId, listingId)
+      ));
+    
+    // Decrement watcher count on listing
+    await db
+      .update(marketplaceListings)
+      .set({ totalWatchers: sql`${marketplaceListings.totalWatchers} - 1` })
+      .where(eq(marketplaceListings.id, listingId));
+  }
+
+  async getMarketplaceWatchers(listingId: string): Promise<MarketplaceWatcher[]> {
+    return db
+      .select()
+      .from(marketplaceWatchers)
+      .where(eq(marketplaceWatchers.listingId, listingId));
+  }
+
+  async isUserWatching(userId: string, listingId: string): Promise<boolean> {
+    const [watcher] = await db
+      .select()
+      .from(marketplaceWatchers)
+      .where(and(
+        eq(marketplaceWatchers.userId, userId),
+        eq(marketplaceWatchers.listingId, listingId)
+      ))
+      .limit(1);
+    return !!watcher;
+  }
+
+  // Seller Profile implementations
+  async getSellerProfile(userId: string): Promise<SellerProfile | undefined> {
+    const [profile] = await db
+      .select()
+      .from(sellerProfiles)
+      .where(eq(sellerProfiles.userId, userId));
+    return profile;
+  }
+
+  async createSellerProfile(profile: InsertSellerProfile): Promise<SellerProfile> {
+    const [newProfile] = await db.insert(sellerProfiles).values(profile).returning();
+    return newProfile;
+  }
+
+  async updateSellerProfile(userId: string, updates: Partial<InsertSellerProfile>): Promise<SellerProfile> {
+    const [profile] = await db
+      .update(sellerProfiles)
+      .set({ ...updates, lastActiveAt: new Date() })
+      .where(eq(sellerProfiles.userId, userId))
+      .returning();
+    
+    if (!profile) {
+      throw new Error("Seller profile not found");
+    }
+    return profile;
+  }
+
+  // Item Verification implementations
+  async createItemVerification(verification: InsertItemVerification): Promise<ItemVerification> {
+    const [newVerification] = await db.insert(itemVerifications).values(verification).returning();
+    return newVerification;
+  }
+
+  async getItemVerification(itemId: string, itemType: string): Promise<ItemVerification | undefined> {
+    const [verification] = await db
+      .select()
+      .from(itemVerifications)
+      .where(and(
+        eq(itemVerifications.itemId, itemId),
+        eq(itemVerifications.itemType, itemType)
+      ));
+    return verification;
+  }
+
+  async updateItemVerification(id: string, updates: Partial<InsertItemVerification>): Promise<ItemVerification> {
+    const [verification] = await db
+      .update(itemVerifications)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(itemVerifications.id, id))
+      .returning();
+    
+    if (!verification) {
+      throw new Error("Item verification not found");
+    }
+    return verification;
+  }
+
+  async verifyPlatformDerivedItem(itemId: string, itemType: string, ownerId: string): Promise<ItemVerification> {
+    // Generate verification hash based on platform data
+    const verificationData = {
+      itemId,
+      itemType,
+      ownerId,
+      timestamp: Date.now(),
+      platform: "VoyageLotto"
+    };
+    
+    const verificationHash = crypto
+      .createHash('sha256')
+      .update(JSON.stringify(verificationData))
+      .digest('hex');
+
+    // Check if verification already exists
+    const existing = await this.getItemVerification(itemId, itemType);
+    if (existing) {
+      return existing;
+    }
+
+    return this.createItemVerification({
+      itemId,
+      itemType,
+      ownerId,
+      verificationHash,
+      verificationProof: JSON.stringify(verificationData),
+      verificationStatus: "verified",
+    });
+  }
+
+  // Marketplace Dispute implementations
+  async createMarketplaceDispute(dispute: InsertMarketplaceDispute): Promise<MarketplaceDispute> {
+    const [newDispute] = await db.insert(marketplaceDisputes).values(dispute).returning();
+    return newDispute;
+  }
+
+  async getMarketplaceDisputes(userId?: string): Promise<MarketplaceDispute[]> {
+    let query = db.select().from(marketplaceDisputes);
+    
+    if (userId) {
+      query = query.where(
+        sql`${marketplaceDisputes.complainantId} = ${userId} OR ${marketplaceDisputes.respondentId} = ${userId}`
+      );
+    }
+    
+    return query.orderBy(desc(marketplaceDisputes.createdAt));
+  }
+
+  async updateMarketplaceDispute(id: string, updates: Partial<InsertMarketplaceDispute>): Promise<MarketplaceDispute> {
+    const [dispute] = await db
+      .update(marketplaceDisputes)
+      .set(updates)
+      .where(eq(marketplaceDisputes.id, id))
+      .returning();
+    
+    if (!dispute) {
+      throw new Error("Dispute not found");
+    }
+    return dispute;
+  }
+
+  async resolveMarketplaceDispute(id: string, resolution: string, resolvedBy: string): Promise<MarketplaceDispute> {
+    const [dispute] = await db
+      .update(marketplaceDisputes)
+      .set({
+        status: "resolved",
+        resolution: "admin_decision",
+        resolutionDetails: resolution,
+        resolvedBy,
+        resolvedAt: new Date(),
+      })
+      .where(eq(marketplaceDisputes.id, id))
+      .returning();
+    
+    if (!dispute) {
+      throw new Error("Dispute not found");
+    }
+    return dispute;
   }
 }
 

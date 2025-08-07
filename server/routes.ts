@@ -1,12 +1,20 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { db } from "./db";
+import { marketplaceListings } from "@shared/schema";
 import Stripe from "stripe";
 import { 
   insertUserSchema, 
   insertLotteryTicketSchema, 
   insertPrizeRedemptionSchema,
-  insertRaivanConversionSchema
+  insertRaivanConversionSchema,
+  insertMarketplaceListingSchema,
+  insertMarketplaceBidSchema,
+  insertMarketplacePurchaseSchema,
+  insertMarketplaceWatcherSchema,
+  insertSellerProfileSchema,
+  insertMarketplaceDisputeSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -759,6 +767,291 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(user);
     } catch (error) {
       res.status(500).json({ message: "Failed to update Raivan tokens" });
+    }
+  });
+
+  // Marketplace Selling and Auction Routes
+  app.get("/api/marketplace/listings", async (req, res) => {
+    try {
+      const { category, sellerId, status } = req.query;
+      const filters: any = {};
+      if (category) filters.category = category as string;
+      if (sellerId) filters.sellerId = sellerId as string;
+      if (status) filters.status = status as string;
+      
+      const listings = await storage.getMarketplaceListings(filters);
+      res.json(listings);
+    } catch (error) {
+      console.error('Marketplace listings error:', error);
+      res.status(500).json({ message: "Failed to fetch marketplace listings" });
+    }
+  });
+
+  app.get("/api/marketplace/listings/:id", async (req, res) => {
+    try {
+      const listing = await storage.getMarketplaceListing(req.params.id);
+      if (!listing) {
+        return res.status(404).json({ message: "Listing not found" });
+      }
+      res.json(listing);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch marketplace listing" });
+    }
+  });
+
+  app.post("/api/marketplace/listings", async (req, res) => {
+    try {
+      const validatedData = insertMarketplaceListingSchema.parse(req.body);
+      const listing = await storage.createMarketplaceListing(validatedData);
+      res.status(201).json(listing);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid listing data", errors: error.errors });
+      }
+      const errorMessage = error instanceof Error ? error.message : "Failed to create marketplace listing";
+      res.status(500).json({ message: errorMessage });
+    }
+  });
+
+  app.patch("/api/marketplace/listings/:id", async (req, res) => {
+    try {
+      const listing = await storage.updateMarketplaceListing(req.params.id, req.body);
+      res.json(listing);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update marketplace listing";
+      res.status(500).json({ message: errorMessage });
+    }
+  });
+
+  app.delete("/api/marketplace/listings/:id", async (req, res) => {
+    try {
+      await storage.deleteMarketplaceListing(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete marketplace listing" });
+    }
+  });
+
+  // Marketplace Bidding Routes
+  app.get("/api/marketplace/listings/:listingId/bids", async (req, res) => {
+    try {
+      const bids = await storage.getMarketplaceBids(req.params.listingId);
+      res.json(bids);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch marketplace bids" });
+    }
+  });
+
+  app.post("/api/marketplace/bids", async (req, res) => {
+    try {
+      const validatedData = insertMarketplaceBidSchema.parse(req.body);
+      const bid = await storage.createMarketplaceBid(validatedData);
+      res.status(201).json(bid);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid bid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create marketplace bid" });
+    }
+  });
+
+  app.get("/api/marketplace/listings/:listingId/highest-bid", async (req, res) => {
+    try {
+      const highestBid = await storage.getHighestBid(req.params.listingId);
+      res.json(highestBid || null);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch highest bid" });
+    }
+  });
+
+  // Marketplace Purchase Routes
+  app.post("/api/marketplace/purchases", async (req, res) => {
+    try {
+      const validatedData = insertMarketplacePurchaseSchema.parse(req.body);
+      const purchase = await storage.createMarketplacePurchase(validatedData);
+      res.status(201).json(purchase);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid purchase data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create marketplace purchase" });
+    }
+  });
+
+  app.get("/api/marketplace/purchases", async (req, res) => {
+    try {
+      const { userId } = req.query;
+      const purchases = await storage.getMarketplacePurchases(userId as string);
+      res.json(purchases);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch marketplace purchases" });
+    }
+  });
+
+  app.patch("/api/marketplace/purchases/:id", async (req, res) => {
+    try {
+      const purchase = await storage.updateMarketplacePurchase(req.params.id, req.body);
+      res.json(purchase);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update marketplace purchase";
+      res.status(500).json({ message: errorMessage });
+    }
+  });
+
+  app.post("/api/marketplace/purchases/:id/complete", async (req, res) => {
+    try {
+      const { transferCode } = req.body;
+      const purchase = await storage.completeMarketplacePurchase(req.params.id, transferCode);
+      res.json(purchase);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to complete marketplace purchase";
+      res.status(400).json({ message: errorMessage });
+    }
+  });
+
+  // Marketplace Watcher Routes
+  app.post("/api/marketplace/watchers", async (req, res) => {
+    try {
+      const validatedData = insertMarketplaceWatcherSchema.parse(req.body);
+      const watcher = await storage.addMarketplaceWatcher(validatedData);
+      res.status(201).json(watcher);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid watcher data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to add marketplace watcher" });
+    }
+  });
+
+  app.delete("/api/marketplace/watchers/:userId/:listingId", async (req, res) => {
+    try {
+      await storage.removeMarketplaceWatcher(req.params.userId, req.params.listingId);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to remove marketplace watcher" });
+    }
+  });
+
+  app.get("/api/marketplace/listings/:listingId/watchers", async (req, res) => {
+    try {
+      const watchers = await storage.getMarketplaceWatchers(req.params.listingId);
+      res.json(watchers);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch marketplace watchers" });
+    }
+  });
+
+  app.get("/api/marketplace/watchers/:userId/:listingId", async (req, res) => {
+    try {
+      const isWatching = await storage.isUserWatching(req.params.userId, req.params.listingId);
+      res.json({ isWatching });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to check watching status" });
+    }
+  });
+
+  // Seller Profile Routes
+  app.get("/api/marketplace/sellers/:userId", async (req, res) => {
+    try {
+      const profile = await storage.getSellerProfile(req.params.userId);
+      if (!profile) {
+        return res.status(404).json({ message: "Seller profile not found" });
+      }
+      res.json(profile);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch seller profile" });
+    }
+  });
+
+  app.post("/api/marketplace/sellers", async (req, res) => {
+    try {
+      const validatedData = insertSellerProfileSchema.parse(req.body);
+      const profile = await storage.createSellerProfile(validatedData);
+      res.status(201).json(profile);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid seller profile data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create seller profile" });
+    }
+  });
+
+  app.patch("/api/marketplace/sellers/:userId", async (req, res) => {
+    try {
+      const profile = await storage.updateSellerProfile(req.params.userId, req.body);
+      res.json(profile);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update seller profile";
+      res.status(500).json({ message: errorMessage });
+    }
+  });
+
+  // Item Verification Routes
+  app.get("/api/marketplace/verify/:itemType/:itemId", async (req, res) => {
+    try {
+      const verification = await storage.getItemVerification(req.params.itemId, req.params.itemType);
+      if (!verification) {
+        return res.status(404).json({ message: "Item verification not found" });
+      }
+      res.json(verification);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch item verification" });
+    }
+  });
+
+  app.post("/api/marketplace/verify", async (req, res) => {
+    try {
+      const { itemId, itemType, ownerId } = req.body;
+      const verification = await storage.verifyPlatformDerivedItem(itemId, itemType, ownerId);
+      res.status(201).json(verification);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to verify platform-derived item";
+      res.status(500).json({ message: errorMessage });
+    }
+  });
+
+  // Marketplace Dispute Routes
+  app.get("/api/marketplace/disputes", async (req, res) => {
+    try {
+      const { userId } = req.query;
+      const disputes = await storage.getMarketplaceDisputes(userId as string);
+      res.json(disputes);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch marketplace disputes" });
+    }
+  });
+
+  app.post("/api/marketplace/disputes", async (req, res) => {
+    try {
+      const validatedData = insertMarketplaceDisputeSchema.parse(req.body);
+      const dispute = await storage.createMarketplaceDispute(validatedData);
+      res.status(201).json(dispute);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid dispute data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create marketplace dispute" });
+    }
+  });
+
+  app.patch("/api/marketplace/disputes/:id", async (req, res) => {
+    try {
+      const dispute = await storage.updateMarketplaceDispute(req.params.id, req.body);
+      res.json(dispute);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update marketplace dispute";
+      res.status(500).json({ message: errorMessage });
+    }
+  });
+
+  app.post("/api/marketplace/disputes/:id/resolve", async (req, res) => {
+    try {
+      const { resolution, resolvedBy } = req.body;
+      const dispute = await storage.resolveMarketplaceDispute(req.params.id, resolution, resolvedBy);
+      res.json(dispute);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to resolve marketplace dispute";
+      res.status(500).json({ message: errorMessage });
     }
   });
 

@@ -277,12 +277,137 @@ export const userAgreements = pgTable("user_agreements", {
   conditionType: text("condition_type").notNull(), // terms_of_service, privacy_policy, operating_conditions
   version: text("version").notNull(),
   agreementStatus: text("agreement_status").notNull().default("pending"), // pending, accepted, revoked
-  sectionsAccepted: text("sections_accepted").array(), // array of section IDs accepted by user
+  sectionsAccepted: text("sections_accepted").array(),
+  acceptedAt: timestamp("accepted_at"),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
-  agreementData: text("agreement_data"), // JSON string with additional agreement metadata
-  agreedAt: timestamp("agreed_at"),
   createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Marketplace user-to-user selling and auctions (platform-derived items only)
+export const marketplaceListings = pgTable("marketplace_listings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sellerId: varchar("seller_id").notNull().references(() => users.id),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(), // experience, travel_package, discount, product, nft, prize_voucher
+  listingType: text("listing_type").notNull(), // sell, auction
+  startPrice: integer("start_price").notNull(), // Kairos tokens
+  buyNowPrice: integer("buy_now_price"), // For auctions with buy-now option
+  currentPrice: integer("current_price"), // Current highest bid for auctions
+  reservePrice: integer("reserve_price"), // Minimum price for auctions
+  // Platform-derived item verification (security guarantee)
+  sourceType: text("source_type").notNull(), // prize_redemption, nft_mint, lottery_win, mission_reward
+  sourceId: varchar("source_id").notNull(), // ID of original platform item/transaction
+  verificationHash: text("verification_hash").notNull(), // Cryptographic proof of platform origin
+  // Listing status and timing
+  status: text("status").notNull().default("active"), // active, sold, cancelled, expired, pending
+  startTime: timestamp("start_time").defaultNow(),
+  endTime: timestamp("end_time").notNull(),
+  // Media and details
+  images: text("images").array().notNull(),
+  tags: text("tags").array(),
+  terms: text("terms"), // Seller-specific terms
+  // Seller performance
+  sellerRating: decimal("seller_rating", { precision: 3, scale: 2 }),
+  totalViews: integer("total_views").notNull().default(0),
+  totalWatchers: integer("total_watchers").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Auction bids tracking
+export const marketplaceBids = pgTable("marketplace_bids", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  listingId: varchar("listing_id").notNull().references(() => marketplaceListings.id),
+  bidderId: varchar("bidder_id").notNull().references(() => users.id),
+  bidAmount: integer("bid_amount").notNull(), // Kairos tokens
+  bidType: text("bid_type").notNull().default("regular"), // regular, auto_bid, buy_now
+  status: text("status").notNull().default("active"), // active, outbid, winning, cancelled
+  automaticBidLimit: integer("automatic_bid_limit"), // For auto-bidding
+  bidMessage: text("bid_message"), // Optional message from bidder
+  ipAddress: text("ip_address"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Purchase transactions for marketplace
+export const marketplacePurchases = pgTable("marketplace_purchases", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  listingId: varchar("listing_id").notNull().references(() => marketplaceListings.id),
+  sellerId: varchar("seller_id").notNull().references(() => users.id),
+  buyerId: varchar("buyer_id").notNull().references(() => users.id),
+  purchaseType: text("purchase_type").notNull(), // direct_sale, auction_win, buy_now
+  finalPrice: integer("final_price").notNull(), // Kairos tokens
+  platformFee: integer("platform_fee").notNull(), // Platform commission in Kairos
+  sellerEarnings: integer("seller_earnings").notNull(), // Seller receives after fee
+  status: text("status").notNull().default("pending"), // pending, completed, disputed, refunded
+  transferStatus: text("transfer_status").notNull().default("pending"), // pending, completed, failed
+  transferCode: text("transfer_code").unique(), // Unique code for item transfer
+  buyerRating: integer("buyer_rating"), // 1-5 stars
+  sellerRating: integer("seller_rating"), // 1-5 stars
+  feedback: text("feedback"),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Marketplace watchers/favorites
+export const marketplaceWatchers = pgTable("marketplace_watchers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  listingId: varchar("listing_id").notNull().references(() => marketplaceListings.id),
+  notifyOnBid: boolean("notify_on_bid").notNull().default(true),
+  notifyOnPriceChange: boolean("notify_on_price_change").notNull().default(true),
+  notifyOnEnding: boolean("notify_on_ending").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Seller performance and reputation
+export const sellerProfiles = pgTable("seller_profiles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id).unique(),
+  totalSales: integer("total_sales").notNull().default(0),
+  totalListings: integer("total_listings").notNull().default(0),
+  averageRating: decimal("average_rating", { precision: 3, scale: 2 }).default("0.00"),
+  totalRatings: integer("total_ratings").notNull().default(0),
+  responseTime: integer("response_time").default(0), // Average response time in hours
+  completionRate: decimal("completion_rate", { precision: 5, scale: 2 }).default("100.00"),
+  sellerBadges: text("seller_badges").array(), // verified, top_seller, fast_shipper, etc.
+  sellerLevel: text("seller_level").notNull().default("bronze"), // bronze, silver, gold, platinum
+  joinedAsSellerAt: timestamp("joined_as_seller_at").defaultNow(),
+  lastActiveAt: timestamp("last_active_at").defaultNow(),
+});
+
+// Disputes and resolution
+export const marketplaceDisputes = pgTable("marketplace_disputes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  purchaseId: varchar("purchase_id").notNull().references(() => marketplacePurchases.id),
+  complainantId: varchar("complainant_id").notNull().references(() => users.id),
+  respondentId: varchar("respondent_id").notNull().references(() => users.id),
+  disputeType: text("dispute_type").notNull(), // item_not_received, item_not_as_described, payment_issue
+  disputeReason: text("dispute_reason").notNull(),
+  evidence: text("evidence"), // JSON with submitted evidence
+  status: text("status").notNull().default("open"), // open, under_review, resolved, closed
+  resolution: text("resolution"), // admin_decision, mutual_agreement, automatic
+  resolutionDetails: text("resolution_details"),
+  resolvedBy: varchar("resolved_by").references(() => users.id),
+  resolvedAt: timestamp("resolved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Platform-derived item verification records
+export const itemVerifications = pgTable("item_verifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  itemId: varchar("item_id").notNull(), // Could be prize, NFT, lottery win, etc.
+  itemType: text("item_type").notNull(), // prize_redemption, nft, lottery_ticket, mission_reward
+  ownerId: varchar("owner_id").notNull().references(() => users.id),
+  verificationStatus: text("verification_status").notNull().default("verified"), // verified, pending, failed
+  verificationHash: text("verification_hash").notNull(),
+  originalTransactionId: varchar("original_transaction_id"),
+  verificationProof: text("verification_proof"), // JSON with verification data
+  isTransferable: boolean("is_transferable").notNull().default(true),
+  transferHistory: text("transfer_history"), // JSON array of transfer records
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // User favorites system for lotteries, missions, and marketplace items
@@ -916,3 +1041,70 @@ export type InsertCountryOperation = z.infer<typeof insertCountryOperationSchema
 
 export type TerritoryManagement = typeof territoryManagement.$inferSelect;
 export type InsertTerritoryManagement = z.infer<typeof insertTerritoryManagementSchema>;
+
+// Marketplace Selling and Auction Zod Schemas
+export const insertMarketplaceListingSchema = createInsertSchema(marketplaceListings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  currentPrice: true,
+  totalViews: true,
+  totalWatchers: true,
+});
+
+export const insertMarketplaceBidSchema = createInsertSchema(marketplaceBids).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertMarketplacePurchaseSchema = createInsertSchema(marketplacePurchases).omit({
+  id: true,
+  createdAt: true,
+  completedAt: true,
+  transferCode: true,
+});
+
+export const insertMarketplaceWatcherSchema = createInsertSchema(marketplaceWatchers).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertSellerProfileSchema = createInsertSchema(sellerProfiles).omit({
+  id: true,
+  joinedAsSellerAt: true,
+  lastActiveAt: true,
+});
+
+export const insertMarketplaceDisputeSchema = createInsertSchema(marketplaceDisputes).omit({
+  id: true,
+  createdAt: true,
+  resolvedAt: true,
+});
+
+export const insertItemVerificationSchema = createInsertSchema(itemVerifications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Marketplace Types
+export type MarketplaceListing = typeof marketplaceListings.$inferSelect;
+export type InsertMarketplaceListing = z.infer<typeof insertMarketplaceListingSchema>;
+
+export type MarketplaceBid = typeof marketplaceBids.$inferSelect;
+export type InsertMarketplaceBid = z.infer<typeof insertMarketplaceBidSchema>;
+
+export type MarketplacePurchase = typeof marketplacePurchases.$inferSelect;
+export type InsertMarketplacePurchase = z.infer<typeof insertMarketplacePurchaseSchema>;
+
+export type MarketplaceWatcher = typeof marketplaceWatchers.$inferSelect;
+export type InsertMarketplaceWatcher = z.infer<typeof insertMarketplaceWatcherSchema>;
+
+export type SellerProfile = typeof sellerProfiles.$inferSelect;
+export type InsertSellerProfile = z.infer<typeof insertSellerProfileSchema>;
+
+export type MarketplaceDispute = typeof marketplaceDisputes.$inferSelect;
+export type InsertMarketplaceDispute = z.infer<typeof insertMarketplaceDisputeSchema>;
+
+export type ItemVerification = typeof itemVerifications.$inferSelect;
+export type InsertItemVerification = z.infer<typeof insertItemVerificationSchema>;
