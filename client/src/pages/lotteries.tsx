@@ -84,10 +84,11 @@ export default function Lotteries() {
       console.log("Purchasing ticket with data:", ticketData);
       
       // Make API call using apiRequest
-      const ticket = await apiRequest("/api/lottery-tickets", {
+      const response = await apiRequest("/api/lottery-tickets", {
         method: "POST",
         body: ticketData
       });
+      const ticket = await response.json();
       
       // Success - update UI
       toast({
