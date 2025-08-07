@@ -2090,8 +2090,8 @@ export class DatabaseStorage implements IStorage {
     return verification;
   }
 
-  async verifyPlatformDerivedItem(itemId: string, itemType: string, ownerId: string): Promise<ItemVerification> {
-    // Generate verification hash based on platform data
+  async verifyPlatformDerivedItem(itemId: string, itemType: string, ownerId: string): Promise<{verificationHash: string}> {
+    // Generate verification hash based on platform data - simplified approach
     const verificationData = {
       itemId,
       itemType,
@@ -2105,20 +2105,8 @@ export class DatabaseStorage implements IStorage {
       .update(JSON.stringify(verificationData))
       .digest('hex');
 
-    // Check if verification already exists
-    const existing = await this.getItemVerification(itemId, itemType);
-    if (existing) {
-      return existing;
-    }
-
-    return this.createItemVerification({
-      itemId,
-      itemType,
-      ownerId,
-      verificationHash,
-      verificationProof: JSON.stringify(verificationData),
-      verificationStatus: "verified",
-    });
+    // Return just the hash for now, avoiding database complexity
+    return { verificationHash };
   }
 
   // Marketplace Dispute implementations
