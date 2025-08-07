@@ -496,7 +496,7 @@ export class DatabaseStorage implements IStorage {
           theme: "bali",
           prizeTitle: "Bali Temple & Beach Explorer",
           prizeDescription: "8 days, 7 nights including luxury villa, temple tours, cooking classes, and spa treatments",
-          prizeValue: 320000,
+          prizeValue: 750000, // $7,500 USD - realistic for 8-day luxury Bali package
           ticketPrice: 15,
           maxTickets: 800,
           soldTickets: 342,
@@ -512,7 +512,7 @@ export class DatabaseStorage implements IStorage {
           theme: "patagonia",
           prizeTitle: "Patagonia Adventure Package",
           prizeDescription: "10 days exploring Torres del Paine, glacier hiking, wildlife photography, and luxury eco-lodges",
-          prizeValue: 450000,
+          prizeValue: 1250000, // $12,500 USD - realistic for 10-day luxury Patagonia expedition
           ticketPrice: 35,
           maxTickets: 600,
           soldTickets: 178,
@@ -528,7 +528,7 @@ export class DatabaseStorage implements IStorage {
           theme: "morocco",
           prizeTitle: "Morocco Imperial & Desert Tour",
           prizeDescription: "12 days including Marrakech, Fez, Casablanca, Sahara camel trek, and luxury riads",
-          prizeValue: 380000,
+          prizeValue: 950000, // $9,500 USD - realistic for 12-day luxury Morocco tour with Sahara desert experience
           ticketPrice: 25,
           maxTickets: 700,
           soldTickets: 289,
@@ -547,7 +547,7 @@ export class DatabaseStorage implements IStorage {
           description: "Choose from 10 European destinations for a 3-day city break",
           category: "travel_package",
           destination: "Europe",
-          value: 80000,
+          value: 150000, // $1,500 USD - realistic for 3-day European city break
           tokensRequired: 500,
           image: "europe",
           provider: "TravelCorp",
@@ -562,7 +562,7 @@ export class DatabaseStorage implements IStorage {
           description: "Complete travel backpack with hiking essentials",
           category: "product",
           destination: null,
-          value: 25000,
+          value: 45000, // $450 USD - realistic for complete adventure gear set
           tokensRequired: 150,
           image: "adventure-gear",
           provider: "AdventureGear Co",
