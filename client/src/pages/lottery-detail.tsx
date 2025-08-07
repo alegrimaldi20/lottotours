@@ -73,7 +73,7 @@ export default function LotteryDetail() {
       if (typeof showSuccess === 'function') {
         showSuccess(
           "Tickets Purchased!",
-          `Successfully bought ${data.ticketCount} ticket${data.ticketCount > 1 ? 's' : ''} for ${data.totalCost} tokens. New balance: ${(user?.tokens || 0) - data.totalCost} tokens`
+          `Successfully bought ${data.ticketCount} ticket${data.ticketCount > 1 ? 's' : ''} for ${data.totalCost} Kairos tokens. New balance: ${(user?.kairosTokens || 0) - data.totalCost} Kairos`
         );
       }
       setTicketCart([]);
@@ -104,7 +104,7 @@ export default function LotteryDetail() {
     setTicketCart(prev => prev.filter((_, i) => i !== index));
   };
 
-  const canAfford = user && lottery && (user.tokens >= ticketCart.length * lottery.ticketPrice);
+  const canAfford = user && lottery && (user.kairosTokens >= ticketCart.length * lottery.ticketPrice);
   const totalCost = ticketCart.length * (lottery?.ticketPrice || 0);
 
   if (isLoading) {
@@ -239,7 +239,7 @@ export default function LotteryDetail() {
                 <div className="mt-4 p-3 bg-slate-50 rounded-lg">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-slate-600">Available Tokens:</span>
-                    <span className="font-semibold text-blue-600">{user.tokens}</span>
+                    <span className="font-semibold text-blue-600">{user.kairosTokens}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm mt-1">
                     <span className="text-slate-600">Ticket Cost:</span>
@@ -371,14 +371,14 @@ export default function LotteryDetail() {
               <div className="border-t pt-4">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <div className="text-lg font-semibold">Total: {totalCost} tokens</div>
+                    <div className="text-lg font-semibold">Total: {totalCost} Kairos</div>
                     <div className="text-sm text-slate-600">
                       {ticketCart.length} ticket{ticketCart.length > 1 ? 's' : ''}
                     </div>
                   </div>
                   <div className="text-right text-sm text-slate-600">
-                    <div>Your Balance: {user?.tokens || 0} tokens</div>
-                    <div>After Purchase: {(user?.tokens || 0) - totalCost} tokens</div>
+                    <div>Your Balance: {user?.kairosTokens || 0} Kairos</div>
+                    <div>After Purchase: {(user?.kairosTokens || 0) - totalCost} Kairos</div>
                   </div>
                 </div>
                 
@@ -404,7 +404,7 @@ export default function LotteryDetail() {
                 
                 {!canAfford && (
                   <p className="text-sm text-red-600 mt-2 text-center">
-                    You need {totalCost - (user?.tokens || 0)} more tokens to purchase these tickets.
+                    You need {totalCost - (user?.kairosTokens || 0)} more Kairos tokens to purchase these tickets.
                   </p>
                 )}
               </div>

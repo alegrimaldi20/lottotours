@@ -1094,17 +1094,17 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db.select().from(users).where(eq(users.id, insertTicket.userId));
     if (!user) throw new Error("User not found");
     
-    if (user.tokens < lottery.ticketPrice) {
-      throw new Error("Insufficient tokens");
+    if (user.kairosTokens < lottery.ticketPrice) {
+      throw new Error("Insufficient Kairos tokens");
     }
     
     // Generate ticket code
     const ticketCode = generateTicketCode(lottery.lotteryCode || undefined);
     
-    // Deduct tokens from user
+    // Deduct Kairos tokens from user
     await db
       .update(users)
-      .set({ tokens: user.tokens - lottery.ticketPrice })
+      .set({ kairosTokens: user.kairosTokens - lottery.ticketPrice })
       .where(eq(users.id, insertTicket.userId));
     
     const [ticket] = await db
