@@ -15,13 +15,13 @@
   --border: hsl(220, 14%, 91%);
   --input: hsl(220, 14%, 91%);
   
-  /* Updated brand colors with new palette */
-  --primary: hsl(230, 70%, 32%); /* Deep Blue Explore Blue #1E3A8A */
+  /* Updated brand colors with VoyageLotto palette */
+  --primary: hsl(262, 83%, 58%); /* Voyager Purple */
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(186, 96%, 53%); /* Vibrant Cyan Ocean Pulse #22D3EE */
-  --secondary-foreground: hsl(230, 70%, 32%);
-  --accent: hsl(45, 93%, 57%); /* Soft Gold Golden Luck #FBBF24 */
-  --accent-foreground: hsl(230, 70%, 32%);
+  --secondary: hsl(25, 95%, 53%); /* Voyager Orange */
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --accent: hsl(174, 72%, 56%); /* Voyager Teal */
+  --accent-foreground: hsl(0, 0%, 100%);
   
   /* State colors */
   --destructive: hsl(0, 84%, 60%);
@@ -29,11 +29,19 @@
   --ring: hsl(221, 83%, 53%);
   --radius: 0.75rem;
   
-  /* New TravelLotto color palette */
-  --explore-blue: hsl(230, 70%, 32%); /* Deep Blue #1E3A8A */
-  --ocean-pulse: hsl(186, 96%, 53%); /* Vibrant Cyan #22D3EE */
-  --golden-luck: hsl(45, 93%, 57%); /* Soft Gold #FBBF24 */
-  --travel-mint: hsl(158, 64%, 52%); /* Tourist Green #34D399 */
+  /* VoyageLotto Color Palette - Fusion of LynKey + Tripster */
+  --voyager-purple: hsl(262, 83%, 58%); /* Rich Purple (LynKey inspired) */
+  --voyager-orange: hsl(25, 95%, 53%); /* Vibrant Orange (Tripster inspired) */
+  --voyager-teal: hsl(174, 72%, 56%); /* Teal/Turquoise (LynKey luxury) */
+  --voyager-pink: hsl(340, 75%, 55%); /* Coral Pink */
+  --voyager-gold: hsl(45, 93%, 58%); /* Premium Gold */
+  --voyager-coral: hsl(14, 78%, 62%); /* Warm Coral */
+  
+  /* Legacy mapping */
+  --explore-blue: hsl(262, 83%, 58%); /* Now Purple */
+  --ocean-pulse: hsl(174, 72%, 56%); /* Now Teal */
+  --golden-luck: hsl(45, 93%, 58%); /* Enhanced Gold */
+  --travel-mint: hsl(174, 72%, 56%); /* Teal */
   --silk-surface: hsl(220, 14%, 96%); /* Light Gray #F3F4F6 */
   --success-green: hsl(158, 64%, 52%);
   --warning-amber: hsl(45, 93%, 57%);

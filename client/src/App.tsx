@@ -29,6 +29,9 @@ import CountryOperations from "./pages/country-operations";
 import UniqueIds from "./pages/unique-ids";
 import LotteryVerification from "./pages/lottery-verification";
 import ViatorTokenManagement from "./pages/ViatorTokenManagement";
+import ExplorePage from "./pages/explore";
+import BeginnerGuidePage from "./pages/beginner-guide";
+import PartnersPage from "./pages/partners";
 import NotFound from "@/pages/not-found";
 
 export const ToastContext = createContext<{
@@ -68,6 +71,9 @@ function Router() {
       <Route path="/unique-ids" component={UniqueIds} />
       <Route path="/lottery-verification" component={LotteryVerification} />
       <Route path="/token-management" component={ViatorTokenManagement} />
+      <Route path="/explore" component={ExplorePage} />
+      <Route path="/beginner-guide" component={BeginnerGuidePage} />
+      <Route path="/partners" component={PartnersPage} />
       <Route component={NotFound} />
     </Switch>
   );

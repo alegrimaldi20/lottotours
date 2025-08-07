@@ -29,24 +29,22 @@ export default function Landing() {
               </div>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
-              <button 
-                onClick={() => scrollToSection('features')}
-                className="text-muted-foreground hover:text-golden-luck transition-colors"
-                data-testid="nav-features"
-              >
-                Features
-              </button>
-              <button 
-                onClick={() => scrollToSection('how-it-works')}
-                className="text-muted-foreground hover:text-golden-luck transition-colors"
-                data-testid="nav-how-it-works"
-              >
-                How It Works
-              </button>
+              <Link href="/explore" className="text-muted-foreground hover:text-golden-luck transition-colors" data-testid="nav-explore">
+                Explorar
+              </Link>
+              <Link href="/beginner-guide" className="text-muted-foreground hover:text-golden-luck transition-colors" data-testid="nav-guide">
+                Guía
+              </Link>
+              <Link href="/partners" className="text-muted-foreground hover:text-golden-luck transition-colors" data-testid="nav-partners">
+                Socios
+              </Link>
+              <Link href="/lotteries" className="text-muted-foreground hover:text-golden-luck transition-colors" data-testid="nav-lotteries">
+                Loterías
+              </Link>
               <LanguageSelector variant="ghost" size="sm" />
-              <Link href="/dashboard">
+              <Link href="/beginner-guide">
                 <Button className="btn-lottery shadow-lg" data-testid="button-get-started">
-                  Get Started
+                  Comenzar
                 </Button>
               </Link>
             </nav>
@@ -72,25 +70,25 @@ export default function Landing() {
               Your next adventure starts with a single click!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Link href="/dashboard">
+              <Link href="/beginner-guide">
                 <Button 
                   size="lg" 
-                  className="btn-lottery px-8 py-4 text-lg shadow-xl"
+                  className="bg-gradient-to-r from-purple-600 via-orange-500 to-teal-500 hover:from-purple-700 hover:via-orange-600 hover:to-teal-600 text-white px-8 py-4 text-lg shadow-xl"
                   data-testid="button-start-exploring"
                 >
                   <Sparkles className="mr-2 h-5 w-5" />
-                  Start Exploring
+                  Comenzar Aventura
                 </Button>
               </Link>
-              <Link href="/lotteries">
+              <Link href="/explore">
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="btn-adventure px-8 py-4 text-lg shadow-xl"
-                  data-testid="button-view-lotteries"
+                  className="border-2 border-purple-500 text-purple-600 hover:bg-purple-50 px-8 py-4 text-lg shadow-xl"
+                  data-testid="button-explore-destinations"
                 >
-                  <Trophy className="mr-2 h-5 w-5" />
-                  View Lotteries
+                  <MapPin className="mr-2 h-5 w-5" />
+                  Explorar Destinos
                 </Button>
               </Link>
             </div>
