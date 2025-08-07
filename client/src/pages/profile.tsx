@@ -74,10 +74,8 @@ export default function Profile() {
             </nav>
 
             <div className="flex items-center space-x-4">
-              <div className="hidden md:flex items-center space-x-4">
-                <LanguageSelector />
-                <ProfileDropdown />
-              </div>
+              <LanguageSelector />
+              <ProfileDropdown />
               <MobileNavigation currentPath="/profile" />
             </div>
           </div>
