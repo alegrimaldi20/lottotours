@@ -90,10 +90,11 @@ export default function Lotteries() {
       });
       const ticket = await response.json();
       
-      // Success - update UI
+      // Success - update UI with detailed feedback
       toast({
-        title: "¡Ticket comprado!",
-        description: `Ticket #${ticket.ticketNumber} con números ${selectedNumbers.join(", ")}`,
+        title: "🎉 ¡TICKET COMPRADO EXITOSAMENTE!",
+        description: `✅ Ticket #${ticket.ticketNumber} | Números: ${selectedNumbers.join(", ")} | Código: ${ticket.ticketCode}`,
+        duration: 5000, // Show for 5 seconds
       });
       
       // Refresh data
@@ -103,9 +104,10 @@ export default function Lotteries() {
     } catch (error: any) {
       console.error("Purchase error:", error);
       toast({
-        title: "Error en la compra",
-        description: error?.message || "No se pudo comprar el ticket. Intenta de nuevo.",
+        title: "❌ ERROR EN LA COMPRA",
+        description: error?.message || "No se pudo comprar el ticket. Verifica tu conexión e intenta de nuevo.",
         variant: "destructive",
+        duration: 5000,
       });
     } finally {
       setIsProcessing(false);
@@ -383,7 +385,7 @@ export default function Lotteries() {
 
                     {/* Entry Button */}
                     <Button 
-                      className="w-full mt-4" 
+                      className={`w-full mt-4 ${!userCanAfford ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'}`}
                       disabled={!userCanAfford || isProcessing}
                       onClick={() => handleBuyTicket(lottery)}
                       data-testid={`enter-lottery-${lottery.id}`}
@@ -392,14 +394,17 @@ export default function Lotteries() {
                       {!userCanAfford ? (
                         <>
                           <Coins className="h-4 w-4 mr-2" />
-                          Need More Kairos
+                          Necesitas Más Kairos
                         </>
                       ) : isProcessing ? (
-                        "Processing..."
+                        <>
+                          <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent mr-2"></div>
+                          Comprando Ticket...
+                        </>
                       ) : (
                         <>
                           <Ticket className="h-4 w-4 mr-2" />
-                          Buy Ticket ({lottery.ticketPrice} Kairos)
+                          🎫 COMPRAR TICKET ({lottery.ticketPrice} Kairos)
                         </>
                       )}
                     </Button>
