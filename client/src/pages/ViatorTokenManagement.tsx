@@ -209,8 +209,10 @@ export default function ViatorTokenManagement() {
             </nav>
 
             <div className="flex items-center space-x-4">
-              <LanguageSelector />
-              <ProfileDropdown />
+              <div className="hidden md:flex items-center space-x-4">
+                <LanguageSelector />
+                <ProfileDropdown />
+              </div>
               <MobileNavigation currentPath="/token-management" />
             </div>
           </div>

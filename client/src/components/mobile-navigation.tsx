@@ -63,8 +63,8 @@ export default function MobileNavigation({ currentPath }: MobileNavigationProps)
         <DialogContent className="w-80 max-w-sm p-6">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
-              <span className="text-xl font-bold gradient-travel bg-clip-text text-transparent">
-                🌟 TravelLotto
+              <span className="text-xl font-bold text-explore-blue">
+                🌟 VoyageLotto
               </span>
               <Button
                 variant="ghost"

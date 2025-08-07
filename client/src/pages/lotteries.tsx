@@ -197,8 +197,10 @@ export default function Lotteries() {
             </nav>
 
             <div className="flex items-center space-x-4">
-              <LanguageSelector />
-              <ProfileDropdown />
+              <div className="hidden md:flex items-center space-x-4">
+                <LanguageSelector />
+                <ProfileDropdown />
+              </div>
               <MobileNavigation currentPath="/lotteries" />
             </div>
           </div>
