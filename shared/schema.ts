@@ -635,6 +635,7 @@ export const insertLotterySchema = createInsertSchema(lotteries).omit({
 
 export const insertLotteryTicketSchema = createInsertSchema(lotteryTickets).omit({
   id: true,
+  ticketCode: true,
   purchasedAt: true,
   isWinningTicket: true,
   winnerQrCode: true,
