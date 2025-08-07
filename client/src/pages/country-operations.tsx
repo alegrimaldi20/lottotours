@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { 
   Globe, Users, Building2, MapPin, TrendingUp, Award,
   DollarSign, Target, Zap, Filter, Search, MoreVertical,
@@ -248,6 +248,7 @@ const sampleTerritories = [
 ];
 
 export default function CountryOperations() {
+  const [, navigate] = useLocation();
   const [selectedRegion, setSelectedRegion] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
@@ -322,9 +323,13 @@ export default function CountryOperations() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Link href="/dashboard" className="text-slate-600 hover:text-blue-600 transition-colors mr-4">
+              <button 
+                onClick={() => navigate('/dashboard')}
+                className="text-slate-600 hover:text-blue-600 transition-colors mr-4 bg-transparent border-none cursor-pointer" 
+                data-testid="nav-dashboard"
+              >
                 ← Dashboard
-              </Link>
+              </button>
               <div className="flex items-center gap-3">
                 <Globe className="h-8 w-8 text-blue-600" />
                 <h1 className="text-2xl font-bold text-slate-900">Global Operations</h1>
