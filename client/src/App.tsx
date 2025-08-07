@@ -6,7 +6,8 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { InlineToaster } from "@/components/inline-toast";
 import { useLocaleSafeToast } from "@/hooks/use-locale-safe-toast";
 import { LanguageProvider } from "@/lib/i18n";
-import { createContext, type ReactNode } from "react";
+import { createContext, type ReactNode, useEffect } from "react";
+import { setupErrorSuppression } from "@/utils/error-suppression";
 
 import Landing from "./pages/landing";
 import Dashboard from "./pages/dashboard";
@@ -72,6 +73,11 @@ function Router() {
 
 function App() {
   const { toasts, removeToast } = useLocaleSafeToast();
+
+  useEffect(() => {
+    // Initialize error suppression system on app start
+    setupErrorSuppression();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
