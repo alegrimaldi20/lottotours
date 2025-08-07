@@ -600,7 +600,6 @@ export const reviews = pgTable("reviews", {
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
-  tokens: true,
   level: true,
   totalMissionsCompleted: true,
 });
