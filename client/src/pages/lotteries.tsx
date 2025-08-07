@@ -81,26 +81,29 @@ export default function Lotteries() {
     },
     onSuccess: ({ ticket, totalCost }) => {
       toast({
-        title: "Ticket Purchased! 🎫",
-        description: `Good luck! Your ticket: #${ticket.ticketNumber}`,
+        title: "Ticket Purchased Successfully",
+        description: `Your ticket number: #${ticket.ticketNumber}`,
       });
       
-      // Update user Kairos tokens
+      // Update user Kairos tokens safely
       if (user) {
         queryClient.setQueryData(["/api/users", SAMPLE_USER_ID], {
           ...user,
-          kairosTokens: (user.kairosTokens || 0) - totalCost
+          kairosTokens: Math.max(0, (user.kairosTokens || 0) - totalCost)
         });
       }
       
+      // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ["/api/lotteries"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/users", SAMPLE_USER_ID] });
     },
     onError: (error: Error) => {
+      console.error("Ticket purchase error:", error);
       toast({
         title: "Purchase Failed",
         description: error.message === "Insufficient Kairos tokens" 
           ? "You don't have enough Kairos tokens for this purchase" 
-          : "Unable to purchase ticket. Please try again.",
+          : error.message || "Unable to purchase ticket. Please try again.",
         variant: "destructive",
       });
     },
