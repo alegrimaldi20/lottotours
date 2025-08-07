@@ -7,9 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+
 import { 
   Trophy, Clock, Users, Ticket, Coins, Calendar, MapPin, Copy, 
   Plane, Star, Target, Gift, ArrowRight, Timer, DollarSign
@@ -26,8 +24,7 @@ const SAMPLE_USER_ID = "sample-user";
 export default function Lotteries() {
   const { toast } = useToast();
   const { t } = useLanguage();
-  const [selectedLottery, setSelectedLottery] = useState<Lottery | null>(null);
-  const [ticketQuantity, setTicketQuantity] = useState(1);
+
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -53,30 +50,26 @@ export default function Lotteries() {
   });
 
   const buyTicketMutation = useMutation({
-    mutationFn: async ({ lotteryId, ticketPrice, quantity }: { lotteryId: string; ticketPrice: number; quantity: number }) => {
-      const totalCost = ticketPrice * quantity;
-      if (!user || (user.kairosTokens || 0) < totalCost) {
+    mutationFn: async ({ lotteryId, ticketPrice }: { lotteryId: string; ticketPrice: number }) => {
+      if (!user || (user.kairosTokens || 0) < ticketPrice) {
         throw new Error("Insufficient Kairos tokens");
       }
       
-      const tickets = [];
-      for (let i = 0; i < quantity; i++) {
-        const response = await apiRequest("/api/lottery-tickets", {
-          method: "POST",
-          body: {
-            lotteryId,
-            userId: SAMPLE_USER_ID,
-            ticketNumber: Math.floor(Math.random() * 1000000) + 1
-          }
-        });
-        tickets.push(await response.json());
-      }
-      return { tickets, totalCost };
+      const response = await apiRequest("/api/lottery-tickets", {
+        method: "POST",
+        body: {
+          lotteryId,
+          userId: SAMPLE_USER_ID,
+          ticketNumber: Math.floor(Math.random() * 1000000) + 1
+        }
+      });
+      const ticket = await response.json();
+      return { ticket, totalCost: ticketPrice };
     },
-    onSuccess: ({ tickets, totalCost }) => {
+    onSuccess: ({ ticket, totalCost }) => {
       toast({
-        title: `${tickets.length} Ticket${tickets.length > 1 ? 's' : ''} Purchased! 🎫`,
-        description: `Good luck! Your tickets: ${tickets.map(t => `#${t.ticketNumber}`).join(', ')}`,
+        title: "Ticket Purchased! 🎫",
+        description: `Good luck! Your ticket: #${ticket.ticketNumber}`,
       });
       
       // Update user Kairos tokens
@@ -88,25 +81,22 @@ export default function Lotteries() {
       }
       
       queryClient.invalidateQueries({ queryKey: ["/api/lotteries"] });
-      setSelectedLottery(null);
-      setTicketQuantity(1);
     },
     onError: (error: Error) => {
       toast({
         title: "Purchase Failed",
         description: error.message === "Insufficient Kairos tokens" 
           ? "You don't have enough Kairos tokens for this purchase" 
-          : "Unable to purchase tickets. Please try again.",
+          : "Unable to purchase ticket. Please try again.",
         variant: "destructive",
       });
     },
   });
 
-  const handleBuyTickets = (lottery: Lottery) => {
+  const handleBuyTicket = (lottery: Lottery) => {
     buyTicketMutation.mutate({ 
       lotteryId: lottery.id, 
-      ticketPrice: lottery.ticketPrice,
-      quantity: ticketQuantity
+      ticketPrice: lottery.ticketPrice
     });
   };
 
@@ -349,104 +339,26 @@ export default function Lotteries() {
                     </div>
 
                     {/* Entry Button */}
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button 
-                          className="w-full mt-4" 
-                          disabled={!userCanAfford || buyTicketMutation.isPending}
-                          onClick={() => setSelectedLottery(lottery)}
-                          data-testid={`enter-lottery-${lottery.id}`}
-                        >
-                          {!userCanAfford ? (
-                            <>
-                              <Coins className="h-4 w-4 mr-2" />
-                              Need More Kairos
-                            </>
-                          ) : (
-                            <>
-                              <Ticket className="h-4 w-4 mr-2" />
-                              Enter Lottery
-                            </>
-                          )}
-                        </Button>
-                      </DialogTrigger>
-                      
-                      {selectedLottery?.id === lottery.id && (
-                        <DialogContent className="sm:max-w-md">
-                          <DialogHeader>
-                            <DialogTitle className="flex items-center space-x-2">
-                              <span>{theme.icon}</span>
-                              <span>Enter {lottery.title}</span>
-                            </DialogTitle>
-                            <DialogDescription>
-                              Choose how many tickets you want to purchase for this lottery.
-                            </DialogDescription>
-                          </DialogHeader>
-                          
-                          <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div>
-                                <Label>Cost per ticket</Label>
-                                <div className="font-semibold text-purple-600">
-                                  {lottery.ticketPrice} Kairos
-                                </div>
-                              </div>
-                              <div>
-                                <Label>Your balance</Label>
-                                <div className="font-semibold text-blue-600">
-                                  {user?.kairosTokens || 0} Kairos
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <div>
-                              <Label htmlFor="quantity">Number of tickets</Label>
-                              <Input
-                                id="quantity"
-                                type="number"
-                                value={ticketQuantity}
-                                onChange={(e) => setTicketQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                                min={1}
-                                max={Math.floor((user?.kairosTokens || 0) / lottery.ticketPrice)}
-                                className="mt-1"
-                              />
-                            </div>
-                            
-                            <div className="bg-gray-50 p-3 rounded-lg">
-                              <div className="flex justify-between items-center">
-                                <span className="font-medium">Total cost:</span>
-                                <span className="text-xl font-bold text-purple-600">
-                                  {ticketQuantity * lottery.ticketPrice} Kairos
-                                </span>
-                              </div>
-                              <div className="flex justify-between items-center mt-1">
-                                <span className="text-sm text-gray-600">Remaining balance:</span>
-                                <span className="text-sm font-medium">
-                                  {(user?.kairosTokens || 0) - (ticketQuantity * lottery.ticketPrice)} Kairos
-                                </span>
-                              </div>
-                            </div>
-                            
-                            <div className="flex space-x-3">
-                              <Button 
-                                variant="outline" 
-                                className="flex-1"
-                                onClick={() => setSelectedLottery(null)}
-                              >
-                                Cancel
-                              </Button>
-                              <Button 
-                                className="flex-1" 
-                                onClick={() => handleBuyTickets(lottery)}
-                                disabled={buyTicketMutation.isPending || (ticketQuantity * lottery.ticketPrice) > (user?.kairosTokens || 0)}
-                              >
-                                {buyTicketMutation.isPending ? "Processing..." : `Buy ${ticketQuantity} Ticket${ticketQuantity > 1 ? 's' : ''}`}
-                              </Button>
-                            </div>
-                          </div>
-                        </DialogContent>
+                    <Button 
+                      className="w-full mt-4" 
+                      disabled={!userCanAfford || buyTicketMutation.isPending}
+                      onClick={() => handleBuyTicket(lottery)}
+                      data-testid={`enter-lottery-${lottery.id}`}
+                    >
+                      {!userCanAfford ? (
+                        <>
+                          <Coins className="h-4 w-4 mr-2" />
+                          Need More Kairos
+                        </>
+                      ) : buyTicketMutation.isPending ? (
+                        "Processing..."
+                      ) : (
+                        <>
+                          <Ticket className="h-4 w-4 mr-2" />
+                          Buy Ticket ({lottery.ticketPrice} Kairos)
+                        </>
                       )}
-                    </Dialog>
+                    </Button>
 
                     {/* Lottery Details Link */}
                     <Link href={`/lottery/${lottery.id}`}>
