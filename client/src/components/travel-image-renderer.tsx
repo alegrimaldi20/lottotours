@@ -52,7 +52,24 @@ export const TravelImageRenderer: React.FC<TravelImageProps> = ({
         case "paris": return "paris";
         case "luxury": return "luxury";
         case "adventure": return "adventure";
+        case "wellness": return "wellness";
+        case "cultural": return "cultural";
         default: return "europe";
+      }
+    }
+    
+    // Handle marketplace images with authentic product photography
+    if (type === "marketplace") {
+      switch (theme) {
+        case "gear": return "adventure";
+        case "wellness": return "wellness";
+        case "experiences": return "cultural";
+        case "services": return "luxury";
+        case "backpack": return "adventure";
+        case "spa": return "wellness";
+        case "tour": return "cultural";
+        case "hotel": return "luxury";
+        default: return "cultural";
       }
     }
     

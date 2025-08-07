@@ -18,6 +18,7 @@ import MobileNavigation from "@/components/mobile-navigation";
 import NavigationDropdown from "@/components/navigation-dropdown";
 import ProfileDropdown from "@/components/profile-dropdown";
 import LanguageSelector from "@/components/language-selector";
+import TravelImageRenderer from "@/components/travel-image-renderer";
 import { useLanguage } from "@/lib/i18n";
 
 const SAMPLE_USER_ID = "sample-user";
@@ -129,25 +130,29 @@ export default function Lotteries() {
       bg: 'from-orange-50 to-red-50',
       border: 'border-orange-200',
       text: 'text-orange-700',
-      icon: '🏝️'
+      icon: '🏝️',
+      destination: 'tropical'
     };
     if (lotteryId.includes('patagonia')) return {
       bg: 'from-blue-50 to-cyan-50',
       border: 'border-blue-200',
       text: 'text-blue-700',
-      icon: '🏔️'
+      icon: '🏔️',
+      destination: 'adventure'
     };
     if (lotteryId.includes('morocco')) return {
       bg: 'from-amber-50 to-yellow-50',
       border: 'border-amber-200',
       text: 'text-amber-700',
-      icon: '🏜️'
+      icon: '🏜️',
+      destination: 'cultural'
     };
     return {
       bg: 'from-purple-50 to-pink-50',
       border: 'border-purple-200',
       text: 'text-purple-700',
-      icon: '✈️'
+      icon: '✈️',
+      destination: 'cultural'
     };
   };
 
@@ -270,19 +275,33 @@ export default function Lotteries() {
               const userCanAfford = (user?.kairosTokens || 0) >= lottery.ticketPrice;
               
               return (
-                <Card key={lottery.id} className={`${theme.border} bg-gradient-to-br ${theme.bg} hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1`}>
+                <Card key={lottery.id} className={`${theme.border} bg-white hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden`}>
+                  <div className="relative h-48 rounded-t-lg overflow-hidden">
+                    <TravelImageRenderer 
+                      type="lottery" 
+                      theme={theme.destination}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                    <div className="absolute top-4 left-4 text-white text-3xl">
+                      {theme.icon}
+                    </div>
+                    <Badge className="absolute top-4 right-4 bg-white/90 text-slate-700">
+                      {lottery.drawDate ? `Draw: ${new Date(lottery.drawDate).toLocaleDateString()}` : 'No Draw Date'}
+                    </Badge>
+                    <div className="absolute bottom-4 left-4 text-white">
+                      <h3 className="text-xl font-bold">{lottery.title}</h3>
+                      <Badge variant="secondary" className="mt-1 bg-white/20 text-white border-white/30">
+                        {lottery.lotteryCode || lottery.id}
+                      </Badge>
+                    </div>
+                  </div>
                   <CardHeader className="pb-4">
                     <div className="flex items-start justify-between">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-2xl">{theme.icon}</span>
-                        <div>
-                          <CardTitle className={`text-xl ${theme.text}`}>
-                            {lottery.title}
-                          </CardTitle>
-                          <Badge variant="outline" className="mt-1">
-                            {lottery.lotteryCode || lottery.id}
-                          </Badge>
-                        </div>
+                      <div className="flex-1">
+                        <CardDescription className="text-gray-700 mt-2">
+                          {lottery.description}
+                        </CardDescription>
                       </div>
                       <Button
                         variant="ghost"
@@ -293,9 +312,6 @@ export default function Lotteries() {
                         <Copy className="h-3 w-3" />
                       </Button>
                     </div>
-                    <CardDescription className="text-gray-700 mt-2">
-                      {lottery.description}
-                    </CardDescription>
                   </CardHeader>
                   
                   <CardContent className="space-y-4">

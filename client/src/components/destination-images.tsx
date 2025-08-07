@@ -74,6 +74,13 @@ export const DestinationImages = {
     credit: 'Pexels'
   },
 
+  // Wellness and spa experiences
+  wellness: {
+    main: 'https://images.pexels.com/photos/3766217/pexels-photo-3766217.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+    alt: 'Luxury spa wellness center with relaxing atmosphere and tropical setting',
+    credit: 'Pexels'
+  },
+
   // Lottery and gaming themed (casino/resort style)
   lottery: {
     main: 'https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',

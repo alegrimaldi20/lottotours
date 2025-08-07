@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 import MissionVerification from "@/components/mission-verification";
 import FavoriteHeart from "@/components/favorite-heart";
+import TravelImageRenderer from "@/components/travel-image-renderer";
 import type { Mission, UserMission } from "@shared/schema";
 
 const SAMPLE_USER_ID = "sample-user";

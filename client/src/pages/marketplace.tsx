@@ -14,6 +14,7 @@ import MobileNavigation from "@/components/mobile-navigation";
 import NavigationDropdown from "@/components/navigation-dropdown";
 import ProfileDropdown from "@/components/profile-dropdown";
 import LanguageSelector from "@/components/language-selector";
+import TravelImageRenderer from "@/components/travel-image-renderer";
 import { useLanguage } from "@/lib/i18n";
 
 const SAMPLE_USER_ID = "sample-user";
@@ -223,6 +224,107 @@ export default function Marketplace() {
 
         {/* Marketplace Items */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Travel Experience Card */}
+          <Card className="hover:shadow-lg transition-shadow overflow-hidden">
+            <div className="relative h-48">
+              <TravelImageRenderer 
+                type="marketplace" 
+                theme="experiences"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+              <Badge className="absolute top-4 right-4 bg-golden-luck text-white">
+                Popular
+              </Badge>
+              <div className="absolute bottom-4 left-4 text-white">
+                <h3 className="text-lg font-bold">Cultural City Tours</h3>
+                <p className="text-sm">Authentic local experiences</p>
+              </div>
+            </div>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>City Experience Package</span>
+                <span className="text-ocean-pulse">150 Kairos</span>
+              </CardTitle>
+              <CardDescription>
+                Discover hidden gems with local guides in major cities worldwide
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <Button className="w-full" data-testid="buy-experience">
+                <ShoppingBag className="h-4 w-4 mr-2" />
+                Purchase Experience
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Wellness Package Card */}
+          <Card className="hover:shadow-lg transition-shadow overflow-hidden">
+            <div className="relative h-48">
+              <TravelImageRenderer 
+                type="marketplace" 
+                theme="wellness"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+              <Badge className="absolute top-4 right-4 bg-travel-mint text-white">
+                Relaxing
+              </Badge>
+              <div className="absolute bottom-4 left-4 text-white">
+                <h3 className="text-lg font-bold">Spa & Wellness Retreat</h3>
+                <p className="text-sm">Rejuvenation packages</p>
+              </div>
+            </div>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Wellness Package</span>
+                <span className="text-travel-mint">200 Kairos</span>
+              </CardTitle>
+              <CardDescription>
+                Premium spa treatments and wellness experiences at luxury resorts
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <Button className="w-full" data-testid="buy-wellness">
+                <Star className="h-4 w-4 mr-2" />
+                Purchase Package
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Adventure Gear Card */}
+          <Card className="hover:shadow-lg transition-shadow overflow-hidden">
+            <div className="relative h-48">
+              <TravelImageRenderer 
+                type="marketplace" 
+                theme="gear"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+              <Badge className="absolute top-4 right-4 bg-explore-blue text-white">
+                Essential
+              </Badge>
+              <div className="absolute bottom-4 left-4 text-white">
+                <h3 className="text-lg font-bold">Adventure Gear Set</h3>
+                <p className="text-sm">Premium travel equipment</p>
+              </div>
+            </div>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Adventure Equipment</span>
+                <span className="text-explore-blue">120 Kairos</span>
+              </CardTitle>
+              <CardDescription>
+                High-quality backpacks, gear, and travel accessories for adventurers
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <Button className="w-full" data-testid="buy-gear">
+                <Plane className="h-4 w-4 mr-2" />
+                Purchase Gear
+              </Button>
+            </CardContent>
+          </Card>
           {filteredItems.map((item) => (
             <Card key={item.id} className={`hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${getRarityColor(item.rarity)} border-2`}>
               <CardHeader className="pb-4">
