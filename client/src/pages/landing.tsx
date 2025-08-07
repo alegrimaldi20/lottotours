@@ -15,7 +15,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-silk-surface">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-lottery-purple/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

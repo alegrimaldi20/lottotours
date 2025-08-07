@@ -165,7 +165,7 @@ export default function Lotteries() {
   const completedLotteries = lotteries.filter(l => new Date(l.drawDate) <= new Date());
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-silk-surface">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -278,14 +278,14 @@ export default function Lotteries() {
                             {lottery.title}
                           </CardTitle>
                           <Badge variant="outline" className="mt-1">
-                            {lottery.uniqueId}
+                            {lottery.lotteryCode || lottery.id}
                           </Badge>
                         </div>
                       </div>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => copyToClipboard(lottery.uniqueId, "Lottery ID")}
+                        onClick={() => copyToClipboard(lottery.lotteryCode || lottery.id, "Lottery ID")}
                         className="h-8 w-8 p-0"
                       >
                         <Copy className="h-3 w-3" />

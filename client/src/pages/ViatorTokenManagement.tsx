@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Coins, ArrowRightLeft, Trophy, Star, Zap, Target } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useLanguage } from "@/lib/i18n";
+import MobileNavigation from "@/components/mobile-navigation";
+import ProfileDropdown from "@/components/profile-dropdown";
+import LanguageSelector from "@/components/language-selector";
 
 interface ViatorTokenPack {
   id: string;
@@ -173,7 +177,7 @@ export default function ViatorTokenManagement() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-silk-surface">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

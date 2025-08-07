@@ -3,25 +3,25 @@
 @tailwind utilities;
 
 :root {
-  /* Professional travel platform colors */
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(222, 84%, 4.9%);
-  --muted: hsl(210, 40%, 96%);
-  --muted-foreground: hsl(215, 16%, 47%);
+  /* New Travel Platform Color Palette */
+  --background: hsl(220, 14%, 96%); /* Light Gray Silk Surface #F3F4F6 */
+  --foreground: hsl(230, 70%, 32%); /* Deep Blue Explore Blue #1E3A8A */
+  --muted: hsl(220, 14%, 96%); /* Light Gray #F3F4F6 */
+  --muted-foreground: hsl(230, 35%, 45%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(222, 84%, 4.9%);
+  --popover-foreground: hsl(230, 70%, 32%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(222, 84%, 4.9%);
-  --border: hsl(214, 32%, 91%);
-  --input: hsl(214, 32%, 91%);
+  --card-foreground: hsl(230, 70%, 32%);
+  --border: hsl(220, 14%, 91%);
+  --input: hsl(220, 14%, 91%);
   
-  /* Travel platform brand colors */
-  --primary: hsl(221, 83%, 53%);
-  --primary-foreground: hsl(210, 40%, 98%);
-  --secondary: hsl(210, 40%, 96%);
-  --secondary-foreground: hsl(222, 84%, 4.9%);
-  --accent: hsl(210, 40%, 96%);
-  --accent-foreground: hsl(222, 84%, 4.9%);
+  /* Updated brand colors with new palette */
+  --primary: hsl(230, 70%, 32%); /* Deep Blue Explore Blue #1E3A8A */
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(186, 96%, 53%); /* Vibrant Cyan Ocean Pulse #22D3EE */
+  --secondary-foreground: hsl(230, 70%, 32%);
+  --accent: hsl(45, 93%, 57%); /* Soft Gold Golden Luck #FBBF24 */
+  --accent-foreground: hsl(230, 70%, 32%);
   
   /* State colors */
   --destructive: hsl(0, 84%, 60%);
@@ -29,21 +29,23 @@
   --ring: hsl(221, 83%, 53%);
   --radius: 0.75rem;
   
-  /* TravelLotto brand colors - Professional palette */
-  --viator-gold: hsl(43, 96%, 56%);
-  --kairos-purple: hsl(262, 83%, 58%);
-  --raivan-teal: hsl(173, 58%, 39%);
-  --success-green: hsl(142, 76%, 36%);
-  --warning-amber: hsl(38, 92%, 50%);
+  /* New TravelLotto color palette */
+  --explore-blue: hsl(230, 70%, 32%); /* Deep Blue #1E3A8A */
+  --ocean-pulse: hsl(186, 96%, 53%); /* Vibrant Cyan #22D3EE */
+  --golden-luck: hsl(45, 93%, 57%); /* Soft Gold #FBBF24 */
+  --travel-mint: hsl(158, 64%, 52%); /* Tourist Green #34D399 */
+  --silk-surface: hsl(220, 14%, 96%); /* Light Gray #F3F4F6 */
+  --success-green: hsl(158, 64%, 52%);
+  --warning-amber: hsl(45, 93%, 57%);
   --error-red: hsl(0, 84%, 60%);
-  --info-blue: hsl(221, 83%, 53%);
+  --info-blue: hsl(230, 70%, 32%);
   
-  /* Travel destination colors */
-  --bali-orange: hsl(25, 95%, 53%);
-  --patagonia-blue: hsl(200, 98%, 39%);
-  --morocco-terracotta: hsl(16, 75%, 48%);
-  --adventure-emerald: hsl(142, 76%, 36%);
-  --exploration-indigo: hsl(243, 75%, 59%);
+  /* Travel destination colors - updated palette */
+  --bali-orange: hsl(45, 93%, 57%); /* Golden Luck */
+  --patagonia-blue: hsl(230, 70%, 32%); /* Explore Blue */
+  --morocco-terracotta: hsl(186, 96%, 53%); /* Ocean Pulse */
+  --adventure-emerald: hsl(158, 64%, 52%); /* Travel Mint */
+  --exploration-indigo: hsl(230, 70%, 32%); /* Explore Blue */
   
   /* Legacy color mappings for gradual transition */
   --slate-50: hsl(280, 100%, 98%);
@@ -110,18 +112,37 @@
 }
 
 @layer utilities {
-  /* Professional gradients */
+  /* Updated gradients with new palette */
   .gradient-travel {
-    background: linear-gradient(135deg, hsl(221, 83%, 53%) 0%, hsl(262, 83%, 58%) 100%);
+    background: linear-gradient(135deg, hsl(230, 70%, 32%) 0%, hsl(186, 96%, 53%) 100%);
   }
   
   .gradient-viator {
-    background: linear-gradient(135deg, hsl(43, 96%, 56%) 0%, hsl(38, 92%, 50%) 100%);
+    background: linear-gradient(135deg, hsl(45, 93%, 57%) 0%, hsl(186, 96%, 53%) 100%);
   }
   
   .gradient-success {
-    background: linear-gradient(135deg, hsl(142, 76%, 36%) 0%, hsl(173, 58%, 39%) 100%);
+    background: linear-gradient(135deg, hsl(158, 64%, 52%) 0%, hsl(186, 96%, 53%) 100%);
   }
+  
+  /* Background utilities */
+  .bg-explore-blue { background-color: hsl(230, 70%, 32%); }
+  .bg-ocean-pulse { background-color: hsl(186, 96%, 53%); }
+  .bg-golden-luck { background-color: hsl(45, 93%, 57%); }
+  .bg-travel-mint { background-color: hsl(158, 64%, 52%); }
+  .bg-silk-surface { background-color: hsl(220, 14%, 96%); }
+  
+  /* Text utilities */
+  .text-explore-blue { color: hsl(230, 70%, 32%); }
+  .text-ocean-pulse { color: hsl(186, 96%, 53%); }
+  .text-golden-luck { color: hsl(45, 93%, 57%); }
+  .text-travel-mint { color: hsl(158, 64%, 52%); }
+  
+  /* Border utilities */
+  .border-explore-blue { border-color: hsl(230, 70%, 32%); }
+  .border-ocean-pulse { border-color: hsl(186, 96%, 53%); }
+  .border-golden-luck { border-color: hsl(45, 93%, 57%); }
+  .border-travel-mint { border-color: hsl(158, 64%, 52%); }
   
   .gradient-adventure {
     background: linear-gradient(135deg, hsl(200, 98%, 39%) 0%, hsl(173, 58%, 39%) 100%);

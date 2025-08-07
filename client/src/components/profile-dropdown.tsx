@@ -79,7 +79,7 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
             <div className="flex items-center justify-between pt-2 border-t">
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Coins className="h-3 w-3" />
-                <span>{user?.tokens || 0} tokens</span>
+                <span>{user?.viatorTokens || "0.00"} Viator</span>
               </div>
               {user?.level && (
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">

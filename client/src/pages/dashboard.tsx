@@ -57,7 +57,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-silk-surface">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -102,10 +102,10 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-explore-blue mb-2">
             Welcome back, {user?.username || 'Traveler'}! ✨
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Ready for your next adventure? Explore lotteries, manage tokens, and win amazing travel experiences.
           </p>
         </div>
@@ -113,77 +113,77 @@ export default function Dashboard() {
         {/* Token Balance Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           {/* Viator Tokens */}
-          <Card className="border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-50">
+          <Card className="border-golden-luck bg-gradient-to-br from-golden-luck/10 to-golden-luck/5">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-yellow-700">
+              <CardTitle className="flex items-center gap-2 text-golden-luck">
                 <Coins className="h-5 w-5" />
                 Viator Tokens
               </CardTitle>
               <CardDescription>Strong Currency ($1 USD each)</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-yellow-600" data-testid="viator-balance">
+              <div className="text-3xl font-bold text-golden-luck" data-testid="viator-balance">
                 {user?.viatorTokens || "0.00"}
               </div>
-              <p className="text-sm text-yellow-600 mt-1">
+              <p className="text-sm text-golden-luck/70 mt-1">
                 ≈ ${user?.viatorTokens || "0.00"} USD
               </p>
             </CardContent>
           </Card>
 
           {/* Kairos Tokens */}
-          <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-indigo-50">
+          <Card className="border-ocean-pulse bg-gradient-to-br from-ocean-pulse/10 to-ocean-pulse/5">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-purple-700">
+              <CardTitle className="flex items-center gap-2 text-ocean-pulse">
                 <Target className="h-5 w-5" />
                 Kairos Tokens
               </CardTitle>
               <CardDescription>Lottery Tickets</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-purple-600" data-testid="kairos-balance">
+              <div className="text-3xl font-bold text-ocean-pulse" data-testid="kairos-balance">
                 {user?.kairosTokens || 0}
               </div>
-              <p className="text-sm text-purple-600 mt-1">
+              <p className="text-sm text-ocean-pulse/70 mt-1">
                 Ready for lotteries
               </p>
             </CardContent>
           </Card>
 
           {/* Raivan Tokens */}
-          <Card className="border-teal-200 bg-gradient-to-br from-teal-50 to-cyan-50">
+          <Card className="border-travel-mint bg-gradient-to-br from-travel-mint/10 to-travel-mint/5">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-teal-700">
+              <CardTitle className="flex items-center gap-2 text-travel-mint">
                 <Zap className="h-5 w-5" />
                 Raivan Tokens
               </CardTitle>
               <CardDescription>Reward Points</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-teal-600" data-testid="raivan-balance">
+              <div className="text-3xl font-bold text-travel-mint" data-testid="raivan-balance">
                 {user?.raivanTokens || 0}
               </div>
-              <p className="text-sm text-teal-600 mt-1">
+              <p className="text-sm text-travel-mint/70 mt-1">
                 Convert: {Math.floor((user?.raivanTokens || 0) / 18)} Kairos
               </p>
             </CardContent>
           </Card>
 
           {/* User Level */}
-          <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-sky-50">
+          <Card className="border-explore-blue bg-gradient-to-br from-explore-blue/10 to-explore-blue/5">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-blue-700">
+              <CardTitle className="flex items-center gap-2 text-explore-blue">
                 <Crown className="h-5 w-5" />
                 Traveler Level
               </CardTitle>
               <CardDescription>Adventure Progress</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-blue-600" data-testid="user-level">
+              <div className="text-3xl font-bold text-explore-blue" data-testid="user-level">
                 {userLevel}
               </div>
               <Progress value={levelProgress} className="mt-2" />
-              <p className="text-sm text-blue-600 mt-1">
+              <p className="text-sm text-explore-blue/70 mt-1">
                 {100 - levelProgress}% to next level
               </p>
             </CardContent>
@@ -316,7 +316,7 @@ export default function Dashboard() {
           {/* Token Packs Tab */}
           <TabsContent value="tokens" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {tokenPacks.map((pack: any) => (
+              {(tokenPacks as any[])?.map((pack: any) => (
                 <Card key={pack.id} className={`relative ${pack.popularBadge ? 'border-yellow-400 ring-2 ring-yellow-200' : ''}`}>
                   {pack.popularBadge && (
                     <Badge className="absolute -top-2 -right-2 bg-yellow-500 text-white">

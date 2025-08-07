@@ -5,7 +5,7 @@ import { Home, Search, Plane } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+    <div className="min-h-screen bg-silk-surface flex items-center justify-center">
       <div className="max-w-md w-full px-4">
         <Card className="text-center">
           <CardHeader className="pb-6">
