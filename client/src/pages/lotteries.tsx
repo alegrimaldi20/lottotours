@@ -7,21 +7,25 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Trophy, Clock, Users, Ticket, Coins, Calendar, MapPin, Copy } from "lucide-react";
-import TravelImageRenderer from "@/components/travel-image-renderer";
-import FavoriteHeart from "@/components/favorite-heart";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { 
+  Trophy, Clock, Users, Ticket, Coins, Calendar, MapPin, Copy, 
+  Plane, Star, Target, Gift, ArrowRight, Timer, DollarSign
+} from "lucide-react";
 import MobileNavigation from "@/components/mobile-navigation";
 import ProfileDropdown from "@/components/profile-dropdown";
 import LanguageSelector from "@/components/language-selector";
 import { useLanguage } from "@/lib/i18n";
 
-// Using sample user for demo
 const SAMPLE_USER_ID = "sample-user";
 
 export default function Lotteries() {
   const { toast } = useToast();
   const { t } = useLanguage();
+  const [selectedLottery, setSelectedLottery] = useState<Lottery | null>(null);
+  const [ticketQuantity, setTicketQuantity] = useState(1);
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -42,58 +46,65 @@ export default function Lotteries() {
     queryKey: ["/api/users", SAMPLE_USER_ID],
   });
 
-  const { data: lotteries, isLoading } = useQuery<Lottery[]>({
+  const { data: lotteries = [], isLoading } = useQuery<Lottery[]>({
     queryKey: ["/api/lotteries"],
   });
 
   const buyTicketMutation = useMutation({
-    mutationFn: async ({ lotteryId, ticketPrice }: { lotteryId: string; ticketPrice: number }) => {
-      // First check if user has enough tokens
-      if (!user || user.tokens < ticketPrice) {
-        throw new Error("Insufficient tokens");
+    mutationFn: async ({ lotteryId, ticketPrice, quantity }: { lotteryId: string; ticketPrice: number; quantity: number }) => {
+      const totalCost = ticketPrice * quantity;
+      if (!user || (user.kairosTokens || 0) < totalCost) {
+        throw new Error("Insufficient Kairos tokens");
       }
       
-      const response = await apiRequest("/api/lottery-tickets", {
-        method: "POST",
-        body: {
-          lotteryId,
-          userId: SAMPLE_USER_ID,
-          ticketNumber: Math.floor(Math.random() * 1000000) + 1
-        }
-      });
-      return response.json();
+      const tickets = [];
+      for (let i = 0; i < quantity; i++) {
+        const response = await apiRequest("/api/lottery-tickets", {
+          method: "POST",
+          body: {
+            lotteryId,
+            userId: SAMPLE_USER_ID,
+            ticketNumber: Math.floor(Math.random() * 1000000) + 1
+          }
+        });
+        tickets.push(await response.json());
+      }
+      return { tickets, totalCost };
     },
-    onSuccess: (data, { ticketPrice }) => {
+    onSuccess: ({ tickets, totalCost }) => {
       toast({
-        title: "Ticket Purchased! 🎫",
-        description: `Good luck! Your ticket number is #${data.ticketNumber}`,
+        title: `${tickets.length} Ticket${tickets.length > 1 ? 's' : ''} Purchased! 🎫`,
+        description: `Good luck! Your tickets: ${tickets.map(t => `#${t.ticketNumber}`).join(', ')}`,
       });
       
-      // Update user tokens
+      // Update user Kairos tokens
       if (user) {
         queryClient.setQueryData(["/api/users", SAMPLE_USER_ID], {
           ...user,
-          tokens: user.tokens - ticketPrice
+          kairosTokens: (user.kairosTokens || 0) - totalCost
         });
       }
       
       queryClient.invalidateQueries({ queryKey: ["/api/lotteries"] });
+      setSelectedLottery(null);
+      setTicketQuantity(1);
     },
     onError: (error: Error) => {
       toast({
         title: "Purchase Failed",
-        description: error.message === "Insufficient tokens" 
-          ? "You don't have enough tokens for this ticket" 
-          : "Unable to purchase ticket. Please try again.",
+        description: error.message === "Insufficient Kairos tokens" 
+          ? "You don't have enough Kairos tokens for this purchase" 
+          : "Unable to purchase tickets. Please try again.",
         variant: "destructive",
       });
     },
   });
 
-  const handleBuyTicket = (lottery: Lottery) => {
+  const handleBuyTickets = (lottery: Lottery) => {
     buyTicketMutation.mutate({ 
       lotteryId: lottery.id, 
-      ticketPrice: lottery.ticketPrice 
+      ticketPrice: lottery.ticketPrice,
+      quantity: ticketQuantity
     });
   };
 
@@ -105,278 +116,407 @@ export default function Lotteries() {
     
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     
     if (days > 0) return `${days}d ${hours}h remaining`;
-    return `${hours}h remaining`;
+    if (hours > 0) return `${hours}h ${minutes}m remaining`;
+    return `${minutes}m remaining`;
+  };
+
+  const getLotteryTheme = (lotteryId: string) => {
+    if (lotteryId.includes('bali')) return {
+      bg: 'from-orange-50 to-red-50',
+      border: 'border-orange-200',
+      text: 'text-orange-700',
+      icon: '🏝️'
+    };
+    if (lotteryId.includes('patagonia')) return {
+      bg: 'from-blue-50 to-cyan-50',
+      border: 'border-blue-200',
+      text: 'text-blue-700',
+      icon: '🏔️'
+    };
+    if (lotteryId.includes('morocco')) return {
+      bg: 'from-amber-50 to-yellow-50',
+      border: 'border-amber-200',
+      text: 'text-amber-700',
+      icon: '🏜️'
+    };
+    return {
+      bg: 'from-purple-50 to-pink-50',
+      border: 'border-purple-200',
+      text: 'text-purple-700',
+      icon: '✈️'
+    };
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-explore-blue mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading lotteries...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading travel lotteries...</p>
         </div>
       </div>
     );
   }
 
+  const activeLotteries = lotteries.filter(l => new Date(l.drawDate) > new Date());
+  const completedLotteries = lotteries.filter(l => new Date(l.drawDate) <= new Date());
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
-      {/* Header - Mobile Responsive */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/">
               <div className="text-xl sm:text-2xl font-bold gradient-travel bg-clip-text text-transparent" data-testid="logo">
-                🌟 TravelLotto
+                ✈️ TravelLotto
               </div>
             </Link>
-            <nav className="hidden md:flex space-x-6">
+            
+            <nav className="hidden lg:flex space-x-6">
               <Link href="/dashboard">
                 <Button variant="ghost" data-testid="nav-dashboard">Dashboard</Button>
               </Link>
               <Link href="/lotteries">
-                <Button variant="ghost" className="bg-blue-50 text-explore-blue" data-testid="nav-lotteries">Lotteries</Button>
+                <Button variant="ghost" className="text-blue-600 font-medium" data-testid="nav-lotteries">
+                  Lotteries
+                </Button>
+              </Link>
+              <Link href="/token-management">
+                <Button variant="ghost" data-testid="nav-tokens">Token Management</Button>
               </Link>
               <Link href="/marketplace">
                 <Button variant="ghost" data-testid="nav-marketplace">Marketplace</Button>
               </Link>
+              <Link href="/profile">
+                <Button variant="ghost" data-testid="nav-profile">Profile</Button>
+              </Link>
             </nav>
-            {/* Mobile Navigation */}
-            <MobileNavigation currentPath="/lotteries" />
+
+            <div className="flex items-center space-x-4">
+              <LanguageSelector />
+              <ProfileDropdown />
+              <MobileNavigation currentPath="/lotteries" />
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header Section - Mobile Responsive */}
-        <div className="text-center mb-8 md:mb-12">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-4" data-testid="lotteries-title">
-            🎲 Active Travel Lotteries
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header Section */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            🎫 Travel Lotteries
           </h1>
-          <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto mb-6 px-4" data-testid="lotteries-subtitle">
-            Enter exciting lotteries for a chance to win amazing travel packages and experiences
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            Win incredible travel experiences around the world! Use your Kairos tokens to enter exclusive lotteries for luxury vacations and adventures.
           </p>
-          
-          {/* User Token Display */}
-          <div className="inline-flex items-center bg-white rounded-full px-6 py-3 shadow-md">
-            <Coins className="h-5 w-5 text-golden-luck mr-2" />
-            <span className="font-semibold text-slate-900" data-testid="user-tokens">
-              {user?.tokens || 0} Tokens Available
-            </span>
+        </div>
+
+        {/* User Token Balance */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-yellow-100 rounded-lg">
+                <Coins className="h-6 w-6 text-yellow-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Viator Tokens</p>
+                <p className="text-2xl font-bold text-yellow-600">{user?.viatorTokens || "0.00"}</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-purple-100 rounded-lg">
+                <Target className="h-6 w-6 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Kairos Tokens</p>
+                <p className="text-2xl font-bold text-purple-600">{user?.kairosTokens || 0}</p>
+                <p className="text-sm text-gray-500">Available for lottery entries</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-center">
+              <Link href="/token-management">
+                <Button className="w-full" data-testid="buy-tokens-button">
+                  <Coins className="h-4 w-4 mr-2" />
+                  Buy More Tokens
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
 
-        {/* Lotteries Grid - Responsive */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-          {lotteries?.map((lottery) => {
-            const ticketsSoldPercentage = (lottery.soldTickets / lottery.maxTickets) * 100;
-            const timeRemaining = formatTimeRemaining(lottery.drawDate);
-            const canAfford = user ? user.tokens >= lottery.ticketPrice : false;
-            
-            return (
-              <Card 
-                key={lottery.id} 
-                className="overflow-hidden hover:shadow-xl transition-shadow duration-300"
-                data-testid={`lottery-${lottery.id}`}
-              >
-                <div className="relative">
-                  {/* Prize Image/Icon */}
-                  <div className="h-48 bg-gradient-casino flex items-center justify-center overflow-hidden">
-                    <TravelImageRenderer type="lottery" theme={lottery.image} className="w-full h-full object-cover" />
-                  </div>
-                  
-                  {/* Theme Badge */}
-                  <Badge className="absolute top-4 left-4 bg-white text-slate-900" data-testid={`lottery-theme-${lottery.id}`}>
-                    {lottery.theme}
-                  </Badge>
-                  
-                  {/* Time Remaining Badge */}
-                  <Badge 
-                    variant={timeRemaining.includes('remaining') ? 'default' : 'secondary'}
-                    className="absolute top-4 right-4"
-                    data-testid={`lottery-time-${lottery.id}`}
-                  >
-                    <Clock className="h-3 w-3 mr-1" />
-                    {timeRemaining}
-                  </Badge>
-                </div>
-
-                <CardHeader>
-                  <div className="flex items-center justify-between mb-2">
-                    <CardTitle className="text-2xl" data-testid={`lottery-title-${lottery.id}`}>
-                      {lottery.title}
-                    </CardTitle>
-                    <FavoriteHeart
-                      itemType="lottery"
-                      itemId={lottery.id}
-                      itemTitle={lottery.title}
-                      itemDescription={lottery.description}
-                      itemMetadata={{ 
-                        drawDate: lottery.drawDate,
-                        prizeTitle: lottery.prizeTitle,
-                        prizeValue: lottery.prizeValue,
-                        ticketPrice: lottery.ticketPrice 
-                      }}
-                      size="lg"
-                    />
-                  </div>
-                  
-                  {/* Lottery Code Display */}
-                  {lottery.lotteryCode && (
-                    <div className="flex items-center gap-2 mb-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 px-3 py-2 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Lottery ID:</span>
-                      <code className="font-mono font-bold text-blue-800 dark:text-blue-200 flex-1" data-testid={`lottery-code-${lottery.id}`}>
-                        {lottery.lotteryCode}
-                      </code>
+        {/* Active Lotteries Section */}
+        <div className="mb-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Active Lotteries</h2>
+            <Badge variant="secondary" className="text-lg px-3 py-1">
+              {activeLotteries.length} Active
+            </Badge>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {activeLotteries.map((lottery) => {
+              const theme = getLotteryTheme(lottery.id);
+              const timeRemaining = formatTimeRemaining(new Date(lottery.drawDate));
+              const userCanAfford = (user?.kairosTokens || 0) >= lottery.ticketPrice;
+              
+              return (
+                <Card key={lottery.id} className={`${theme.border} bg-gradient-to-br ${theme.bg} hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1`}>
+                  <CardHeader className="pb-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-2xl">{theme.icon}</span>
+                        <div>
+                          <CardTitle className={`text-xl ${theme.text}`}>
+                            {lottery.title}
+                          </CardTitle>
+                          <Badge variant="outline" className="mt-1">
+                            {lottery.uniqueId}
+                          </Badge>
+                        </div>
+                      </div>
                       <Button
-                        data-testid={`button-copy-code-${lottery.id}`}
                         variant="ghost"
                         size="sm"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          copyToClipboard(lottery.lotteryCode!, "Lottery ID");
-                        }}
-                        className="h-6 w-6 p-0 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
+                        onClick={() => copyToClipboard(lottery.uniqueId, "Lottery ID")}
+                        className="h-8 w-8 p-0"
                       >
                         <Copy className="h-3 w-3" />
                       </Button>
                     </div>
-                  )}
+                    <CardDescription className="text-gray-700 mt-2">
+                      {lottery.description}
+                    </CardDescription>
+                  </CardHeader>
                   
-                  <CardDescription className="text-base" data-testid={`lottery-description-${lottery.id}`}>
-                    {lottery.description}
-                  </CardDescription>
-                </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Prize Value */}
+                    <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg">
+                      <div className="flex items-center space-x-2">
+                        <Trophy className="h-5 w-5 text-yellow-600" />
+                        <span className="font-medium">Prize Value</span>
+                      </div>
+                      <span className="text-2xl font-bold text-green-600">
+                        ${lottery.prizeValue.toLocaleString()}
+                      </span>
+                    </div>
 
-                <CardContent className="space-y-4">
-                  {/* Prize Details */}
-                  <div className="bg-gradient-to-r from-golden-luck/10 to-travel-mint/10 rounded-lg p-4">
-                    <h4 className="font-semibold text-slate-900 mb-2" data-testid={`prize-title-${lottery.id}`}>
-                      🏆 {lottery.prizeTitle}
-                    </h4>
-                    <p className="text-slate-600 text-sm mb-3" data-testid={`prize-description-${lottery.id}`}>
-                      {lottery.prizeDescription}
-                    </p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-golden-luck" data-testid={`prize-value-${lottery.id}`}>
-                        ${(lottery.prizeValue / 100).toLocaleString()}
-                      </span>
-                      <span className="text-sm text-slate-500">
-                        Prize Value
+                    {/* Entry Cost */}
+                    <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg">
+                      <div className="flex items-center space-x-2">
+                        <Target className="h-5 w-5 text-purple-600" />
+                        <span className="font-medium">Entry Cost</span>
+                      </div>
+                      <span className="text-xl font-bold text-purple-600">
+                        {lottery.ticketPrice} Kairos
                       </span>
                     </div>
-                  </div>
 
-                  {/* Lottery Stats */}
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="flex items-center gap-1">
-                        <Ticket className="h-4 w-4" />
-                        Tickets Sold
-                      </span>
-                      <span className="font-semibold" data-testid={`tickets-sold-${lottery.id}`}>
-                        {lottery.soldTickets} / {lottery.maxTickets}
-                      </span>
-                    </div>
-                    
-                    <Progress value={ticketsSoldPercentage} className="h-2" />
-                    
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        Draw Date
-                      </span>
-                      <span className="font-semibold" data-testid={`draw-date-${lottery.id}`}>
-                        {new Date(lottery.drawDate).toLocaleDateString()}
+                    {/* Draw Date */}
+                    <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg">
+                      <div className="flex items-center space-x-2">
+                        <Timer className="h-5 w-5 text-blue-600" />
+                        <span className="font-medium">Time Remaining</span>
+                      </div>
+                      <span className="text-sm font-semibold text-blue-600">
+                        {timeRemaining}
                       </span>
                     </div>
-                  </div>
 
-                  {/* Purchase Section */}
-                  <div className="pt-4 border-t border-slate-200">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-lg font-semibold">Ticket Price</span>
-                      <span className="flex items-center gap-1 text-xl font-bold text-explore-blue" data-testid={`ticket-price-${lottery.id}`}>
-                        <Coins className="h-5 w-5" />
-                        {lottery.ticketPrice}
-                      </span>
-                    </div>
-                    
-                    <Link href={`/lottery/${lottery.id}`} className="block w-full">
-                      <Button
-                        disabled={lottery.soldTickets >= lottery.maxTickets}
-                        className="w-full shadow-lg btn-lottery"
-                        data-testid={`select-numbers-${lottery.id}`}
-                      >
-                        {lottery.soldTickets >= lottery.maxTickets ? (
-                          "Sold Out"
-                        ) : (
-                          <>
-                            <Ticket className="mr-2 h-4 w-4" />
-                            Select Numbers & Play
-                          </>
-                        )}
+                    {/* Entry Button */}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button 
+                          className="w-full mt-4" 
+                          disabled={!userCanAfford || buyTicketMutation.isPending}
+                          onClick={() => setSelectedLottery(lottery)}
+                          data-testid={`enter-lottery-${lottery.id}`}
+                        >
+                          {!userCanAfford ? (
+                            <>
+                              <Coins className="h-4 w-4 mr-2" />
+                              Need More Kairos
+                            </>
+                          ) : (
+                            <>
+                              <Ticket className="h-4 w-4 mr-2" />
+                              Enter Lottery
+                            </>
+                          )}
+                        </Button>
+                      </DialogTrigger>
+                      
+                      {selectedLottery?.id === lottery.id && (
+                        <DialogContent className="sm:max-w-md">
+                          <DialogHeader>
+                            <DialogTitle className="flex items-center space-x-2">
+                              <span>{theme.icon}</span>
+                              <span>Enter {lottery.title}</span>
+                            </DialogTitle>
+                            <DialogDescription>
+                              Choose how many tickets you want to purchase for this lottery.
+                            </DialogDescription>
+                          </DialogHeader>
+                          
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <Label>Cost per ticket</Label>
+                                <div className="font-semibold text-purple-600">
+                                  {lottery.ticketPrice} Kairos
+                                </div>
+                              </div>
+                              <div>
+                                <Label>Your balance</Label>
+                                <div className="font-semibold text-blue-600">
+                                  {user?.kairosTokens || 0} Kairos
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div>
+                              <Label htmlFor="quantity">Number of tickets</Label>
+                              <Input
+                                id="quantity"
+                                type="number"
+                                value={ticketQuantity}
+                                onChange={(e) => setTicketQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                                min={1}
+                                max={Math.floor((user?.kairosTokens || 0) / lottery.ticketPrice)}
+                                className="mt-1"
+                              />
+                            </div>
+                            
+                            <div className="bg-gray-50 p-3 rounded-lg">
+                              <div className="flex justify-between items-center">
+                                <span className="font-medium">Total cost:</span>
+                                <span className="text-xl font-bold text-purple-600">
+                                  {ticketQuantity * lottery.ticketPrice} Kairos
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center mt-1">
+                                <span className="text-sm text-gray-600">Remaining balance:</span>
+                                <span className="text-sm font-medium">
+                                  {(user?.kairosTokens || 0) - (ticketQuantity * lottery.ticketPrice)} Kairos
+                                </span>
+                              </div>
+                            </div>
+                            
+                            <div className="flex space-x-3">
+                              <Button 
+                                variant="outline" 
+                                className="flex-1"
+                                onClick={() => setSelectedLottery(null)}
+                              >
+                                Cancel
+                              </Button>
+                              <Button 
+                                className="flex-1" 
+                                onClick={() => handleBuyTickets(lottery)}
+                                disabled={buyTicketMutation.isPending || (ticketQuantity * lottery.ticketPrice) > (user?.kairosTokens || 0)}
+                              >
+                                {buyTicketMutation.isPending ? "Processing..." : `Buy ${ticketQuantity} Ticket${ticketQuantity > 1 ? 's' : ''}`}
+                              </Button>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      )}
+                    </Dialog>
+
+                    {/* Lottery Details Link */}
+                    <Link href={`/lottery/${lottery.id}`}>
+                      <Button variant="outline" className="w-full" size="sm" data-testid={`lottery-details-${lottery.id}`}>
+                        View Full Details
+                        <ArrowRight className="h-3 w-3 ml-2" />
                       </Button>
                     </Link>
-                    
-                    {!canAfford && (
-                      <p className="text-xs text-slate-500 mt-2 text-center">
-                        Complete more missions to earn tokens
-                      </p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </div>
 
-        {/* No Lotteries Message */}
-        {!lotteries || lotteries.length === 0 && (
-          <div className="text-center py-16">
-            <Trophy className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">No Active Lotteries</h3>
-            <p className="text-slate-600 mb-6">Check back soon for new exciting travel lottery opportunities!</p>
+        {/* Completed Lotteries Section */}
+        {completedLotteries.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Recent Results</h2>
+              <Badge variant="outline" className="text-lg px-3 py-1">
+                {completedLotteries.length} Completed
+              </Badge>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {completedLotteries.slice(0, 6).map((lottery) => {
+                const theme = getLotteryTheme(lottery.id);
+                
+                return (
+                  <Card key={lottery.id} className={`${theme.border} bg-gradient-to-br ${theme.bg} opacity-75`}>
+                    <CardHeader className="pb-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-2xl grayscale">{theme.icon}</span>
+                          <div>
+                            <CardTitle className={`text-xl ${theme.text}`}>
+                              {lottery.title}
+                            </CardTitle>
+                            <Badge variant="secondary" className="mt-1">
+                              Completed
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    
+                    <CardContent>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span>Prize Value:</span>
+                          <span className="font-semibold">${lottery.prizeValue.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Draw Date:</span>
+                          <span>{new Date(lottery.drawDate).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      
+                      <Link href={`/lottery/${lottery.id}`}>
+                        <Button variant="outline" className="w-full mt-4" size="sm">
+                          View Results
+                        </Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {lotteries.length === 0 && (
+          <div className="text-center py-12">
+            <Plane className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Lotteries Available</h3>
+            <p className="text-gray-600 mb-6">
+              Check back soon for exciting travel lottery opportunities!
+            </p>
             <Link href="/dashboard">
-              <Button className="bg-explore-blue hover:bg-ocean-pulse">
-                Complete Missions to Earn Tokens
+              <Button data-testid="back-to-dashboard">
+                Return to Dashboard
               </Button>
             </Link>
           </div>
         )}
-
-        {/* Info Section */}
-        <div className="mt-16 bg-white rounded-xl p-8 shadow-sm">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center" data-testid="how-lotteries-work-title">
-            How Travel Lotteries Work
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-explore-blue rounded-full flex items-center justify-center mx-auto mb-4">
-                <Ticket className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="font-semibold mb-2">Purchase Tickets</h3>
-              <p className="text-slate-600 text-sm">Use your earned tokens to buy lottery tickets for amazing travel prizes</p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-ocean-pulse rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="font-semibold mb-2">Wait for Draw</h3>
-              <p className="text-slate-600 text-sm">Each lottery has a scheduled draw date when winners are randomly selected</p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-golden-luck rounded-full flex items-center justify-center mx-auto mb-4">
-                <Trophy className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="font-semibold mb-2">Win & Travel</h3>
-              <p className="text-slate-600 text-sm">Winners receive authentic travel packages and experiences from our partners</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      </main>
     </div>
   );
 }

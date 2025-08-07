@@ -173,75 +173,116 @@ export default function ViatorTokenManagement() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-8" data-testid="viator-token-management">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-purple-600 bg-clip-text text-transparent">
-          Viator Token Management
-        </h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Manage your three-token economy: Viator ($1 USD), Kairos (raffle tickets), and Raivan (reward tokens)
-        </p>
-      </div>
+      <header className="bg-white shadow-sm border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link href="/">
+              <div className="text-xl sm:text-2xl font-bold gradient-travel bg-clip-text text-transparent" data-testid="logo">
+                ✈️ TravelLotto
+              </div>
+            </Link>
+            
+            <nav className="hidden lg:flex space-x-6">
+              <Link href="/dashboard">
+                <Button variant="ghost" data-testid="nav-dashboard">Dashboard</Button>
+              </Link>
+              <Link href="/lotteries">
+                <Button variant="ghost" data-testid="nav-lotteries">Lotteries</Button>
+              </Link>
+              <Link href="/token-management">
+                <Button variant="ghost" className="text-blue-600 font-medium" data-testid="nav-tokens">
+                  Token Management
+                </Button>
+              </Link>
+              <Link href="/marketplace">
+                <Button variant="ghost" data-testid="nav-marketplace">Marketplace</Button>
+              </Link>
+              <Link href="/profile">
+                <Button variant="ghost" data-testid="nav-profile">Profile</Button>
+              </Link>
+            </nav>
 
-      {/* Token Balances */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-orange-200 dark:border-orange-800">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-orange-600">
-              <Coins className="h-5 w-5" />
-              Viator Tokens
-            </CardTitle>
-            <CardDescription>Strong Token ($1 USD value)</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-orange-600" data-testid="viator-balance">
-              {user?.viatorTokens || "0.00"}
+            <div className="flex items-center space-x-4">
+              <LanguageSelector />
+              <ProfileDropdown />
+              <MobileNavigation currentPath="/token-management" />
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              ≈ ${user?.viatorTokens || "0.00"} USD
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+      </header>
 
-        <Card className="border-purple-200 dark:border-purple-800">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-purple-600">
-              <Target className="h-5 w-5" />
-              Kairos Tokens
-            </CardTitle>
-            <CardDescription>Raffle Ticket Tokens</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-purple-600" data-testid="kairos-balance">
-              {user?.kairosTokens || 0}
-            </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Available for lottery entries
-            </p>
-          </CardContent>
-        </Card>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8" data-testid="viator-token-management">
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold text-gray-900">
+            💰 Token Management
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Manage your three-token economy: Viator ($1 USD), Kairos (raffle tickets), and Raivan (reward tokens)
+          </p>
+        </div>
 
-        <Card className="border-teal-200 dark:border-teal-800">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-teal-600">
-              <Zap className="h-5 w-5" />
-              Raivan Tokens
-            </CardTitle>
-            <CardDescription>Reward Tokens (18 = 1 Kairos)</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-teal-600" data-testid="raivan-balance">
-              {user?.raivanTokens || 0}
-            </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Can convert to {Math.floor((user?.raivanTokens || 0) / 18)} Kairos
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+        {/* Token Balances */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-50">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-yellow-700">
+                <Coins className="h-5 w-5" />
+                Viator Tokens
+              </CardTitle>
+              <CardDescription>Strong Currency ($1 USD each)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-yellow-600" data-testid="viator-balance">
+                {user?.viatorTokens || "0.00"}
+              </div>
+              <p className="text-sm text-yellow-600 mt-1">
+                ≈ ${user?.viatorTokens || "0.00"} USD
+              </p>
+            </CardContent>
+          </Card>
 
-      <Tabs defaultValue="conversion" className="space-y-6">
+          <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-indigo-50">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-purple-700">
+                <Target className="h-5 w-5" />
+                Kairos Tokens
+              </CardTitle>
+              <CardDescription>Lottery Tickets</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-purple-600" data-testid="kairos-balance">
+                {user?.kairosTokens || 0}
+              </div>
+              <p className="text-sm text-purple-600 mt-1">
+                Ready for lotteries
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-teal-200 bg-gradient-to-br from-teal-50 to-cyan-50">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-teal-700">
+                <Zap className="h-5 w-5" />
+                Raivan Tokens
+              </CardTitle>
+              <CardDescription>Reward Points (18 = 1 Kairos)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-teal-600" data-testid="raivan-balance">
+                {user?.raivanTokens || 0}
+              </div>
+              <p className="text-sm text-teal-600 mt-1">
+                Convert: {Math.floor((user?.raivanTokens || 0) / 18)} Kairos
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="conversion" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="conversion">Convert Raivan</TabsTrigger>
           <TabsTrigger value="packs">Token Packs</TabsTrigger>
@@ -404,7 +445,8 @@ export default function ViatorTokenManagement() {
             ))}
           </div>
         </TabsContent>
-      </Tabs>
+        </Tabs>
+      </main>
     </div>
   );
 }

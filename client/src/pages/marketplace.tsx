@@ -1,381 +1,313 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { type Prize, type User } from "@shared/schema";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+import { type User } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Coins, Gift, MapPin, Package, Percent, Clock, Check } from "lucide-react";
-import TravelImageRenderer from "@/components/travel-image-renderer";
-import FavoriteHeart from "@/components/favorite-heart";
+import { Input } from "@/components/ui/input";
+import { 
+  Coins, Target, Zap, ShoppingBag, Star, Gift, 
+  Search, Filter, Plane, MapPin, Trophy 
+} from "lucide-react";
 import MobileNavigation from "@/components/mobile-navigation";
 import ProfileDropdown from "@/components/profile-dropdown";
 import LanguageSelector from "@/components/language-selector";
 import { useLanguage } from "@/lib/i18n";
 
-// Using sample user for demo
 const SAMPLE_USER_ID = "sample-user";
 
+// Mock marketplace items for demonstration
+const marketplaceItems = [
+  {
+    id: "item-1",
+    name: "Tokyo Gourmet Experience",
+    description: "Exclusive access to hidden local restaurants and food tours",
+    price: 150,
+    currency: "Kairos",
+    category: "experiences",
+    image: "🍣",
+    rarity: "rare",
+    availability: 25
+  },
+  {
+    id: "item-2", 
+    name: "Bali Wellness Retreat Voucher",
+    description: "3-day spa and meditation retreat in beautiful Bali",
+    price: 200,
+    currency: "Kairos", 
+    category: "wellness",
+    image: "🌺",
+    rarity: "epic",
+    availability: 10
+  },
+  {
+    id: "item-3",
+    name: "Patagonia Adventure Kit",
+    description: "Professional hiking gear and camping equipment rental",
+    price: 75,
+    currency: "Kairos",
+    category: "gear",
+    image: "🎒",
+    rarity: "common",
+    availability: 50
+  },
+  {
+    id: "item-4",
+    name: "Morocco Cultural Guide Service", 
+    description: "Personal guide for authentic Moroccan cultural experiences",
+    price: 100,
+    currency: "Kairos",
+    category: "services",
+    image: "🏺",
+    rarity: "rare",
+    availability: 15
+  },
+  {
+    id: "item-5",
+    name: "Premium Travel Photography Session",
+    description: "Professional photographer for your travel memories",
+    price: 120,
+    currency: "Kairos", 
+    category: "services",
+    image: "📸",
+    rarity: "rare",
+    availability: 20
+  }
+];
+
 export default function Marketplace() {
-  const { toast } = useToast();
   const { t } = useLanguage();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   const { data: user } = useQuery<User>({
     queryKey: ["/api/users", SAMPLE_USER_ID],
   });
 
-  const { data: prizes, isLoading } = useQuery<Prize[]>({
-    queryKey: ["/api/prizes"],
+  const filteredItems = marketplaceItems.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         item.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === "all" || item.category === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
 
-  const redeemPrizeMutation = useMutation({
-    mutationFn: async ({ prizeId, tokensRequired }: { prizeId: string; tokensRequired: number }) => {
-      // First check if user has enough tokens
-      if (!user || user.tokens < tokensRequired) {
-        throw new Error("Insufficient tokens");
-      }
-      
-      const response = await apiRequest("/api/prize-redemptions", {
-        method: "POST",
-        body: {
-          userId: SAMPLE_USER_ID,
-          prizeId,
-          status: "pending"
-        }
-      });
-      return response.json();
-    },
-    onSuccess: (data, { tokensRequired }) => {
-      toast({
-        title: "Prize Redeemed! 🎉",
-        description: `Your redemption code is ${data.redemptionCode}. Check your email for details.`,
-        duration: 5000,
-      });
-      
-      // Update user tokens
-      if (user) {
-        queryClient.setQueryData(["/api/users", SAMPLE_USER_ID], {
-          ...user,
-          tokens: user.tokens - tokensRequired
-        });
-      }
-      
-      queryClient.invalidateQueries({ queryKey: ["/api/prizes"] });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Redemption Failed",
-        description: error.message === "Insufficient tokens" 
-          ? "You don't have enough tokens for this prize" 
-          : "Unable to redeem prize. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleRedeemPrize = (prize: Prize) => {
-    redeemPrizeMutation.mutate({ 
-      prizeId: prize.id, 
-      tokensRequired: prize.tokensRequired 
-    });
-  };
-
-  const categoryIcon = (category: string) => {
-    switch (category) {
-      case 'travel_package': return <MapPin className="h-5 w-5" />;
-      case 'product': return <Package className="h-5 w-5" />;
-      case 'discount': return <Percent className="h-5 w-5" />;
-      case 'experience': return <Gift className="h-5 w-5" />;
-      default: return <Gift className="h-5 w-5" />;
+  const getRarityColor = (rarity: string) => {
+    switch (rarity) {
+      case "legendary": return "text-yellow-600 border-yellow-200 bg-yellow-50";
+      case "epic": return "text-purple-600 border-purple-200 bg-purple-50";
+      case "rare": return "text-blue-600 border-blue-200 bg-blue-50";
+      default: return "text-gray-600 border-gray-200 bg-gray-50";
     }
   };
-
-  const categoryName = (category: string) => {
-    switch (category) {
-      case 'travel_package': return 'Travel Packages';
-      case 'product': return 'Products';
-      case 'discount': return 'Discounts';
-      case 'experience': return 'Experiences';
-      default: return 'All Prizes';
-    }
-  };
-
-  const filterPrizesByCategory = (category: string) => {
-    if (category === 'all') return prizes || [];
-    return prizes?.filter(prize => prize.category === category) || [];
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-explore-blue mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading marketplace...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const categories = ['all', 'travel_package', 'experience', 'product', 'discount'];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
-      {/* Header - Mobile Responsive */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/">
               <div className="text-xl sm:text-2xl font-bold gradient-travel bg-clip-text text-transparent" data-testid="logo">
-                🌟 TravelLotto
+                ✈️ TravelLotto
               </div>
             </Link>
-            <nav className="hidden md:flex space-x-6">
+            
+            <nav className="hidden lg:flex space-x-6">
               <Link href="/dashboard">
                 <Button variant="ghost" data-testid="nav-dashboard">Dashboard</Button>
               </Link>
               <Link href="/lotteries">
                 <Button variant="ghost" data-testid="nav-lotteries">Lotteries</Button>
               </Link>
+              <Link href="/token-management">
+                <Button variant="ghost" data-testid="nav-tokens">Token Management</Button>
+              </Link>
               <Link href="/marketplace">
-                <Button variant="ghost" className="bg-blue-50 text-explore-blue" data-testid="nav-marketplace">Marketplace</Button>
+                <Button variant="ghost" className="text-blue-600 font-medium" data-testid="nav-marketplace">
+                  Marketplace
+                </Button>
+              </Link>
+              <Link href="/profile">
+                <Button variant="ghost" data-testid="nav-profile">Profile</Button>
               </Link>
             </nav>
-            {/* Mobile Navigation */}
-            <MobileNavigation currentPath="/marketplace" />
+
+            <div className="flex items-center space-x-4">
+              <LanguageSelector />
+              <ProfileDropdown />
+              <MobileNavigation currentPath="/marketplace" />
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header Section - Mobile Responsive */}
-        <div className="text-center mb-8 md:mb-12">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-4" data-testid="marketplace-title">
-            🏪 Prize Marketplace
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header Section */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            🛍️ Travel Marketplace
           </h1>
-          <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto mb-6 px-4" data-testid="marketplace-subtitle">
-            Redeem your hard-earned tokens for amazing travel packages, experiences, and exclusive rewards
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            Discover amazing travel experiences, services, and gear. Use your Kairos tokens to unlock exclusive offerings from around the world.
           </p>
-          
-          {/* User Token Display */}
-          <div className="inline-flex items-center bg-white rounded-full px-6 py-3 shadow-md">
-            <Coins className="h-5 w-5 text-golden-luck mr-2" />
-            <span className="font-semibold text-slate-900" data-testid="user-tokens">
-              {user?.tokens || 0} Tokens Available
-            </span>
-          </div>
         </div>
 
-        {/* Category Tabs */}
-        <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 mb-8">
-            {categories.map((category) => (
-              <TabsTrigger key={category} value={category} className="flex items-center gap-2" data-testid={`tab-${category}`}>
-                {category !== 'all' && categoryIcon(category)}
-                {categoryName(category)}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-
-          {categories.map((category) => (
-            <TabsContent key={category} value={category}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {filterPrizesByCategory(category).map((prize) => {
-                  const canAfford = user ? user.tokens >= prize.tokensRequired : false;
-                  const isAvailable = prize.availability > 0;
-                  
-                  return (
-                    <Card 
-                      key={prize.id} 
-                      className="overflow-hidden hover:shadow-xl transition-shadow duration-300"
-                      data-testid={`prize-${prize.id}`}
-                    >
-                      <div className="relative">
-                        {/* Prize Image/Icon - Responsive */}
-                        <div className="h-32 sm:h-40 bg-gradient-adventure flex items-center justify-center overflow-hidden">
-                          <TravelImageRenderer type="prize" theme={prize.image} className="w-full h-full object-cover" />
-                        </div>
-                        
-                        {/* Category Badge */}
-                        <Badge className="absolute top-3 left-3" data-testid={`prize-category-${prize.id}`}>
-                          {categoryIcon(prize.category)}
-                          <span className="ml-1">{categoryName(prize.category)}</span>
-                        </Badge>
-                        
-                        {/* Availability Badge */}
-                        <Badge 
-                          variant={isAvailable ? 'secondary' : 'destructive'}
-                          className="absolute top-3 right-3"
-                          data-testid={`prize-availability-${prize.id}`}
-                        >
-                          {isAvailable ? `${prize.availability} left` : 'Sold Out'}
-                        </Badge>
-                      </div>
-
-                      <CardHeader>
-                        <div className="flex items-center justify-between mb-2">
-                          <CardTitle className="text-lg" data-testid={`prize-title-${prize.id}`}>
-                            {prize.title}
-                          </CardTitle>
-                          <FavoriteHeart
-                            itemType="marketplace_item"
-                            itemId={prize.id}
-                            itemTitle={prize.title}
-                            itemDescription={prize.description}
-                            itemMetadata={{ 
-                              category: prize.category,
-                              tokensRequired: prize.tokensRequired,
-                              availability: prize.availability,
-                              destination: prize.destination
-                            }}
-                            size="md"
-                          />
-                        </div>
-                        <CardDescription className="text-sm" data-testid={`prize-description-${prize.id}`}>
-                          {prize.description}
-                        </CardDescription>
-                      </CardHeader>
-
-                      <CardContent className="space-y-4">
-                        {/* Prize Details */}
-                        <div className="space-y-2">
-                          {prize.destination && (
-                            <div className="flex items-center gap-2 text-sm text-slate-600">
-                              <MapPin className="h-4 w-4" />
-                              <span data-testid={`prize-destination-${prize.id}`}>{prize.destination}</span>
-                            </div>
-                          )}
-                          
-                          <div className="flex items-center gap-2 text-sm text-slate-600">
-                            <Package className="h-4 w-4" />
-                            <span data-testid={`prize-provider-${prize.id}`}>by {prize.provider}</span>
-                          </div>
-                          
-                          {prize.validUntil && (
-                            <div className="flex items-center gap-2 text-sm text-slate-600">
-                              <Clock className="h-4 w-4" />
-                              <span data-testid={`prize-valid-until-${prize.id}`}>
-                                Valid until {new Date(prize.validUntil).toLocaleDateString()}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Value and Cost */}
-                        <div className="bg-slate-50 rounded-lg p-4 space-y-2">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-slate-600">Actual Value</span>
-                            <span className="font-semibold text-slate-900" data-testid={`prize-value-${prize.id}`}>
-                              ${(prize.value / 100).toLocaleString()}
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-slate-600">Token Cost</span>
-                            <span className="flex items-center gap-1 text-lg font-bold text-explore-blue" data-testid={`prize-tokens-${prize.id}`}>
-                              <Coins className="h-4 w-4" />
-                              {prize.tokensRequired}
-                            </span>
-                          </div>
-                          <div className="text-xs text-slate-500 pt-2 border-t border-slate-200">
-                            You save ${((prize.value - prize.tokensRequired * 2) / 100).toLocaleString()}!
-                          </div>
-                        </div>
-
-                        {/* Terms */}
-                        {prize.terms && (
-                          <div className="text-xs text-slate-500 bg-slate-50 rounded p-2" data-testid={`prize-terms-${prize.id}`}>
-                            <strong>Terms:</strong> {prize.terms}
-                          </div>
-                        )}
-
-                        {/* Redeem Button */}
-                        <Button
-                          onClick={() => handleRedeemPrize(prize)}
-                          disabled={!canAfford || !isAvailable || redeemPrizeMutation.isPending}
-                          className={`w-full shadow-lg ${canAfford && isAvailable
-                            ? 'btn-adventure' 
-                            : 'bg-slate-300 text-white'
-                          }`}
-                          data-testid={`redeem-prize-${prize.id}`}
-                        >
-                          {redeemPrizeMutation.isPending ? (
-                            "Redeeming..."
-                          ) : !isAvailable ? (
-                            "Sold Out"
-                          ) : !canAfford ? (
-                            "Insufficient Tokens"
-                          ) : (
-                            <>
-                              <Check className="mr-2 h-4 w-4" />
-                              Redeem Prize
-                            </>
-                          )}
-                        </Button>
-                        
-                        {!canAfford && isAvailable && (
-                          <p className="text-xs text-slate-500 text-center">
-                            Need {prize.tokensRequired - (user?.tokens || 0)} more tokens
-                          </p>
-                        )}
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-
-              {/* Empty State */}
-              {filterPrizesByCategory(category).length === 0 && (
-                <div className="text-center py-16">
-                  <div className="text-5xl mb-4">🎁</div>
-                  <h3 className="text-xl font-semibold text-slate-900 mb-2">
-                    No {categoryName(category)} Available
-                  </h3>
-                  <p className="text-slate-600 mb-6">
-                    Check back soon for new {categoryName(category).toLowerCase()} in our marketplace!
-                  </p>
-                  <Link href="/dashboard">
-                    <Button className="btn-lottery shadow-lg">
-                      Complete Missions to Earn Tokens
-                    </Button>
-                  </Link>
+        {/* Token Balance */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Target className="h-5 w-5 text-purple-600" />
                 </div>
-              )}
-            </TabsContent>
-          ))}
-        </Tabs>
-
-        {/* Info Section */}
-        <div className="mt-16 bg-white rounded-xl p-8 shadow-sm">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center" data-testid="how-redemption-works-title">
-            How Prize Redemption Works
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-explore-blue rounded-full flex items-center justify-center mx-auto mb-4">
-                <Coins className="h-6 w-6 text-white" />
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Available Kairos</p>
+                  <p className="text-xl font-bold text-purple-600">{user?.kairosTokens || 0}</p>
+                </div>
               </div>
-              <h3 className="font-semibold mb-2">Earn Tokens</h3>
-              <p className="text-slate-600 text-sm">Complete missions and participate in activities to earn tokens</p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-ocean-pulse rounded-full flex items-center justify-center mx-auto mb-4">
-                <Gift className="h-6 w-6 text-white" />
+              
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-yellow-100 rounded-lg">
+                  <Coins className="h-5 w-5 text-yellow-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Viator Tokens</p>
+                  <p className="text-xl font-bold text-yellow-600">{user?.viatorTokens || "0.00"}</p>
+                </div>
               </div>
-              <h3 className="font-semibold mb-2">Choose Prize</h3>
-              <p className="text-slate-600 text-sm">Browse our marketplace and select the perfect reward for your adventure</p>
             </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-golden-luck rounded-full flex items-center justify-center mx-auto mb-4">
-                <Check className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="font-semibold mb-2">Redeem & Enjoy</h3>
-              <p className="text-slate-600 text-sm">Get your redemption code and instructions to claim your authentic prize</p>
-            </div>
+            
+            <Link href="/token-management">
+              <Button className="ml-6" data-testid="buy-more-tokens">
+                <Coins className="h-4 w-4 mr-2" />
+                Buy More Tokens
+              </Button>
+            </Link>
           </div>
         </div>
-      </div>
+
+        {/* Search and Filter */}
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Search experiences, services, and gear..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+                data-testid="search-input"
+              />
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap gap-2">
+            {["all", "experiences", "wellness", "gear", "services"].map((category) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(category)}
+                data-testid={`filter-${category}`}
+              >
+                <Filter className="h-3 w-3 mr-1" />
+                {category.charAt(0).toUpperCase() + category.slice(1)}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Marketplace Items */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredItems.map((item) => (
+            <Card key={item.id} className={`hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${getRarityColor(item.rarity)} border-2`}>
+              <CardHeader className="pb-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="text-4xl">{item.image}</div>
+                    <div>
+                      <CardTitle className="text-lg">
+                        {item.name}
+                      </CardTitle>
+                      <Badge variant="outline" className="mt-1 text-xs">
+                        {item.rarity.toUpperCase()}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+                <CardDescription className="mt-3 text-gray-700">
+                  {item.description}
+                </CardDescription>
+              </CardHeader>
+              
+              <CardContent className="space-y-4">
+                {/* Price and Availability */}
+                <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <Target className="h-4 w-4 text-purple-600" />
+                    <span className="font-bold text-purple-600 text-xl">
+                      {item.price} Kairos
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium text-gray-600">Available</div>
+                    <div className="text-sm font-bold text-green-600">{item.availability} left</div>
+                  </div>
+                </div>
+
+                {/* Purchase Button */}
+                <Button 
+                  className="w-full" 
+                  disabled={(user?.kairosTokens || 0) < item.price || item.availability === 0}
+                  data-testid={`purchase-${item.id}`}
+                >
+                  {(user?.kairosTokens || 0) < item.price ? (
+                    <>
+                      <Coins className="h-4 w-4 mr-2" />
+                      Need More Kairos
+                    </>
+                  ) : item.availability === 0 ? (
+                    "Sold Out"
+                  ) : (
+                    <>
+                      <ShoppingBag className="h-4 w-4 mr-2" />
+                      Purchase Now
+                    </>
+                  )}
+                </Button>
+
+                {/* Item Details */}
+                <div className="text-xs text-gray-500 space-y-1">
+                  <div className="flex justify-between">
+                    <span>Category:</span>
+                    <span className="font-medium capitalize">{item.category}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Rarity:</span>
+                    <span className="font-medium capitalize">{item.rarity}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* No Results */}
+        {filteredItems.length === 0 && (
+          <div className="text-center py-12">
+            <Gift className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Items Found</h3>
+            <p className="text-gray-600 mb-6">
+              Try adjusting your search or filter criteria to find amazing travel experiences.
+            </p>
+            <Button variant="outline" onClick={() => { setSearchTerm(""); setSelectedCategory("all"); }}>
+              Clear Filters
+            </Button>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
