@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Eye, Heart, MapPin, Calendar, DollarSign, Verified, Trophy, Star } from 'lucide-react';
+import { Eye, Heart, MapPin, Calendar, DollarSign, Verified, Trophy, Star, Clock } from 'lucide-react';
 
 interface MarketplaceListing {
   id: string;
@@ -23,6 +23,7 @@ interface MarketplaceListing {
   listingType: 'fixed_price' | 'auction';
   status: 'active' | 'sold' | 'cancelled' | 'expired';
   totalWatchers: number;
+  images?: string[];
   endsAt?: string;
   createdAt: string;
   updatedAt: string;
@@ -191,7 +192,33 @@ export default function MarketplacePage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredListings.map((listing) => (
-                <Card key={listing.id} className="hover:shadow-lg transition-shadow duration-200" data-testid={`card-listing-${listing.id}`}>
+                <Card key={listing.id} className="hover:shadow-lg transition-shadow duration-200 overflow-hidden" data-testid={`card-listing-${listing.id}`}>
+                  {/* Image Gallery */}
+                  {listing.images && listing.images.length > 0 && (
+                    <div className="relative h-48 bg-gray-100">
+                      <img
+                        src={listing.images[0]}
+                        alt={listing.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=600&fit=crop';
+                        }}
+                      />
+                      {listing.images.length > 1 && (
+                        <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                          +{listing.images.length - 1} more
+                        </div>
+                      )}
+                      <div className="absolute top-2 left-2">
+                        {listing.listingType === 'auction' && (
+                          <Badge className="bg-red-500 text-white border-red-600">
+                            <Clock className="h-3 w-3 mr-1" />
+                            AUCTION
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
