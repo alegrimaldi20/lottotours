@@ -54,7 +54,7 @@ const quickStartSteps = [
 
 const faqs = [
   {
-    question: '¿Qué hace único a VoyageLotto?',
+    question: '¿Qué hace único a TravelLotto?',
     answer: 'Somos la primera plataforma que combina loterías verificadas en blockchain con experiencias de viaje reales. Todos nuestros premios son experiencias auténticas, no solo tokens.'
   },
   {
@@ -121,7 +121,7 @@ export default function BeginnerGuidePage() {
             Guía Completa para Principiantes
           </h1>
           <p className="text-xl text-gray-600 mb-6 max-w-3xl mx-auto">
-            Aprende todo lo que necesitas para empezar tu aventura en VoyageLotto. 
+            Aprende todo lo que necesitas para empezar tu aventura en TravelLotto. 
             Desde conceptos básicos hasta estrategias avanzadas.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
@@ -348,7 +348,7 @@ export default function BeginnerGuidePage() {
           <CardContent className="p-8 text-center">
             <h2 className="text-3xl font-bold mb-4">¿Listo para Comenzar tu Aventura?</h2>
             <p className="text-lg mb-6 max-w-2xl mx-auto">
-              Ahora que conoces los conceptos básicos, es hora de vivir la experiencia VoyageLotto
+              Ahora que conoces los conceptos básicos, es hora de vivir la experiencia TravelLotto
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 

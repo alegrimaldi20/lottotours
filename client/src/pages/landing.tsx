@@ -25,7 +25,7 @@ export default function Landing() {
                 <div className="w-8 h-8">
                   <TravelImageRenderer type="cultural" className="w-full h-full" />
                 </div>
-                VoyageLotto
+                TravelLotto
               </div>
             </div>
             <nav className="hidden md:flex items-center space-x-8">

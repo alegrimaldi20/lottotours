@@ -1,7 +1,7 @@
-# VoyageLotto DApp - Blockchain Tourism Lottery Platform
+# TravelLotto DApp - Blockchain Tourism Lottery Platform
 
 ## Overview
-VoyageLotto is a comprehensive blockchain-based travel platform that combines verified lotteries with authentic travel experiences. The platform currently features:
+TravelLotto is a comprehensive blockchain-based travel platform that combines verified lotteries with authentic travel experiences. The platform currently features competitor-inspired design elements from Travala (continent-based exploration), LynKey (interactive guides), and Tripster (professional partner presentation). Key features include:
 
 **Travel Lottery System:** Three active travel lotteries with blockchain-verified draws (all restored and permanently active):
 - Bali Cultural Immersion (8 days) - LT2025-101 
@@ -28,7 +28,13 @@ VoyageLotto is a comprehensive blockchain-based travel platform that combines ve
 - Country-specific analytics, agency partnerships, and market penetration tracking
 - Multi-currency support and regional customization
 
-**Core Features:** Token-based economy with three-tier token pack system, mission verification system, QR code lottery verification, unique draw ID tracking, multi-language support (EN/ES/PT), comprehensive user management, complete South American expansion program with 9 countries, and robust error handling with navigation fixes for seamless user experience.
+**Core Features:** 
+- Travala-style Destination Exploration: Continent-based navigation with visual destination cards (/explore)
+- LynKey-inspired Interactive Guide System: Step-by-step tutorials with dynamic explanations (/beginner-guide) 
+- Tripster-style Partner Presentation: Professional agency logos and categorized partnerships (/partners)
+- Token-based economy with three-tier token pack system, mission verification system, QR code lottery verification
+- Unique draw ID tracking, multi-language support (EN/ES/PT), comprehensive user management
+- Complete South American expansion program with 9 countries, robust error handling with navigation fixes
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

@@ -171,7 +171,7 @@ export default function InteractiveGuide() {
       {/* Header */}
       <div className="text-center">
         <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-orange-500 to-teal-600 bg-clip-text text-transparent mb-4">
-          Guía Interactiva de VoyageLotto
+          Guía Interactiva de TravelLotto
         </h2>
         <p className="text-lg text-gray-600 mb-6">
           Aprende a usar nuestra plataforma paso a paso de manera dinámica y sencilla
@@ -343,7 +343,7 @@ export default function InteractiveGuide() {
             </div>
             <h3 className="text-2xl font-bold text-green-800 mb-2">¡Felicidades!</h3>
             <p className="text-green-700 mb-4">
-              Has completado la guía interactiva. ¡Ahora estás listo para usar VoyageLotto al máximo!
+              Has completado la guía interactiva. ¡Ahora estás listo para usar TravelLotto al máximo!
             </p>
             <Button 
               className="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600"
