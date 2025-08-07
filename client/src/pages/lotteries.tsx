@@ -15,6 +15,7 @@ import {
   Plane, Star, Target, Gift, ArrowRight, Timer, DollarSign
 } from "lucide-react";
 import MobileNavigation from "@/components/mobile-navigation";
+import NavigationDropdown from "@/components/navigation-dropdown";
 import ProfileDropdown from "@/components/profile-dropdown";
 import LanguageSelector from "@/components/language-selector";
 import { useLanguage } from "@/lib/i18n";
@@ -197,6 +198,7 @@ export default function Lotteries() {
             </nav>
 
             <div className="flex items-center space-x-4">
+              <NavigationDropdown currentPath="/lotteries" />
               <LanguageSelector />
               <ProfileDropdown />
               <MobileNavigation currentPath="/lotteries" />

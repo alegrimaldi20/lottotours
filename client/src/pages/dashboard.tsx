@@ -14,6 +14,7 @@ import {
   Target, Crown, Plane, MapPin, Calendar, TrendingUp, Zap
 } from "lucide-react";
 import MobileNavigation from "@/components/mobile-navigation";
+import NavigationDropdown from "@/components/navigation-dropdown";
 import ProfileDropdown from "@/components/profile-dropdown";
 import LanguageSelector from "@/components/language-selector";
 import { useLanguage } from "@/lib/i18n";
@@ -90,6 +91,7 @@ export default function Dashboard() {
             </nav>
 
             <div className="flex items-center space-x-4">
+              <NavigationDropdown currentPath="/dashboard" />
               <LanguageSelector />
               <ProfileDropdown />
               <MobileNavigation currentPath="/dashboard" />

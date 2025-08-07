@@ -11,6 +11,7 @@ import { Coins, ArrowRightLeft, Trophy, Star, Zap, Target } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useLanguage } from "@/lib/i18n";
 import MobileNavigation from "@/components/mobile-navigation";
+import NavigationDropdown from "@/components/navigation-dropdown";
 import ProfileDropdown from "@/components/profile-dropdown";
 import LanguageSelector from "@/components/language-selector";
 
@@ -209,6 +210,7 @@ export default function ViatorTokenManagement() {
             </nav>
 
             <div className="flex items-center space-x-4">
+              <NavigationDropdown currentPath="/token-management" />
               <LanguageSelector />
               <ProfileDropdown />
               <MobileNavigation currentPath="/token-management" />

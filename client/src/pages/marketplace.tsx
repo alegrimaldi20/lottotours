@@ -11,6 +11,7 @@ import {
   Search, Filter, Plane, MapPin, Trophy 
 } from "lucide-react";
 import MobileNavigation from "@/components/mobile-navigation";
+import NavigationDropdown from "@/components/navigation-dropdown";
 import ProfileDropdown from "@/components/profile-dropdown";
 import LanguageSelector from "@/components/language-selector";
 import { useLanguage } from "@/lib/i18n";
@@ -134,6 +135,7 @@ export default function Marketplace() {
             </nav>
 
             <div className="flex items-center space-x-4">
+              <NavigationDropdown currentPath="/marketplace" />
               <LanguageSelector />
               <ProfileDropdown />
               <MobileNavigation currentPath="/marketplace" />
