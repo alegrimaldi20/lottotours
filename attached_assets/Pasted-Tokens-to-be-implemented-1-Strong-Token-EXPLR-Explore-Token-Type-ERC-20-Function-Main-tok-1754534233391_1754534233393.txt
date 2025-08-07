@@ -1,0 +1,70 @@
+Tokens to be implemented
+1. Strong Token – $EXPLR (Explore Token)
+Type: ERC-20
+Function: Main token with real value, convertible to USD or external cryptocurrencies.
+Uses:
+• Redemption of physical rewards (travel, products, premium experiences).
+• Access to special events, VIP raffles, and governance.
+• Purchase of TokenPacks for participation tickets.
+Technical Requirements:
+• ERC-20 smart contract with transfer, balancing, and conversion functions.
+• Prepared for integration with a payment gateway or external exchange.
+• Configurable transaction fee.
+
+2. Participation Token – $TKT (Ticket Token)
+Type: ERC-20 or internal token
+Function: Exclusively for purchasing raffle participation tickets.
+Uses:
+• Activation of themed raffles.
+• Entry into missions with limited access.
+Acquisition:
+Obtained through TokenPacks, which must be defined as bundles:
+{
+"tokenpacks": [
+{ "name": "Basic Pack", "amount": 5, "price": 1 },
+{ "name": "Medium Pack", "amount": 15, "price": 2.5 },
+{ "name": "Premium Pack", "amount": 40, "price": 5 }
+]
+}
+Technical Requirements:
+• Function to issue $TKT when purchasing a TokenPack using $EXPLR.
+• Balance validation and automatic ticket delivery.
+• Log usage per raffle.
+
+3. Reward Token – $XP (Experience Points)
+Type: Non-transferable internal token
+Function: Symbolic reward for participation, completed missions, and invitations.
+Uses:
+• Unlocking achievements and chests.
+• Conversion limited to $TKT or $EXPLR.
+• Access to hidden missions or visual upgrades.
+Internal conversion (configurable ratios):
+• 100 $XP → 1 $TKT
+• 500 $XP → 0.5 $EXPLR
+Technical requirements:
+• Activity-based accumulation system.
+• Conversion with ratio validation and daily limits.
+• Record of achievements and unlocked rewards.
+
+General Economic Flow
+1. User earns $XP for participating.
+2. Can convert $XP into $TKT to enter raffles.
+3. You can convert $XP to $EXPLR to access real-world rewards.
+4. $EXPLR is used to purchase TokenPacks, access premium events, or redeem prizes.
+5. $TKT is used exclusively for raffles and themed quests.
+
+Technical Implementation Suggestions
+• Use Solidity for $EXPLR and $TKT contracts.
+• Use JavaScript/TypeScript + Web3.js or Ethers.js for front-end integration.
+• Create separate modules for:
+o TokenPack purchase logic
+o Reward tracking and XP accumulation
+o Conversion engine with adjustable ratios
+• Include a visual dashboard to display balances and available conversions.
+
+Expected Outcome
+A functional system within the DApp prototype that allows for:
+• Viewing and managing the three tokens.
+• Purchasing tickets using TokenPacks.
+• Accumulating and converting rewards.
+• Paving the way for integration with the real economy.
