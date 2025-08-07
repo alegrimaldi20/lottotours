@@ -15,10 +15,19 @@ import {
   type AffiliatePayout, type InsertAffiliatePayout, type AffiliateTrackingEvent, type InsertAffiliateTrackingEvent,
   type AffiliateLeaderboard, type InsertAffiliateLeaderboard,
   type CountryOperation, type InsertCountryOperation, type TerritoryManagement, type InsertTerritoryManagement,
+  // New token system types
+  type TokenConversion, type InsertTokenConversion,
+  type NewTokenPack, type InsertNewTokenPack,
+  type XpActivity, type InsertXpActivity,
+  type UserConversionLimit, type InsertUserConversionLimit,
+  type Achievement, type InsertAchievement,
+  type UserAchievement, type InsertUserAchievement,
   users, missions, userMissions, lotteries, lotteryTickets, lotteryDraws, missionActivities, nfts, prizes, prizeRedemptions, tokenPacks, tokenPurchases, serviceConditions, userAgreements, userFavorites,
   travelAgencies, agencyTourPackages, prizeWinners, agencyCommissions, agencyAnalytics,
   affiliatePrograms, affiliateReferrals, affiliatePayouts, affiliateTrackingEvents, affiliateLeaderboard,
-  countryOperations, territoryManagement
+  countryOperations, territoryManagement,
+  // New token system tables
+  tokenConversions, newTokenPacks, xpActivities, userConversionLimits, achievements, userAchievements
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql } from "drizzle-orm";
@@ -34,6 +43,9 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUser(userId: string, updateData: Partial<InsertUser>): Promise<User>;
   updateUserTokens(userId: string, tokens: number): Promise<User>;
+  updateUserEXPLRTokens(userId: string, explrTokens: string): Promise<User>;
+  updateUserTKTTokens(userId: string, tktTokens: number): Promise<User>;
+  updateUserXPTokens(userId: string, xpTokens: number): Promise<User>;
   incrementUserMissionsCompleted(userId: string): Promise<User>;
 
   // User Favorites
@@ -153,6 +165,36 @@ export interface IStorage {
   getTerritoryManagement(id: string): Promise<TerritoryManagement | null>;
   createTerritoryManagement(territory: InsertTerritoryManagement): Promise<TerritoryManagement>;
   updateTerritoryManagement(id: string, updates: Partial<TerritoryManagement>): Promise<TerritoryManagement>;
+
+  // New Token System
+  // Token Conversions
+  createTokenConversion(conversion: InsertTokenConversion): Promise<TokenConversion>;
+  getUserTokenConversions(userId: string): Promise<TokenConversion[]>;
+  getTokenConversionRates(): Promise<{ xpToTkt: number; xpToExplr: number }>;
+  validateConversionLimits(userId: string, conversionType: string, amount: number): Promise<boolean>;
+  
+  // New Token Packs
+  getNewTokenPacks(): Promise<NewTokenPack[]>;
+  getActiveNewTokenPacks(): Promise<NewTokenPack[]>;
+  getNewTokenPack(id: string): Promise<NewTokenPack | undefined>;
+  purchaseNewTokenPack(userId: string, packId: string, paymentMethod: 'explr' | 'usd'): Promise<{ success: boolean; error?: string }>;
+  
+  // XP Activities and Tracking
+  createXpActivity(activity: InsertXpActivity): Promise<XpActivity>;
+  getUserXpActivities(userId: string): Promise<XpActivity[]>;
+  awardXP(userId: string, activityType: string, xpAmount: number, activityId?: string, activityData?: any): Promise<XpActivity>;
+  
+  // User Conversion Limits
+  getUserConversionLimits(userId: string): Promise<UserConversionLimit[]>;
+  createUserConversionLimit(limit: InsertUserConversionLimit): Promise<UserConversionLimit>;
+  resetDailyConversionLimits(userId: string): Promise<void>;
+  
+  // Achievements System
+  getAchievements(): Promise<Achievement[]>;
+  getActiveAchievements(): Promise<Achievement[]>;
+  getUserAchievements(userId: string): Promise<UserAchievement[]>;
+  checkAndUnlockAchievements(userId: string): Promise<UserAchievement[]>;
+  claimAchievementReward(userId: string, achievementId: string): Promise<UserAchievement>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -590,6 +632,52 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({
         tokens: sql`${users.tokens} + ${tokenChange}`
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (!user) throw new Error("User not found");
+    return user;
+  }
+
+  async updateUserEXPLRTokens(userId: string, explrTokens: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ explrTokens })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (!user) throw new Error("User not found");
+    return user;
+  }
+
+  async updateUserTKTTokens(userId: string, tktTokens: number): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ tktTokens })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (!user) throw new Error("User not found");
+    return user;
+  }
+
+  async updateUserXPTokens(userId: string, xpTokens: number): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ xpTokens })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (!user) throw new Error("User not found");
+    return user;
+  }
+
+  async incrementUserMissionsCompleted(userId: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({
+        totalMissionsCompleted: sql`${users.totalMissionsCompleted} + 1`
       })
       .where(eq(users.id, userId))
       .returning();
@@ -1349,6 +1437,322 @@ export class DatabaseStorage implements IStorage {
   async getAffiliateAnalytics(agencyId: string, period: string): Promise<any> { return {}; }
   async getConversionFunnel(agencyId: string): Promise<any> { return {}; }
   async getRevenueBySource(agencyId: string, period: string): Promise<any[]> { return []; }
+
+  // New Token System Implementation
+  async createTokenConversion(conversion: InsertTokenConversion): Promise<TokenConversion> {
+    const [newConversion] = await db
+      .insert(tokenConversions)
+      .values(conversion)
+      .returning();
+    return newConversion;
+  }
+
+  async getUserTokenConversions(userId: string): Promise<TokenConversion[]> {
+    return await db
+      .select()
+      .from(tokenConversions)
+      .where(eq(tokenConversions.userId, userId))
+      .orderBy(desc(tokenConversions.createdAt));
+  }
+
+  async getTokenConversionRates(): Promise<{ xpToTkt: number; xpToExplr: number }> {
+    // Return configurable conversion rates as specified in requirements
+    return {
+      xpToTkt: 100, // 100 XP → 1 TKT
+      xpToExplr: 500 // 500 XP → 0.5 EXPLR
+    };
+  }
+
+  async validateConversionLimits(userId: string, conversionType: string, amount: number): Promise<boolean> {
+    const today = new Date();
+    const [limit] = await db
+      .select()
+      .from(userConversionLimits)
+      .where(
+        and(
+          eq(userConversionLimits.userId, userId),
+          eq(userConversionLimits.conversionType, conversionType)
+        )
+      );
+
+    if (!limit) {
+      // Create default limits if none exist
+      await this.createUserConversionLimit({
+        userId,
+        conversionType,
+        dailyLimit: conversionType === 'xp_to_tkt' ? 1000 : 100, // Default daily limits
+        currentDayUsage: 0
+      });
+      return true;
+    }
+
+    // Check if we need to reset daily usage
+    const lastReset = new Date(limit.lastResetDate!);
+    if (lastReset.toDateString() !== today.toDateString()) {
+      await db
+        .update(userConversionLimits)
+        .set({
+          currentDayUsage: 0,
+          lastResetDate: today
+        })
+        .where(eq(userConversionLimits.id, limit.id));
+      return amount <= limit.dailyLimit;
+    }
+
+    return (limit.currentDayUsage + amount) <= limit.dailyLimit;
+  }
+
+  async getNewTokenPacks(): Promise<NewTokenPack[]> {
+    return await db.select().from(newTokenPacks);
+  }
+
+  async getActiveNewTokenPacks(): Promise<NewTokenPack[]> {
+    return await db
+      .select()
+      .from(newTokenPacks)
+      .where(eq(newTokenPacks.isActive, true));
+  }
+
+  async getNewTokenPack(id: string): Promise<NewTokenPack | undefined> {
+    const [pack] = await db
+      .select()
+      .from(newTokenPacks)
+      .where(eq(newTokenPacks.id, id));
+    return pack;
+  }
+
+  async purchaseNewTokenPack(userId: string, packId: string, paymentMethod: 'explr' | 'usd'): Promise<{ success: boolean; error?: string }> {
+    try {
+      const pack = await this.getNewTokenPack(packId);
+      if (!pack) {
+        return { success: false, error: 'Token pack not found' };
+      }
+
+      const user = await this.getUser(userId);
+      if (!user) {
+        return { success: false, error: 'User not found' };
+      }
+
+      if (paymentMethod === 'explr') {
+        // Check if user has enough EXPLR tokens
+        const userExplr = parseFloat(user.explrTokens || '0');
+        const packCost = parseFloat(pack.explrCost);
+        
+        if (userExplr < packCost) {
+          return { success: false, error: 'Insufficient EXPLR tokens' };
+        }
+
+        // Deduct EXPLR and add TKT
+        await this.updateUserEXPLRTokens(userId, (userExplr - packCost).toString());
+        await this.updateUserTKTTokens(userId, (user.tktTokens || 0) + pack.tktAmount);
+      }
+
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: 'Purchase failed' };
+    }
+  }
+
+  async createXpActivity(activity: InsertXpActivity): Promise<XpActivity> {
+    const [newActivity] = await db
+      .insert(xpActivities)
+      .values(activity)
+      .returning();
+    return newActivity;
+  }
+
+  async getUserXpActivities(userId: string): Promise<XpActivity[]> {
+    return await db
+      .select()
+      .from(xpActivities)
+      .where(eq(xpActivities.userId, userId))
+      .orderBy(desc(xpActivities.createdAt));
+  }
+
+  async awardXP(userId: string, activityType: string, xpAmount: number, activityId?: string, activityData?: any): Promise<XpActivity> {
+    // Create XP activity record
+    const activity = await this.createXpActivity({
+      userId,
+      activityType,
+      activityId,
+      xpEarned: xpAmount,
+      activityData: activityData ? JSON.stringify(activityData) : undefined
+    });
+
+    // Update user's XP balance
+    const user = await this.getUser(userId);
+    if (user) {
+      await this.updateUserXPTokens(userId, (user.xpTokens || 0) + xpAmount);
+    }
+
+    return activity;
+  }
+
+  async getUserConversionLimits(userId: string): Promise<UserConversionLimit[]> {
+    return await db
+      .select()
+      .from(userConversionLimits)
+      .where(eq(userConversionLimits.userId, userId));
+  }
+
+  async createUserConversionLimit(limit: InsertUserConversionLimit): Promise<UserConversionLimit> {
+    const [newLimit] = await db
+      .insert(userConversionLimits)
+      .values(limit)
+      .returning();
+    return newLimit;
+  }
+
+  async resetDailyConversionLimits(userId: string): Promise<void> {
+    await db
+      .update(userConversionLimits)
+      .set({
+        currentDayUsage: 0,
+        lastResetDate: new Date()
+      })
+      .where(eq(userConversionLimits.userId, userId));
+  }
+
+  async getAchievements(): Promise<Achievement[]> {
+    return await db.select().from(achievements);
+  }
+
+  async getActiveAchievements(): Promise<Achievement[]> {
+    return await db
+      .select()
+      .from(achievements)
+      .where(eq(achievements.isActive, true));
+  }
+
+  async getUserAchievements(userId: string): Promise<UserAchievement[]> {
+    return await db
+      .select()
+      .from(userAchievements)
+      .where(eq(userAchievements.userId, userId));
+  }
+
+  async checkAndUnlockAchievements(userId: string): Promise<UserAchievement[]> {
+    const unlockedAchievements: UserAchievement[] = [];
+    const achievements = await this.getActiveAchievements();
+    const user = await this.getUser(userId);
+    
+    if (!user) return unlockedAchievements;
+
+    for (const achievement of achievements) {
+      const criteria = JSON.parse(achievement.criteria);
+      let isUnlocked = false;
+
+      switch (achievement.type) {
+        case 'mission_based':
+          if (criteria.missions_completed && user.totalMissionsCompleted >= criteria.missions_completed) {
+            isUnlocked = true;
+          }
+          break;
+        case 'conversion_based':
+          const conversions = await this.getUserTokenConversions(userId);
+          if (criteria.conversions_made && conversions.length >= criteria.conversions_made) {
+            isUnlocked = true;
+          }
+          break;
+        case 'participation_based':
+          const tickets = await this.getUserLotteryTickets(userId);
+          if (criteria.lottery_participations && tickets.length >= criteria.lottery_participations) {
+            isUnlocked = true;
+          }
+          break;
+      }
+
+      if (isUnlocked) {
+        // Check if user already has this achievement
+        const existingAchievement = await db
+          .select()
+          .from(userAchievements)
+          .where(
+            and(
+              eq(userAchievements.userId, userId),
+              eq(userAchievements.achievementId, achievement.id)
+            )
+          );
+
+        if (existingAchievement.length === 0) {
+          const [newUserAchievement] = await db
+            .insert(userAchievements)
+            .values({
+              userId,
+              achievementId: achievement.id,
+              progress: criteria.missions_completed || criteria.conversions_made || criteria.lottery_participations || 1,
+              maxProgress: criteria.missions_completed || criteria.conversions_made || criteria.lottery_participations || 1,
+              isUnlocked: true,
+              unlockedAt: new Date()
+            })
+            .returning();
+
+          unlockedAchievements.push(newUserAchievement);
+        }
+      }
+    }
+
+    return unlockedAchievements;
+  }
+
+  async claimAchievementReward(userId: string, achievementId: string): Promise<UserAchievement> {
+    const [userAchievement] = await db
+      .select()
+      .from(userAchievements)
+      .where(
+        and(
+          eq(userAchievements.userId, userId),
+          eq(userAchievements.achievementId, achievementId),
+          eq(userAchievements.isUnlocked, true),
+          eq(userAchievements.rewardsClaimed, false)
+        )
+      );
+
+    if (!userAchievement) {
+      throw new Error('Achievement not found or already claimed');
+    }
+
+    const achievement = await db
+      .select()
+      .from(achievements)
+      .where(eq(achievements.id, achievementId));
+
+    if (achievement.length > 0) {
+      const achv = achievement[0];
+      const user = await this.getUser(userId);
+      
+      if (user) {
+        // Award XP tokens
+        if (achv.xpReward > 0) {
+          await this.updateUserXPTokens(userId, (user.xpTokens || 0) + achv.xpReward);
+        }
+        
+        // Award TKT tokens
+        if (achv.tktReward > 0) {
+          await this.updateUserTKTTokens(userId, (user.tktTokens || 0) + achv.tktReward);
+        }
+        
+        // Award EXPLR tokens
+        if (parseFloat(achv.explrReward) > 0) {
+          const currentExplr = parseFloat(user.explrTokens || '0');
+          const newExplr = currentExplr + parseFloat(achv.explrReward);
+          await this.updateUserEXPLRTokens(userId, newExplr.toString());
+        }
+      }
+    }
+
+    // Mark rewards as claimed
+    const [updatedAchievement] = await db
+      .update(userAchievements)
+      .set({
+        rewardsClaimed: true,
+        claimedAt: new Date()
+      })
+      .where(eq(userAchievements.id, userAchievement.id))
+      .returning();
+
+    return updatedAchievement;
+  }
 }
 
 export const storage = new DatabaseStorage();

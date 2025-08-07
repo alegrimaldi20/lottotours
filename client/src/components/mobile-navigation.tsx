@@ -15,7 +15,8 @@ import {
   MapPin,
   Fingerprint,
   Globe,
-  X
+  X,
+  Coins
 } from "lucide-react";
 
 interface NavigationItem {
@@ -30,6 +31,7 @@ const navigationItems: NavigationItem[] = [
   { href: "/lotteries", labelKey: "lotteries", icon: Gamepad2 },
   { href: "/marketplace", labelKey: "marketplace", icon: ShoppingBag },
   { href: "/missions", labelKey: "missions", icon: MapPin },
+  { href: "/token-management", labelKey: "tokenManagement", icon: Coins, badge: "EXPLR" },
   { href: "/profile", labelKey: "profile", icon: User },
   { href: "/winner-dashboard", labelKey: "myPrizes", icon: Trophy },
   { href: "/affiliate-dashboard", labelKey: "affiliateProgram", icon: Users, badge: "New" },

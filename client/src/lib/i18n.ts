@@ -8,6 +8,7 @@ export interface Translations {
   lotteries: string;
   marketplace: string;
   missions: string;
+  tokenManagement: string;
   profile: string;
   myPrizes: string;
   affiliateProgram: string;
@@ -108,6 +109,7 @@ const translations: Record<Language, Translations> = {
     lotteries: 'Lotteries',
     marketplace: 'Marketplace',
     missions: 'Missions',
+    tokenManagement: 'Token Management',
     profile: 'Profile',
     myPrizes: 'My Prizes',
     affiliateProgram: 'Affiliate Program',
@@ -206,6 +208,7 @@ const translations: Record<Language, Translations> = {
     lotteries: 'Loterías',
     marketplace: 'Mercado',
     missions: 'Misiones',
+    tokenManagement: 'Gestión de Tokens',
     profile: 'Perfil',
     myPrizes: 'Mis Premios',
     affiliateProgram: 'Programa de Afiliados',
@@ -304,6 +307,7 @@ const translations: Record<Language, Translations> = {
     lotteries: 'Loterias',
     marketplace: 'Mercado',
     missions: 'Missões',
+    tokenManagement: 'Gestão de Tokens',
     profile: 'Perfil',
     myPrizes: 'Meus Prêmios',
     affiliateProgram: 'Programa de Afiliados',

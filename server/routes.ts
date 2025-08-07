@@ -5,7 +5,8 @@ import Stripe from "stripe";
 import { 
   insertUserSchema, 
   insertLotteryTicketSchema, 
-  insertPrizeRedemptionSchema 
+  insertPrizeRedemptionSchema,
+  insertTokenConversionSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -504,6 +505,179 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(territories);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch territories" });
+    }
+  });
+
+  // New Token System Routes
+
+  // Token Conversion Routes
+  app.get("/api/token/conversion-rates", async (req, res) => {
+    try {
+      const rates = await storage.getTokenConversionRates();
+      res.json(rates);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch conversion rates" });
+    }
+  });
+
+  app.post("/api/users/:userId/token-conversions", async (req, res) => {
+    try {
+      const conversionData = insertTokenConversionSchema.parse({
+        ...req.body,
+        userId: req.params.userId
+      });
+      
+      // Validate conversion limits
+      const isValid = await storage.validateConversionLimits(
+        req.params.userId,
+        conversionData.conversionType,
+        conversionData.fromAmount
+      );
+      
+      if (!isValid) {
+        return res.status(400).json({ message: "Daily conversion limit exceeded" });
+      }
+      
+      const conversion = await storage.createTokenConversion(conversionData);
+      res.status(201).json(conversion);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create token conversion" });
+    }
+  });
+
+  app.get("/api/users/:userId/token-conversions", async (req, res) => {
+    try {
+      const conversions = await storage.getUserTokenConversions(req.params.userId);
+      res.json(conversions);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch token conversions" });
+    }
+  });
+
+  // New Token Packs Routes
+  app.get("/api/token-packs/new", async (req, res) => {
+    try {
+      const packs = await storage.getActiveNewTokenPacks();
+      res.json(packs);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch token packs" });
+    }
+  });
+
+  app.post("/api/users/:userId/token-packs/:packId/purchase", async (req, res) => {
+    try {
+      const { paymentMethod } = req.body;
+      const result = await storage.purchaseNewTokenPack(
+        req.params.userId,
+        req.params.packId,
+        paymentMethod
+      );
+      
+      if (result.success) {
+        res.status(201).json({ message: "Token pack purchased successfully" });
+      } else {
+        res.status(400).json({ message: result.error });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Failed to purchase token pack" });
+    }
+  });
+
+  // XP Activities Routes
+  app.get("/api/users/:userId/xp-activities", async (req, res) => {
+    try {
+      const activities = await storage.getUserXpActivities(req.params.userId);
+      res.json(activities);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch XP activities" });
+    }
+  });
+
+  app.post("/api/users/:userId/award-xp", async (req, res) => {
+    try {
+      const { activityType, xpAmount, activityId, activityData } = req.body;
+      const activity = await storage.awardXP(
+        req.params.userId,
+        activityType,
+        xpAmount,
+        activityId,
+        activityData
+      );
+      res.status(201).json(activity);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to award XP" });
+    }
+  });
+
+  // Achievements Routes
+  app.get("/api/achievements", async (req, res) => {
+    try {
+      const achievements = await storage.getActiveAchievements();
+      res.json(achievements);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch achievements" });
+    }
+  });
+
+  app.get("/api/users/:userId/achievements", async (req, res) => {
+    try {
+      const userAchievements = await storage.getUserAchievements(req.params.userId);
+      res.json(userAchievements);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user achievements" });
+    }
+  });
+
+  app.post("/api/users/:userId/achievements/check", async (req, res) => {
+    try {
+      const unlockedAchievements = await storage.checkAndUnlockAchievements(req.params.userId);
+      res.json(unlockedAchievements);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to check achievements" });
+    }
+  });
+
+  app.post("/api/users/:userId/achievements/:achievementId/claim", async (req, res) => {
+    try {
+      const claimedAchievement = await storage.claimAchievementReward(
+        req.params.userId,
+        req.params.achievementId
+      );
+      res.json(claimedAchievement);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to claim achievement";
+      res.status(400).json({ message: errorMessage });
+    }
+  });
+
+  // User Token Balance Routes
+  app.patch("/api/users/:userId/explr-tokens", async (req, res) => {
+    try {
+      const { explrTokens } = req.body;
+      const user = await storage.updateUserEXPLRTokens(req.params.userId, explrTokens);
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update EXPLR tokens" });
+    }
+  });
+
+  app.patch("/api/users/:userId/tkt-tokens", async (req, res) => {
+    try {
+      const { tktTokens } = req.body;
+      const user = await storage.updateUserTKTTokens(req.params.userId, tktTokens);
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update TKT tokens" });
+    }
+  });
+
+  app.patch("/api/users/:userId/xp-tokens", async (req, res) => {
+    try {
+      const { xpTokens } = req.body;
+      const user = await storage.updateUserXPTokens(req.params.userId, xpTokens);
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update XP tokens" });
     }
   });
 

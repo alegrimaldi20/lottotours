@@ -9,7 +9,10 @@ export const users = pgTable("users", {
   username: text("username").notNull(),
   email: text("email"),
   avatar: text("avatar"),
-  tokens: integer("tokens").notNull().default(0),
+  tokens: integer("tokens").notNull().default(0), // Legacy tokens - will be phased out
+  explrTokens: decimal("explr_tokens", { precision: 18, scale: 8 }).notNull().default("0"), // $EXPLR - Strong Token
+  tktTokens: integer("tkt_tokens").notNull().default(0), // $TKT - Participation Token  
+  xpTokens: integer("xp_tokens").notNull().default(0), // $XP - Experience Points
   level: integer("level").notNull().default(1),
   totalMissionsCompleted: integer("total_missions_completed").notNull().default(0),
   stripeCustomerId: text("stripe_customer_id").unique(),
@@ -175,6 +178,87 @@ export const tokenPurchases = pgTable("token_purchases", {
   amountPaid: decimal("amount_paid", { precision: 10, scale: 2 }).notNull(),
   status: text("status").notNull().default("pending"), // pending, completed, failed
   purchasedAt: timestamp("purchased_at").defaultNow(),
+});
+
+// Token conversion tracking and limits
+export const tokenConversions = pgTable("token_conversions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  fromTokenType: text("from_token_type").notNull(), // xp, tkt, explr
+  toTokenType: text("to_token_type").notNull(), // xp, tkt, explr
+  fromAmount: decimal("from_amount", { precision: 18, scale: 8 }).notNull(),
+  toAmount: decimal("to_amount", { precision: 18, scale: 8 }).notNull(),
+  conversionRate: decimal("conversion_rate", { precision: 10, scale: 6 }).notNull(),
+  transactionHash: text("transaction_hash"), // For blockchain transactions
+  status: text("status").notNull().default("completed"), // pending, completed, failed
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Token Pack configuration - Updated for new three-token system
+export const newTokenPacks = pgTable("new_token_packs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  tktAmount: integer("tkt_amount").notNull(), // $TKT tokens included in pack
+  explrCost: decimal("explr_cost", { precision: 18, scale: 8 }).notNull(), // $EXPLR cost to purchase
+  usdPrice: decimal("usd_price", { precision: 10, scale: 2 }).notNull(), // USD price for direct purchase
+  packType: text("pack_type").notNull().default("basic"), // basic, medium, premium
+  isActive: boolean("is_active").notNull().default(true),
+  popularBadge: boolean("popular_badge").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// XP earning activities and achievements
+export const xpActivities = pgTable("xp_activities", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  activityType: text("activity_type").notNull(), // mission_complete, referral, daily_login, lottery_participate
+  activityId: varchar("activity_id"), // Mission ID, lottery ID, etc.
+  xpEarned: integer("xp_earned").notNull(),
+  activityData: text("activity_data"), // JSON with activity details
+  isSignificant: boolean("is_significant").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Daily conversion limits and tracking
+export const userConversionLimits = pgTable("user_conversion_limits", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  conversionType: text("conversion_type").notNull(), // xp_to_tkt, xp_to_explr
+  dailyLimit: integer("daily_limit").notNull(),
+  currentDayUsage: integer("current_day_usage").notNull().default(0),
+  lastResetDate: timestamp("last_reset_date").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Achievement unlocks and rewards
+export const achievements = pgTable("achievements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  type: text("type").notNull(), // mission_based, conversion_based, participation_based
+  criteria: text("criteria").notNull(), // JSON with unlock criteria
+  xpReward: integer("xp_reward").notNull().default(0),
+  tktReward: integer("tkt_reward").notNull().default(0),
+  explrReward: decimal("explr_reward", { precision: 18, scale: 8 }).notNull().default("0"),
+  icon: text("icon").notNull(),
+  rarity: text("rarity").notNull().default("common"), // common, rare, epic, legendary
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User achievement tracking
+export const userAchievements = pgTable("user_achievements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  achievementId: varchar("achievement_id").notNull().references(() => achievements.id),
+  progress: integer("progress").notNull().default(0),
+  maxProgress: integer("max_progress").notNull(),
+  isUnlocked: boolean("is_unlocked").notNull().default(false),
+  unlockedAt: timestamp("unlocked_at"),
+  rewardsClaimed: boolean("rewards_claimed").notNull().default(false),
+  claimedAt: timestamp("claimed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const serviceConditions = pgTable("service_conditions", {
@@ -587,6 +671,37 @@ export const insertTokenPurchaseSchema = createInsertSchema(tokenPurchases).omit
   purchasedAt: true,
 });
 
+// New token system Zod schemas
+export const insertTokenConversionSchema = createInsertSchema(tokenConversions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertNewTokenPackSchema = createInsertSchema(newTokenPacks).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertXpActivitySchema = createInsertSchema(xpActivities).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserConversionLimitSchema = createInsertSchema(userConversionLimits).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAchievementSchema = createInsertSchema(achievements).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserAchievementSchema = createInsertSchema(userAchievements).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertServiceConditionSchema = createInsertSchema(serviceConditions).omit({
   id: true,
   createdAt: true,
@@ -690,10 +805,58 @@ export const insertTerritoryManagementSchema = createInsertSchema(territoryManag
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+
 export type Mission = typeof missions.$inferSelect;
 export type InsertMission = z.infer<typeof insertMissionSchema>;
+
 export type UserMission = typeof userMissions.$inferSelect;
 export type InsertUserMission = z.infer<typeof insertUserMissionSchema>;
+
+export type Lottery = typeof lotteries.$inferSelect;
+export type InsertLottery = z.infer<typeof insertLotterySchema>;
+
+export type LotteryTicket = typeof lotteryTickets.$inferSelect;
+export type InsertLotteryTicket = z.infer<typeof insertLotteryTicketSchema>;
+
+export type Prize = typeof prizes.$inferSelect;
+export type InsertPrize = z.infer<typeof insertPrizeSchema>;
+
+export type PrizeRedemption = typeof prizeRedemptions.$inferSelect;
+export type InsertPrizeRedemption = z.infer<typeof insertPrizeRedemptionSchema>;
+
+export type TokenPack = typeof tokenPacks.$inferSelect;
+export type InsertTokenPack = z.infer<typeof insertTokenPackSchema>;
+
+export type TokenPurchase = typeof tokenPurchases.$inferSelect;
+export type InsertTokenPurchase = z.infer<typeof insertTokenPurchaseSchema>;
+
+// New token system types
+export type TokenConversion = typeof tokenConversions.$inferSelect;
+export type InsertTokenConversion = z.infer<typeof insertTokenConversionSchema>;
+
+export type NewTokenPack = typeof newTokenPacks.$inferSelect;
+export type InsertNewTokenPack = z.infer<typeof insertNewTokenPackSchema>;
+
+export type XpActivity = typeof xpActivities.$inferSelect;
+export type InsertXpActivity = z.infer<typeof insertXpActivitySchema>;
+
+export type UserConversionLimit = typeof userConversionLimits.$inferSelect;
+export type InsertUserConversionLimit = z.infer<typeof insertUserConversionLimitSchema>;
+
+export type Achievement = typeof achievements.$inferSelect;
+export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
+
+export type UserAchievement = typeof userAchievements.$inferSelect;
+export type InsertUserAchievement = z.infer<typeof insertUserAchievementSchema>;
+
+export type TravelAgency = typeof travelAgencies.$inferSelect;
+export type InsertTravelAgency = z.infer<typeof insertTravelAgencySchema>;
+
+export type ServiceCondition = typeof serviceConditions.$inferSelect;
+export type InsertServiceCondition = z.infer<typeof insertServiceConditionSchema>;
+
+export type UserFavorite = typeof userFavorites.$inferSelect;
+export type InsertUserFavorite = z.infer<typeof insertUserFavoriteSchema>;
 
 export const insertLotteryDrawSchema = createInsertSchema(lotteryDraws).omit({
   id: true,
@@ -710,51 +873,48 @@ export const insertMissionActivitySchema = createInsertSchema(missionActivities)
 export type MissionActivity = typeof missionActivities.$inferSelect;
 export type InsertMissionActivity = z.infer<typeof insertMissionActivitySchema>;
 export type MissionVerification = z.infer<typeof missionVerificationSchema>;
-export type Lottery = typeof lotteries.$inferSelect;
-export type InsertLottery = z.infer<typeof insertLotterySchema>;
-export type LotteryTicket = typeof lotteryTickets.$inferSelect;
-export type InsertLotteryTicket = z.infer<typeof insertLotteryTicketSchema>;
+
 export type NFT = typeof nfts.$inferSelect;
 export type InsertNFT = z.infer<typeof insertNftSchema>;
-export type Prize = typeof prizes.$inferSelect;
-export type InsertPrize = z.infer<typeof insertPrizeSchema>;
-export type PrizeRedemption = typeof prizeRedemptions.$inferSelect;
-export type InsertPrizeRedemption = z.infer<typeof insertPrizeRedemptionSchema>;
-export type TokenPack = typeof tokenPacks.$inferSelect;
-export type InsertTokenPack = z.infer<typeof insertTokenPackSchema>;
-export type TokenPurchase = typeof tokenPurchases.$inferSelect;
-export type InsertTokenPurchase = z.infer<typeof insertTokenPurchaseSchema>;
-export type ServiceCondition = typeof serviceConditions.$inferSelect;
-export type InsertServiceCondition = z.infer<typeof insertServiceConditionSchema>;
+
 export type UserAgreement = typeof userAgreements.$inferSelect;
 export type InsertUserAgreement = z.infer<typeof insertUserAgreementSchema>;
+
 export type Service = typeof services.$inferSelect;
 export type InsertService = z.infer<typeof insertServiceSchema>;
+
 export type Review = typeof reviews.$inferSelect;
 export type InsertReview = z.infer<typeof insertReviewSchema>;
-export type TravelAgency = typeof travelAgencies.$inferSelect;
-export type InsertTravelAgency = z.infer<typeof insertTravelAgencySchema>;
+
 export type AgencyTourPackage = typeof agencyTourPackages.$inferSelect;
 export type InsertAgencyTourPackage = z.infer<typeof insertAgencyTourPackageSchema>;
+
 export type PrizeWinner = typeof prizeWinners.$inferSelect;
 export type InsertPrizeWinner = z.infer<typeof insertPrizeWinnerSchema>;
+
 export type AgencyCommission = typeof agencyCommissions.$inferSelect;
 export type InsertAgencyCommission = z.infer<typeof insertAgencyCommissionSchema>;
+
 export type AgencyAnalytics = typeof agencyAnalytics.$inferSelect;
 export type InsertAgencyAnalytics = z.infer<typeof insertAgencyAnalyticsSchema>;
+
 export type AffiliateProgram = typeof affiliatePrograms.$inferSelect;
 export type InsertAffiliateProgram = z.infer<typeof insertAffiliateProgramSchema>;
+
 export type AffiliateReferral = typeof affiliateReferrals.$inferSelect;
 export type InsertAffiliateReferral = z.infer<typeof insertAffiliateReferralSchema>;
+
 export type AffiliatePayout = typeof affiliatePayouts.$inferSelect;
 export type InsertAffiliatePayout = z.infer<typeof insertAffiliatePayoutSchema>;
+
 export type AffiliateTrackingEvent = typeof affiliateTrackingEvents.$inferSelect;
 export type InsertAffiliateTrackingEvent = z.infer<typeof insertAffiliateTrackingEventSchema>;
+
 export type AffiliateLeaderboard = typeof affiliateLeaderboard.$inferSelect;
 export type InsertAffiliateLeaderboard = z.infer<typeof insertAffiliateLeaderboardSchema>;
-export type UserFavorite = typeof userFavorites.$inferSelect;
-export type InsertUserFavorite = z.infer<typeof insertUserFavoriteSchema>;
+
 export type CountryOperation = typeof countryOperations.$inferSelect;
 export type InsertCountryOperation = z.infer<typeof insertCountryOperationSchema>;
+
 export type TerritoryManagement = typeof territoryManagement.$inferSelect;
 export type InsertTerritoryManagement = z.infer<typeof insertTerritoryManagementSchema>;
