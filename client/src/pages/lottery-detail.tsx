@@ -141,6 +141,17 @@ export default function LotteryDetail() {
   const daysUntilDraw = Math.ceil((new Date(lottery.drawDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
   const ticketsRemaining = lottery.maxTickets - lottery.soldTickets;
 
+  const formatPrizeValue = (value: number) => {
+    // Ensure maximum 5 digits with appropriate formatting
+    if (value >= 100000) {
+      return `$${Math.floor(value / 1000)}K USD`;
+    } else if (value >= 10000) {
+      return `$${(value / 1000).toFixed(0)}K USD`;
+    } else {
+      return `$${value.toLocaleString()} USD`;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
       {/* Header */}
@@ -189,7 +200,7 @@ export default function LotteryDetail() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center p-4 bg-gradient-to-br from-lottery-gold/10 to-adventure-orange/10 rounded-lg">
                   <Trophy className="h-6 w-6 mx-auto mb-2 text-lottery-gold" />
-                  <div className="text-xl font-bold text-slate-900">${(lottery.prizeValue / 100).toLocaleString()}</div>
+                  <div className="text-xl font-bold text-slate-900">{formatPrizeValue(lottery.prizeValue)}</div>
                   <div className="text-sm text-slate-600">Prize Value</div>
                 </div>
                 <div className="text-center p-4 bg-gradient-to-br from-travel-coral/10 to-lottery-purple/10 rounded-lg">

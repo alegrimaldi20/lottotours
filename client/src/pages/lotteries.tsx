@@ -115,6 +115,17 @@ export default function Lotteries() {
     return `${minutes}m remaining`;
   };
 
+  const formatPrizeValue = (value: number) => {
+    // Ensure maximum 5 digits with appropriate formatting
+    if (value >= 100000) {
+      return `$${Math.floor(value / 1000)}K USD`;
+    } else if (value >= 10000) {
+      return `$${(value / 1000).toFixed(0)}K USD`;
+    } else {
+      return `$${value.toLocaleString()} USD`;
+    }
+  };
+
   const getLotteryTheme = (lotteryId: string) => {
     if (lotteryId.includes('bali')) return {
       bg: 'from-orange-50 to-red-50',
@@ -312,7 +323,7 @@ export default function Lotteries() {
                         <span className="font-medium">Prize Value</span>
                       </div>
                       <span className="text-2xl font-bold text-green-600">
-                        ${lottery.prizeValue.toLocaleString()}
+                        {formatPrizeValue(lottery.prizeValue)}
                       </span>
                     </div>
 
@@ -410,7 +421,7 @@ export default function Lotteries() {
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span>Prize Value:</span>
-                          <span className="font-semibold">${lottery.prizeValue.toLocaleString()}</span>
+                          <span className="font-semibold">{formatPrizeValue(lottery.prizeValue)}</span>
                         </div>
                         <div className="flex justify-between">
                           <span>Draw Date:</span>
