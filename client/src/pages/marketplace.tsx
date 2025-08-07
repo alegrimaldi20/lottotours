@@ -52,6 +52,18 @@ export default function MarketplacePage() {
 
   const { data: listings = [], isLoading, error } = useQuery<MarketplaceListing[]>({
     queryKey: ['/api/marketplace/listings', selectedCategory],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (selectedCategory && selectedCategory !== 'all') {
+        params.append('category', selectedCategory);
+      }
+      const url = `/api/marketplace/listings${params.toString() ? '?' + params.toString() : ''}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch marketplace listings');
+      }
+      return response.json();
+    },
     retry: false,
   });
 
