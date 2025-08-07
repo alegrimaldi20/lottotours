@@ -116,13 +116,13 @@ export default function Lotteries() {
   };
 
   const formatPrizeValue = (value: number) => {
-    // Ensure maximum 5 digits with appropriate formatting
+    // Format as $USD with maximum 5 digits
     if (value >= 100000) {
-      return `$${Math.floor(value / 1000)}K USD`;
-    } else if (value >= 10000) {
-      return `$${(value / 1000).toFixed(0)}K USD`;
+      // Values 100K+ shown as whole thousands (e.g., $USD 125)
+      return `$USD ${Math.floor(value / 1000)}`;
     } else {
-      return `$${value.toLocaleString()} USD`;
+      // Values under 100K shown with commas (e.g., $USD 1,250)
+      return `$USD ${value.toLocaleString()}`;
     }
   };
 
