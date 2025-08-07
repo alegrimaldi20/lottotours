@@ -325,23 +325,103 @@ export default function Marketplace() {
               </Button>
             </CardContent>
           </Card>
-          {filteredItems.map((item) => (
-            <Card key={item.id} className={`hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${getRarityColor(item.rarity)} border-2`}>
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="text-4xl">{item.image}</div>
-                    <div>
-                      <CardTitle className="text-lg">
-                        {item.name}
-                      </CardTitle>
-                      <Badge variant="outline" className="mt-1 text-xs">
-                        {item.rarity.toUpperCase()}
-                      </Badge>
-                    </div>
-                  </div>
+        </div>
+
+        {/* Featured Travel Packages */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Featured Travel Packages</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Paris Getaway Package */}
+            <Card className="hover:shadow-lg transition-shadow overflow-hidden">
+              <div className="relative h-64">
+                <TravelImageRenderer 
+                  type="paris"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <Badge className="absolute top-4 right-4 bg-golden-luck text-white">
+                  Premium
+                </Badge>
+                <div className="absolute bottom-4 left-4 text-white">
+                  <h3 className="text-xl font-bold">Paris City Break</h3>
+                  <p className="text-sm">3 Days • Eiffel Tower • Seine River</p>
                 </div>
-                <CardDescription className="mt-3 text-gray-700">
+              </div>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Paris Romance Package</span>
+                  <span className="text-golden-luck">500 Kairos</span>
+                </CardTitle>
+                <CardDescription>
+                  Experience the City of Light with guided tours, luxury accommodation, and authentic French dining
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <Button className="w-full" data-testid="buy-paris-package">
+                  <Plane className="h-4 w-4 mr-2" />
+                  Book Paris Experience
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Tokyo Adventure Package */}
+            <Card className="hover:shadow-lg transition-shadow overflow-hidden">
+              <div className="relative h-64">
+                <TravelImageRenderer 
+                  type="tokyo"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <Badge className="absolute top-4 right-4 bg-explore-blue text-white">
+                  Adventure
+                </Badge>
+                <div className="absolute bottom-4 left-4 text-white">
+                  <h3 className="text-xl font-bold">Tokyo Discovery</h3>
+                  <p className="text-sm">5 Days • Mount Fuji • Traditional Culture</p>
+                </div>
+              </div>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Tokyo Cultural Journey</span>
+                  <span className="text-explore-blue">650 Kairos</span>
+                </CardTitle>
+                <CardDescription>
+                  Immerse yourself in Japanese culture with temple visits, traditional cuisine, and modern city exploration
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <Button className="w-full" data-testid="buy-tokyo-package">
+                  <MapPin className="h-4 w-4 mr-2" />
+                  Book Tokyo Adventure
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Dynamic Marketplace Items */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Marketplace Items</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredItems.map((item) => (
+            <Card key={item.id} className={`hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${getRarityColor(item.rarity)} border-2 overflow-hidden`}>
+              <div className="relative h-48">
+                <TravelImageRenderer 
+                  type="marketplace" 
+                  theme={item.category}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <Badge className={`absolute top-4 right-4 ${item.rarity === "rare" ? "bg-red-500" : item.rarity === "uncommon" ? "bg-blue-500" : "bg-gray-500"} text-white`}>
+                  {item.rarity.toUpperCase()}
+                </Badge>
+                <div className="absolute bottom-4 left-4 text-white">
+                  <h3 className="text-lg font-bold">{item.name}</h3>
+                  <p className="text-sm opacity-90 capitalize">{item.category}</p>
+                </div>
+              </div>
+              <CardHeader className="pb-4">
+                <CardDescription className="mt-2 text-gray-700">
                   {item.description}
                 </CardDescription>
               </CardHeader>
@@ -396,6 +476,7 @@ export default function Marketplace() {
               </CardContent>
             </Card>
           ))}
+          </div>
         </div>
 
         {/* No Results */}
