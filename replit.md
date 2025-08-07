@@ -1,7 +1,7 @@
-# TravelLotto DApp - Blockchain Tourism Lottery Platform
+# VoyageLotto DApp - Blockchain Tourism Lottery Platform
 
 ## Overview
-TravelLotto is a comprehensive blockchain-based travel platform that combines verified lotteries with authentic travel experiences. The platform currently features:
+VoyageLotto is a comprehensive blockchain-based travel platform that combines verified lotteries with authentic travel experiences. The platform currently features:
 
 **Travel Lottery System:** Three active travel lotteries with blockchain-verified draws (all restored and permanently active):
 - Bali Cultural Immersion (8 days) - LT2025-101 

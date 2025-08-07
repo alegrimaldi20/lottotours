@@ -63,8 +63,8 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/">
-              <div className="text-xl sm:text-2xl font-bold gradient-travel bg-clip-text text-transparent" data-testid="logo">
-                ✈️ TravelLotto
+              <div className="text-xl sm:text-2xl font-bold text-explore-blue" data-testid="logo">
+                ✈️ VoyageLotto
               </div>
             </Link>
             

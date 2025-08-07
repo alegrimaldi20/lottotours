@@ -21,24 +21,24 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <div className="text-2xl font-bold text-gradient-gold flex items-center gap-2" data-testid="logo">
+              <div className="text-2xl font-bold text-explore-blue flex items-center gap-2" data-testid="logo">
                 <div className="w-8 h-8">
                   <TravelImageRenderer type="cultural" className="w-full h-full" />
                 </div>
-                TravelLotto
+                VoyageLotto
               </div>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
               <button 
                 onClick={() => scrollToSection('features')}
-                className="text-slate-600 hover:text-lottery-gold transition-colors"
+                className="text-muted-foreground hover:text-golden-luck transition-colors"
                 data-testid="nav-features"
               >
                 Features
               </button>
               <button 
                 onClick={() => scrollToSection('how-it-works')}
-                className="text-slate-600 hover:text-lottery-gold transition-colors"
+                className="text-muted-foreground hover:text-golden-luck transition-colors"
                 data-testid="nav-how-it-works"
               >
                 How It Works
@@ -63,11 +63,11 @@ export default function Landing() {
       <section className="relative py-20 lg:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-6" data-testid="hero-title">
+            <h1 className="text-4xl md:text-6xl font-bold text-explore-blue mb-6" data-testid="hero-title">
               Turn Your Dreams Into
-              <span className="text-gradient-gold"> Adventures</span>
+              <span className="text-golden-luck"> Adventures</span>
             </h1>
-            <p className="text-xl md:text-2xl text-slate-600 mb-8 max-w-3xl mx-auto" data-testid="hero-subtitle">
+            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto" data-testid="hero-subtitle">
               Complete missions, win lotteries, and earn tokens to unlock real travel experiences. 
               Your next adventure starts with a single click!
             </p>
@@ -98,20 +98,20 @@ export default function Landing() {
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 bg-white rounded-2xl p-8 shadow-lg max-w-4xl mx-auto">
               <div className="text-center" data-testid="stat-adventures">
-                <div className="text-3xl font-bold text-gradient-gold">1000+</div>
-                <div className="text-slate-600">Adventures Won</div>
+                <div className="text-3xl font-bold text-golden-luck">1000+</div>
+                <div className="text-muted-foreground">Adventures Won</div>
               </div>
               <div className="text-center" data-testid="stat-destinations">
-                <div className="text-3xl font-bold text-gradient-adventure">50+</div>
-                <div className="text-slate-600">Destinations</div>
+                <div className="text-3xl font-bold text-ocean-pulse">50+</div>
+                <div className="text-muted-foreground">Destinations</div>
               </div>
               <div className="text-center" data-testid="stat-users">
-                <div className="text-3xl font-bold text-gradient-lottery">25K+</div>
-                <div className="text-slate-600">Active Explorers</div>
+                <div className="text-3xl font-bold text-travel-mint">25K+</div>
+                <div className="text-muted-foreground">Active Explorers</div>
               </div>
               <div className="text-center" data-testid="stat-prizes">
-                <div className="text-3xl font-bold text-gradient-gold">$2M+ USD</div>
-                <div className="text-slate-600">Prizes Given</div>
+                <div className="text-3xl font-bold text-explore-blue">$2M+ USD</div>
+                <div className="text-muted-foreground">Prizes Given</div>
               </div>
             </div>
           </div>
@@ -123,7 +123,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" data-testid="destinations-title">
-              Authentic Travel <span className="text-gradient-gold">Destinations</span>
+              Authentic Travel <span className="text-golden-luck">Destinations</span>
             </h2>
             <p className="text-xl text-slate-300 max-w-2xl mx-auto" data-testid="destinations-subtitle">
               Real places, real experiences, real adventures waiting for you
