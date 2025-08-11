@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
+import { useLocaleSafeToast } from '@/hooks/use-locale-safe-toast';
 import type { User } from '@shared/schema';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -52,7 +52,7 @@ interface SellerProfile {
 }
 
 export default function MarketplacePage() {
-  const { toast } = useToast();
+  const { toast } = useLocaleSafeToast();
   const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -133,14 +133,14 @@ export default function MarketplacePage() {
   };
 
   const formatKairosPrice = (price: number) => {
-    // Convert USD price to Kairos tokens (1 USD = 10 Kairos tokens approximately)
-    const kairosPrice = Math.ceil((price / 100) * 10);
+    // Price is already in centavos, convert directly to Kairos tokens
+    const kairosPrice = Math.ceil(price / 100);
     return `${kairosPrice} Kairos`;
   };
 
   const handlePurchase = (listing: MarketplaceListing) => {
     console.log('Purchase button clicked for listing:', listing.id);
-    const kairosPrice = Math.ceil((listing.currentPrice / 100) * 10);
+    const kairosPrice = Math.ceil(listing.currentPrice / 100);
     console.log('Calculated Kairos price:', kairosPrice);
     console.log('User tokens:', user?.kairosTokens);
     
