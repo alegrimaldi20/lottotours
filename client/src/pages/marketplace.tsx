@@ -58,7 +58,7 @@ export default function MarketplacePage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
-  const [purchasingId, setPurchasingId] = useState<string | null>(null);
+  const [loadingButtons, setLoadingButtons] = useState<Set<string>>(new Set());
 
   // Fetch user data for token balance
   const { data: user } = useQuery<User>({
@@ -108,31 +108,43 @@ export default function MarketplacePage() {
     return `${kairosPrice} Kairos`;
   };
 
-  const handlePurchase = async (listing: MarketplaceListing) => {
+  const addLoadingButton = (id: string) => {
+    setLoadingButtons(prev => new Set(Array.from(prev).concat(id)));
+  };
+
+  const removeLoadingButton = (id: string) => {
+    setLoadingButtons(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(id);
+      return newSet;
+    });
+  };
+
+  const handlePurchase = (listing: MarketplaceListing) => {
     const kairosPrice = Math.ceil(listing.currentPrice / 100);
     
     if (!user || (user.kairosTokens || 0) < kairosPrice) {
       toast({
         title: "Error",
-        description: !user ? "Login requerido" : "Tokens insuficientes",
+        description: !user ? "Login requerido" : "Tokens insuficientes", 
         variant: "destructive",
       });
       return;
     }
 
-    // Set loading state
-    setPurchasingId(listing.id);
-    
-    try {
-      const response = await fetch(`/api/marketplace/listings/${listing.id}/purchase`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          userId: 'sample-user',
-          purchasePrice: kairosPrice,
-          paymentMethod: 'kairos_tokens'
-        })
-      });
+    addLoadingButton(listing.id);
+
+    fetch(`/api/marketplace/listings/${listing.id}/purchase`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        userId: 'sample-user',
+        purchasePrice: kairosPrice,
+        paymentMethod: 'kairos_tokens'
+      })
+    })
+    .then(response => {
+      removeLoadingButton(listing.id);
       
       if (response.ok) {
         toast({
@@ -144,23 +156,31 @@ export default function MarketplacePage() {
         queryClient.invalidateQueries({ queryKey: ['/api/marketplace/listings'] });
         queryClient.invalidateQueries({ queryKey: ["/api/users/sample-user"] });
       } else {
-        const errorData = await response.json().catch(() => ({}));
-        toast({
-          title: "Error en Compra",
-          description: errorData.message || "Error al procesar compra",
-          variant: "destructive",
-        });
+        response.json()
+          .then(errorData => {
+            toast({
+              title: "Error en Compra", 
+              description: errorData.message || "Error al procesar compra",
+              variant: "destructive",
+            });
+          })
+          .catch(() => {
+            toast({
+              title: "Error",
+              description: "Error al procesar compra",
+              variant: "destructive",
+            });
+          });
       }
-    } catch (error) {
+    })
+    .catch(error => {
+      removeLoadingButton(listing.id);
       toast({
         title: "Error",
         description: "Error de conexión",
         variant: "destructive",
       });
-    }
-    
-    // Always clear loading state
-    setPurchasingId(null);
+    });
   };
 
   const getCategoryIcon = (category: string) => {
@@ -469,9 +489,9 @@ export default function MarketplacePage() {
                             className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700" 
                             data-testid={`button-buy-${listing.id}`}
                             onClick={() => handlePurchase(listing)}
-                            disabled={purchasingId === listing.id}
+                            disabled={loadingButtons.has(listing.id)}
                           >
-                            {purchasingId === listing.id ? (
+                            {loadingButtons.has(listing.id) ? (
                               <div className="flex items-center gap-2">
                                 <div className="animate-spin h-4 w-4 border-2 border-current rounded-full border-t-transparent"></div>
                                 Comprando...
