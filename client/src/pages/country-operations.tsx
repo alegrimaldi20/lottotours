@@ -332,13 +332,15 @@ export default function CountryOperations() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <button 
-                onClick={() => handleNavigation('/dashboard')}
-                className="text-slate-600 hover:text-blue-600 transition-colors mr-4 bg-transparent border-none cursor-pointer" 
+              <Button 
+                variant="ghost"
+                size="sm"
+                onClick={() => setLocation('/dashboard')}
+                className="text-slate-600 hover:text-blue-600 transition-colors mr-4" 
                 data-testid="nav-dashboard"
               >
                 ← Dashboard
-              </button>
+              </Button>
               <div className="flex items-center gap-3">
                 <Globe className="h-8 w-8 text-blue-600" />
                 <h1 className="text-2xl font-bold text-slate-900">Global Operations</h1>

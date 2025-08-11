@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Eye, Heart, MapPin, Calendar, DollarSign, Verified, Trophy, Star, Clock, Plus, Coins } from 'lucide-react';
-import { Link } from 'wouter';
+import { Eye, Heart, MapPin, Calendar, DollarSign, Verified, Trophy, Star, Clock, Plus, Coins, ArrowLeft } from 'lucide-react';
+import { Link, useLocation } from 'wouter';
 import { KairosTokenBalance } from "@/components/KairosTokenBalance";
 import { InlineToaster } from "@/components/inline-toast";
 
@@ -53,6 +53,7 @@ interface SellerProfile {
 }
 
 export default function MarketplacePage() {
+  const [, setLocation] = useLocation();
   const { toast, toasts, removeToast } = useLocaleSafeToast();
   const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -198,9 +199,21 @@ export default function MarketplacePage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="mb-6 flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">VoyageLotto Marketplace</h1>
-          <p className="text-gray-600">Discover authentic travel experiences and platform-verified collectibles</p>
+        <div className="flex items-start gap-4">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setLocation('/dashboard')}
+            className="mt-1"
+            data-testid="button-back-dashboard"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Dashboard
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">VoyageLotto Marketplace</h1>
+            <p className="text-gray-600">Discover authentic travel experiences and platform-verified collectibles</p>
+          </div>
         </div>
         <Link href="/sell">
           <Button className="bg-green-600 hover:bg-green-700 text-white" data-testid="button-sell-now">
