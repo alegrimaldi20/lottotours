@@ -15,6 +15,15 @@ import { KairosTokenBalance } from "@/components/KairosTokenBalance";
 import { InlineToaster } from "@/components/inline-toast";
 import { useLanguage } from '@/lib/i18n';
 
+// Import generated images
+import luxuryVilla from '@assets/generated_images/Luxury_vacation_rental_villa_6d9b8368.png';
+import adventureGear from '@assets/generated_images/Adventure_travel_gear_set_e978c561.png';
+import europeanCity from '@assets/generated_images/European_city_travel_experience_08adb5dc.png';
+import culturalExperience from '@assets/generated_images/Cultural_immersion_experience_23b3f64e.png';
+import tropicalBeach from '@assets/generated_images/Tropical_beach_resort_experience_eaee2f31.png';
+import safariAdventure from '@assets/generated_images/Wildlife_safari_adventure_d6ece08d.png';
+import mountainAdventure from '@assets/generated_images/Mountain_adventure_experience_5b656ace.png';
+
 interface MarketplaceListing {
   id: string;
   sellerId: string;
@@ -175,6 +184,58 @@ export default function MarketplacePage() {
       case 'digital_collectibles': return <Trophy className="h-4 w-4" />;
       case 'token_vouchers': return <DollarSign className="h-4 w-4" />;
       default: return <Star className="h-4 w-4" />;
+    }
+  };
+
+  const getListingImage = (listing: MarketplaceListing) => {
+    // If listing has images, use the first one
+    if (listing.images && listing.images.length > 0) {
+      return listing.images[0];
+    }
+    
+    // Map categories and titles to appropriate generated images
+    const title = listing.title.toLowerCase();
+    const category = listing.category.toLowerCase();
+    const description = listing.description.toLowerCase();
+    
+    // Travel experiences mapping
+    if (category.includes('travel') || title.includes('experience')) {
+      if (title.includes('luxury') || title.includes('villa') || title.includes('vip')) {
+        return luxuryVilla;
+      } else if (title.includes('europe') || title.includes('city') || description.includes('european')) {
+        return europeanCity;
+      } else if (title.includes('beach') || title.includes('tropical') || description.includes('beach')) {
+        return tropicalBeach;
+      } else if (title.includes('safari') || title.includes('wildlife') || description.includes('safari')) {
+        return safariAdventure;
+      } else if (title.includes('mountain') || title.includes('adventure') || description.includes('mountain')) {
+        return mountainAdventure;
+      } else if (title.includes('cultural') || title.includes('culture') || description.includes('cultural')) {
+        return culturalExperience;
+      } else {
+        return tropicalBeach; // Default for travel experiences
+      }
+    }
+    
+    // Adventure gear and products
+    if (title.includes('gear') || title.includes('equipment') || category.includes('product')) {
+      return adventureGear;
+    }
+    
+    // Digital collectibles
+    if (category.includes('digital') || category.includes('collectible')) {
+      return culturalExperience; // Use cultural experience for digital items
+    }
+    
+    // Default fallback based on listing content
+    if (description.includes('luxury') || description.includes('premium')) {
+      return luxuryVilla;
+    } else if (description.includes('adventure') || description.includes('gear')) {
+      return adventureGear;
+    } else if (description.includes('europe') || description.includes('city')) {
+      return europeanCity;
+    } else {
+      return tropicalBeach; // Final fallback
     }
   };
 
@@ -366,47 +427,32 @@ export default function MarketplacePage() {
               {filteredListings.map((listing) => (
                 <Card key={listing.id} className="hover:shadow-lg transition-shadow duration-200 overflow-hidden" data-testid={`card-listing-${listing.id}`}>
                   {/* Image Gallery */}
-                  <div className="relative h-48 bg-gradient-to-br from-blue-50 to-purple-50">
-                    {listing.images && listing.images.length > 0 ? (
-                      <>
-                        <img
-                          src={listing.images[0]}
-                          alt={listing.title}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            const target = e.currentTarget;
-                            // Fallback sequence of images
-                            if (target.src.includes('unsplash.com/photo-1488646953014-85cb44e25828')) {
-                              target.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop';
-                            } else if (target.src.includes('unsplash.com/photo-1506905925346-21bda4d32df4')) {
-                              target.src = 'https://images.unsplash.com/photo-1539635278303-d4002c07eae3?w=800&h=600&fit=crop';
-                            } else {
-                              target.style.display = 'none';
-                              const placeholder = target.nextElementSibling as HTMLElement;
-                              if (placeholder) placeholder.style.display = 'flex';
-                            }
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center" style={{ display: 'none' }}>
-                          <div className="text-center text-slate-600">
-                            <MapPin className="h-8 w-8 mx-auto mb-2" />
-                            <p className="text-sm font-medium">{listing.category.replace('_', ' ')}</p>
-                          </div>
-                        </div>
-                        {listing.images.length > 1 && (
-                          <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-                            +{listing.images.length - 1} más
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <div className="text-center text-slate-600">
-                          <MapPin className="h-8 w-8 mx-auto mb-2" />
-                          <p className="text-sm font-medium">{listing.category.replace('_', ' ')}</p>
-                        </div>
+                  <div className="relative h-48 bg-gradient-to-br from-blue-50 to-purple-50 overflow-hidden">
+                    <img
+                      src={getListingImage(listing)}
+                      alt={listing.title}
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        // If generated image fails, show category placeholder
+                        target.style.display = 'none';
+                        const placeholder = target.nextElementSibling as HTMLElement;
+                        if (placeholder) placeholder.style.display = 'flex';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center" style={{ display: 'none' }}>
+                      <div className="text-center text-slate-600">
+                        <MapPin className="h-8 w-8 mx-auto mb-2" />
+                        <p className="text-sm font-medium">{listing.category.replace('_', ' ')}</p>
+                      </div>
+                    </div>
+                    {listing.images && listing.images.length > 1 && (
+                      <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                        +{listing.images.length - 1} más
                       </div>
                     )}
+                    {/* Overlay gradient for better text readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
                     <div className="absolute top-2 left-2">
                       {listing.listingType === 'auction' && (
                         <Badge className="bg-red-500 text-white border-red-600">
