@@ -115,10 +115,12 @@ export default function MarketplacePage() {
   });
 
   const filteredListings = listings.filter((listing) => {
+    // Only show active listings (not sold)
+    const isActive = listing.status === 'active';
     const matchesCategory = selectedCategory === 'all' || listing.category === selectedCategory;
     const matchesSearch = listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          listing.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return isActive && matchesCategory && matchesSearch;
   });
 
   const formatPrice = (price: number) => {
