@@ -82,66 +82,7 @@ export default function MarketplacePage() {
     retry: false,
   });
 
-  // Purchase mutation
-  const purchaseMutation = useMutation({
-    mutationFn: async ({ listingId, price }: { listingId: string; price: number }) => {
-      console.log('Purchase mutation starting...', { listingId, price });
-      try {
-        const response = await fetch(`/api/marketplace/listings/${listingId}/purchase`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            userId: 'sample-user',
-            purchasePrice: price,
-            paymentMethod: 'kairos_tokens'
-          })
-        });
-        
-        console.log('Response received:', response.status, response.ok);
-        
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ message: 'Purchase failed' }));
-          console.log('Error data:', errorData);
-          throw new Error(errorData.message || 'Purchase failed');
-        }
-        
-        const result = await response.json();
-        console.log('Purchase result:', result);
-        return result;
-      } catch (error) {
-        console.error('Purchase mutation error:', error);
-        throw error;
-      }
-    },
-    onSuccess: (data) => {
-      console.log('🎉 SUCCESS! Purchase onSuccess called with data:', data);
-      setPurchasingId(null);
-      // Force toast immediately
-      const successToast = {
-        title: "¡Compra Exitosa!",
-        description: "Artículo comprado exitosamente con tokens Kairos",
-        variant: "default" as const,
-      };
-      console.log('About to show toast:', successToast);
-      toast(successToast);
-      
-      // Invalidate queries
-      queryClient.invalidateQueries({ queryKey: ['/api/marketplace/listings'] });
-      queryClient.invalidateQueries({ queryKey: ["/api/users/sample-user"] });
-      console.log('Queries invalidated');
-    },
-    onError: (error: any) => {
-      console.log('Purchase onError called with error:', error);
-      setPurchasingId(null);
-      toast({
-        title: "Error en Compra",
-        description: error.message || "No se pudo completar la compra",
-        variant: "destructive",
-      });
-    },
-  });
+
 
   const filteredListings = listings.filter((listing) => {
     // Only show active listings (not sold)
@@ -173,14 +114,6 @@ export default function MarketplacePage() {
     console.log('Calculated Kairos price:', kairosPrice);
     console.log('User tokens:', user?.kairosTokens);
     
-    // Test toast first
-    console.log('Testing toast...');
-    toast({
-      title: "Test Toast",
-      description: "This is a test toast",
-      variant: "default",
-    });
-    
     if (!user) {
       toast({
         title: "Login Required",
@@ -199,14 +132,57 @@ export default function MarketplacePage() {
       return;
     }
 
-    console.log('Initiating purchase mutation...');
     setPurchasingId(listing.id);
     
     try {
-      await purchaseMutation.mutateAsync({ listingId: listing.id, price: kairosPrice });
-      console.log('✅ Mutation completed successfully');
+      console.log('Making direct fetch request...');
+      const response = await fetch(`/api/marketplace/listings/${listing.id}/purchase`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          userId: 'sample-user',
+          purchasePrice: kairosPrice,
+          paymentMethod: 'kairos_tokens'
+        })
+      });
+      
+      console.log('Response status:', response.status);
+      
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Purchase successful:', result);
+        
+        // Show success toast
+        toast({
+          title: "¡Compra Exitosa!",
+          description: "Artículo comprado exitosamente con tokens Kairos",
+          variant: "default",
+        });
+        
+        // Refresh data
+        queryClient.invalidateQueries({ queryKey: ['/api/marketplace/listings'] });
+        queryClient.invalidateQueries({ queryKey: ["/api/users/sample-user"] });
+        
+      } else {
+        const errorData = await response.json().catch(() => ({ message: 'Purchase failed' }));
+        console.log('Error:', errorData);
+        toast({
+          title: "Error en Compra",
+          description: errorData.message || "No se pudo completar la compra",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
-      console.error('❌ Mutation failed:', error);
+      console.error('Purchase error:', error);
+      toast({
+        title: "Error en Compra",
+        description: "No se pudo completar la compra",
+        variant: "destructive",
+      });
+    } finally {
+      setPurchasingId(null);
     }
   };
 
