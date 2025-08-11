@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Eye, Heart, MapPin, Calendar, DollarSign, Verified, Trophy, Star, Clock, Plus } from 'lucide-react';
+import { Eye, Heart, MapPin, Calendar, DollarSign, Verified, Trophy, Star, Clock, Plus, Coins } from 'lucide-react';
 import { Link } from 'wouter';
 import { KairosTokenBalance } from "@/components/KairosTokenBalance";
 
@@ -194,7 +194,7 @@ export default function MarketplacePage() {
         <Link href="/sell">
           <Button className="bg-green-600 hover:bg-green-700 text-white" data-testid="button-sell-now">
             <Plus className="h-4 w-4 mr-2" />
-            Sell Item
+            Vender Elemento
           </Button>
         </Link>
       </div>
@@ -204,7 +204,7 @@ export default function MarketplacePage() {
         <div className="flex items-center justify-between">
           <KairosTokenBalance variant="compact" showConvertButton={true} />
           <div className="text-sm text-gray-600">
-            Use Kairos tokens to purchase marketplace items
+            Usa tokens Kairos para comprar elementos del marketplace
           </div>
         </div>
       </div>
@@ -215,7 +215,7 @@ export default function MarketplacePage() {
           <div className="flex-1">
             <Input
               type="text"
-              placeholder="Search listings..."
+              placeholder="Buscar elementos..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full"
@@ -225,13 +225,13 @@ export default function MarketplacePage() {
           <div className="flex gap-4">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger className="w-[200px]" data-testid="select-category">
-                <SelectValue placeholder="All Categories" />
+                <SelectValue placeholder="Todas las Categorías" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="travel_experiences">Travel Experiences</SelectItem>
-                <SelectItem value="digital_collectibles">Digital Collectibles</SelectItem>
-                <SelectItem value="token_vouchers">Token Vouchers</SelectItem>
+                <SelectItem value="all">Todas las Categorías</SelectItem>
+                <SelectItem value="travel_experiences">Experiencias de Viaje</SelectItem>
+                <SelectItem value="digital_collectibles">Coleccionables Digitales</SelectItem>
+                <SelectItem value="token_vouchers">Vouchers de Tokens</SelectItem>
               </SelectContent>
             </Select>
             <Select value={sortBy} onValueChange={setSortBy}>
@@ -239,10 +239,10 @@ export default function MarketplacePage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="newest">Newest First</SelectItem>
-                <SelectItem value="price_low">Price: Low to High</SelectItem>
-                <SelectItem value="price_high">Price: High to Low</SelectItem>
-                <SelectItem value="ending_soon">Ending Soon</SelectItem>
+                <SelectItem value="newest">Más Recientes</SelectItem>
+                <SelectItem value="price_low">Precio: Menor a Mayor</SelectItem>
+                <SelectItem value="price_high">Precio: Mayor a Menor</SelectItem>
+                <SelectItem value="ending_soon">Terminan Pronto</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -251,10 +251,19 @@ export default function MarketplacePage() {
 
       {/* Marketplace Tabs */}
       <Tabs defaultValue="browse" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="browse">Browse Listings</TabsTrigger>
-          <TabsTrigger value="auctions">Live Auctions</TabsTrigger>
-          <TabsTrigger value="sellers">Top Sellers</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 bg-gradient-to-r from-purple-100 to-pink-100">
+          <TabsTrigger value="browse" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white">
+            <Eye className="h-4 w-4 mr-2" />
+            Explorar Marketplace
+          </TabsTrigger>
+          <TabsTrigger value="auctions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-600 data-[state=active]:to-red-600 data-[state=active]:text-white">
+            <Trophy className="h-4 w-4 mr-2" />
+            Subastas en Vivo
+          </TabsTrigger>
+          <TabsTrigger value="sellers" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-600 data-[state=active]:to-amber-600 data-[state=active]:text-white">
+            <Star className="h-4 w-4 mr-2" />
+            Mejores Vendedores
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="browse" className="mt-6">
@@ -275,44 +284,84 @@ export default function MarketplacePage() {
                 </Card>
               ))}
             </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <div className="text-red-400 mb-4">
+                <DollarSign className="h-12 w-12 mx-auto" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Error cargando marketplace</h3>
+              <p className="text-gray-500 mb-4">Por favor, intenta recargar la página</p>
+              <Button 
+                onClick={() => window.location.reload()} 
+                variant="outline"
+                className="mx-auto"
+              >
+                Recargar Página
+              </Button>
+            </div>
           ) : filteredListings.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-gray-400 mb-4">
                 <Eye className="h-12 w-12 mx-auto" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No listings found</h3>
-              <p className="text-gray-500">Try adjusting your search or filter criteria</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron elementos</h3>
+              <p className="text-gray-500">Intenta ajustar tu búsqueda o criterios de filtro</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredListings.map((listing) => (
                 <Card key={listing.id} className="hover:shadow-lg transition-shadow duration-200 overflow-hidden" data-testid={`card-listing-${listing.id}`}>
                   {/* Image Gallery */}
-                  {listing.images && listing.images.length > 0 && (
-                    <div className="relative h-48 bg-gray-100">
-                      <img
-                        src={listing.images[0]}
-                        alt={listing.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=600&fit=crop';
-                        }}
-                      />
-                      {listing.images.length > 1 && (
-                        <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-                          +{listing.images.length - 1} more
+                  <div className="relative h-48 bg-gradient-to-br from-blue-50 to-purple-50">
+                    {listing.images && listing.images.length > 0 ? (
+                      <>
+                        <img
+                          src={listing.images[0]}
+                          alt={listing.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            // Fallback sequence of images
+                            if (target.src.includes('unsplash.com/photo-1488646953014-85cb44e25828')) {
+                              target.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop';
+                            } else if (target.src.includes('unsplash.com/photo-1506905925346-21bda4d32df4')) {
+                              target.src = 'https://images.unsplash.com/photo-1539635278303-d4002c07eae3?w=800&h=600&fit=crop';
+                            } else {
+                              target.style.display = 'none';
+                              const placeholder = target.nextElementSibling as HTMLElement;
+                              if (placeholder) placeholder.style.display = 'flex';
+                            }
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center" style={{ display: 'none' }}>
+                          <div className="text-center text-slate-600">
+                            <MapPin className="h-8 w-8 mx-auto mb-2" />
+                            <p className="text-sm font-medium">{listing.category.replace('_', ' ')}</p>
+                          </div>
                         </div>
-                      )}
-                      <div className="absolute top-2 left-2">
-                        {listing.listingType === 'auction' && (
-                          <Badge className="bg-red-500 text-white border-red-600">
-                            <Clock className="h-3 w-3 mr-1" />
-                            AUCTION
-                          </Badge>
+                        {listing.images.length > 1 && (
+                          <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                            +{listing.images.length - 1} más
+                          </div>
                         )}
+                      </>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <div className="text-center text-slate-600">
+                          <MapPin className="h-8 w-8 mx-auto mb-2" />
+                          <p className="text-sm font-medium">{listing.category.replace('_', ' ')}</p>
+                        </div>
                       </div>
+                    )}
+                    <div className="absolute top-2 left-2">
+                      {listing.listingType === 'auction' && (
+                        <Badge className="bg-red-500 text-white border-red-600">
+                          <Clock className="h-3 w-3 mr-1" />
+                          SUBASTA
+                        </Badge>
+                      )}
                     </div>
-                  )}
+                  </div>
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -344,15 +393,16 @@ export default function MarketplacePage() {
                         <div>
                           {listing.listingType === 'auction' ? (
                             <div>
-                              <p className="text-sm text-gray-500">Current Bid</p>
+                              <p className="text-sm text-gray-500">Oferta Actual</p>
                               <p className="text-xl font-bold text-blue-600">{formatPrice(listing.currentPrice)}</p>
+                              <p className="text-sm text-purple-600 font-medium">{formatKairosPrice(listing.currentPrice)}</p>
                               {listing.buyNowPrice && (
-                                <p className="text-sm text-gray-500">Buy Now: {formatPrice(listing.buyNowPrice)}</p>
+                                <p className="text-sm text-gray-500">Comprar Ahora: {formatPrice(listing.buyNowPrice)}</p>
                               )}
                             </div>
                           ) : (
                             <div>
-                              <p className="text-sm text-gray-500">Price</p>
+                              <p className="text-sm text-gray-500">Precio</p>
                               <p className="text-xl font-bold text-green-600">{formatPrice(listing.currentPrice)}</p>
                               <p className="text-sm text-purple-600 font-medium">{formatKairosPrice(listing.currentPrice)}</p>
                             </div>
@@ -366,7 +416,7 @@ export default function MarketplacePage() {
                           {listing.endsAt && (
                             <div className="flex items-center text-sm text-orange-600 mt-1">
                               <Calendar className="h-4 w-4 mr-1" />
-                              Ends Soon
+                              Termina Pronto
                             </div>
                           )}
                         </div>
@@ -374,12 +424,13 @@ export default function MarketplacePage() {
                       
                       <div className="flex gap-2">
                         {listing.listingType === 'auction' ? (
-                          <Button className="flex-1" data-testid={`button-bid-${listing.id}`}>
-                            Place Bid
+                          <Button className="flex-1 bg-blue-600 hover:bg-blue-700" data-testid={`button-bid-${listing.id}`}>
+                            <DollarSign className="h-4 w-4 mr-2" />
+                            Hacer Oferta
                           </Button>
                         ) : (
                           <Button 
-                            className="flex-1" 
+                            className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700" 
                             data-testid={`button-buy-${listing.id}`}
                             onClick={() => handlePurchase(listing)}
                             disabled={purchaseMutation.isPending}
@@ -392,13 +443,14 @@ export default function MarketplacePage() {
                             ) : (
                               <>
                                 <Coins className="h-4 w-4 mr-2" />
-                                Buy with Kairos
+                                Comprar con Kairos
                               </>
                             )}
                           </Button>
                         )}
                         <Button variant="outline" size="sm" data-testid={`button-details-${listing.id}`}>
-                          Details
+                          <Eye className="h-4 w-4 mr-1" />
+                          Ver
                         </Button>
                       </div>
                     </div>
@@ -410,22 +462,28 @@ export default function MarketplacePage() {
         </TabsContent>
 
         <TabsContent value="auctions" className="mt-6">
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
+          <div className="text-center py-12 bg-gradient-to-br from-orange-50 to-red-50 rounded-lg border border-orange-200">
+            <div className="text-orange-400 mb-4">
               <Trophy className="h-12 w-12 mx-auto" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Live Auctions</h3>
-            <p className="text-gray-500">Browse active auction listings with live bidding</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Subastas en Vivo</h3>
+            <p className="text-gray-600 mb-4">Explora listados de subastas activas con pujas en tiempo real</p>
+            <Badge className="bg-orange-100 text-orange-800 border-orange-300">
+              Próximamente disponible
+            </Badge>
           </div>
         </TabsContent>
 
         <TabsContent value="sellers" className="mt-6">
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
+          <div className="text-center py-12 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg border border-yellow-200">
+            <div className="text-yellow-500 mb-4">
               <Star className="h-12 w-12 mx-auto" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Top Sellers</h3>
-            <p className="text-gray-500">Discover verified sellers with excellent ratings</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Mejores Vendedores</h3>
+            <p className="text-gray-600 mb-4">Descubre vendedores verificados con excelentes calificaciones</p>
+            <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
+              Próximamente disponible
+            </Badge>
           </div>
         </TabsContent>
       </Tabs>
