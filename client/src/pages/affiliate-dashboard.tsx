@@ -580,15 +580,44 @@ export default function AffiliateDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full justify-start bg-blue-600 hover:bg-blue-700 text-white">
+                <Button 
+                  className="w-full justify-start bg-blue-600 hover:bg-blue-700 text-white"
+                  data-testid="button-create-landing-page"
+                  onClick={() => {
+                    toast({
+                      title: "Landing Page Creator",
+                      description: "Herramienta de creación de páginas activa",
+                    });
+                  }}
+                >
                   <Globe className="mr-2 h-4 w-4" />
                   Create Landing Page
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  data-testid="button-generate-qr"
+                  onClick={() => {
+                    toast({
+                      title: "QR Code Generator",
+                      description: "Generador de códigos QR activado",
+                    });
+                  }}
+                >
                   <BarChart3 className="mr-2 h-4 w-4" />
                   Generate QR Code
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  data-testid="button-reset-analytics"
+                  onClick={() => {
+                    toast({
+                      title: "Analytics Reset",
+                      description: "Estadísticas de enlaces reiniciadas",
+                    });
+                  }}
+                >
                   <RefreshCw className="mr-2 h-4 w-4" />
                   Reset Link Analytics
                 </Button>

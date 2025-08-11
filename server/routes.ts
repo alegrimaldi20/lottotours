@@ -514,7 +514,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           sourceId: insertItem.sourceId,
           status: insertItem.status,
           startTime: new Date(insertItem.startTime),
-          endTime: insertItem.endTime ? new Date(insertItem.endTime) : null,
+          endTime: insertItem.endTime ? new Date(insertItem.endTime) : undefined,
           images: insertItem.images,
         });
       }

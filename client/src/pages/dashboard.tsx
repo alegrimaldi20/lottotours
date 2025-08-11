@@ -232,6 +232,18 @@ export default function Dashboard() {
                       <Gift className="h-4 w-4" />
                     </Button>
                   </Link>
+                  <Link href="/missions">
+                    <Button variant="outline" className="w-full justify-between" data-testid="quick-action-missions">
+                      View Missions
+                      <Target className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Link href="/explore">
+                    <Button variant="outline" className="w-full justify-between" data-testid="quick-action-explore">
+                      Explore Countries
+                      <Plane className="h-4 w-4" />
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
 

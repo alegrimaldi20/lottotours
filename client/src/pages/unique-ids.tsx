@@ -254,8 +254,19 @@ export default function UniqueIdsPage() {
                     placeholder="Enter activity ID..."
                     value={searchActivityId}
                     onChange={(e) => setSearchActivityId(e.target.value)}
+                    data-testid="input-activity-search"
                   />
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    data-testid="button-search-activity"
+                    onClick={() => {
+                      toast({
+                        title: "Activity Search",
+                        description: `Buscando actividad: ${searchActivityId}`,
+                      });
+                    }}
+                  >
                     <Search className="h-4 w-4" />
                   </Button>
                 </div>

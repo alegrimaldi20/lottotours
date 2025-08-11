@@ -265,6 +265,10 @@ export default function TravelPartners() {
               <Button 
                 className="w-full mt-4 bg-gradient-to-r from-purple-500 to-orange-500 hover:from-purple-600 hover:to-orange-600"
                 data-testid={`partner-contact-${partner.id}`}
+                onClick={() => {
+                  // Activate partner contact functionality
+                  window.open(`/affiliate-dashboard?partner=${partner.id}`, '_blank');
+                }}
               >
                 <ExternalLink className="w-4 h-4 mr-2" />
                 Ver Detalles
@@ -287,6 +291,7 @@ export default function TravelPartners() {
               size="lg" 
               className="bg-white text-purple-600 hover:bg-gray-100"
               data-testid="button-become-partner"
+              onClick={() => window.open('/affiliate-dashboard', '_blank')}
             >
               Convertirse en Socio
             </Button>
@@ -295,6 +300,7 @@ export default function TravelPartners() {
               variant="outline" 
               className="border-white text-white hover:bg-white hover:text-purple-600"
               data-testid="button-partner-info"
+              onClick={() => window.open('/beginner-guide', '_blank')}
             >
               Más Información
             </Button>

@@ -147,6 +147,7 @@ export default function VerificationDemo() {
                   onClick={handleAutoVerification}
                   disabled={verificationStates.auto !== "ready"}
                   className="bg-green-500 hover:bg-green-600"
+                  data-testid="button-auto-verification"
                 >
                   {verificationStates.auto === "ready" ? "Complete Mission" : 
                    verificationStates.auto === "processing" ? "Processing..." : "✓ Completed"}
@@ -156,6 +157,7 @@ export default function VerificationDemo() {
                   <Button 
                     variant="outline" 
                     onClick={() => setVerificationStates(prev => ({ ...prev, auto: "ready" }))}
+                    data-testid="button-auto-reset"
                   >
                     Reset
                   </Button>

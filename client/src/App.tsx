@@ -34,6 +34,7 @@ import BeginnerGuidePage from "./pages/beginner-guide";
 import PartnersPage from "./pages/partners";
 import TicketHistory from "./pages/ticket-history";
 import NotFound from "@/pages/not-found";
+import CountryPage from "./pages/country";
 
 export const ToastContext = createContext<{
   toast: (options: { title?: string; description?: string; variant?: "default" | "destructive" }) => string;
@@ -76,6 +77,7 @@ function Router() {
       <Route path="/beginner-guide" component={BeginnerGuidePage} />
       <Route path="/partners" component={PartnersPage} />
       <Route path="/ticket-history" component={TicketHistory} />
+      <Route path="/country/:country" component={CountryPage} />
       <Route component={NotFound} />
     </Switch>
   );

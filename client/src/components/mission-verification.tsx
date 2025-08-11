@@ -280,6 +280,7 @@ export default function MissionVerification({ mission, userMission, userId }: Mi
               onClick={handleStartMission}
               disabled={startMissionMutation.isPending}
               variant="outline"
+              data-testid={`start-mission-${mission.id}`}
             >
               {startMissionMutation.isPending ? "Starting..." : "Start Mission"}
             </Button>
@@ -289,6 +290,7 @@ export default function MissionVerification({ mission, userMission, userId }: Mi
             <Button
               onClick={handleCompleteMission}
               disabled={completeMissionMutation.isPending}
+              data-testid={`complete-mission-${mission.id}`}
             >
               {completeMissionMutation.isPending ? "Submitting..." : "Complete Mission"}
             </Button>

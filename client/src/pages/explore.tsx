@@ -222,8 +222,9 @@ export default function ExplorePage() {
                     variant="outline" 
                     className="w-full border-purple-300 text-purple-600 hover:bg-purple-50"
                     data-testid={`explore-country-${country.name.toLowerCase()}`}
+                    onClick={() => setLocation(`/country/${country.name.toLowerCase()}`)}
                   >
-                    Explorar Destinos
+                    Explorar País
                   </Button>
                 </CardContent>
               </Card>
