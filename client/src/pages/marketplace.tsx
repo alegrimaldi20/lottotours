@@ -444,14 +444,32 @@ export default function MarketplacePage() {
                       style={{ 
                         backgroundImage: (() => {
                           const title = listing.title.toLowerCase();
-                          if (title.includes('city') || title.includes('guide')) {
+                          
+                          // Mapeo específico para cada producto
+                          if (title.includes('digital city guide')) {
+                            // Ciudad europea para guía de ciudad - MANTENER ESTA
                             return `url(https://images.unsplash.com/photo-1549144511-f099e773c147?w=800&h=600&fit=crop&crop=center)`;
                           } else if (title.includes('journal') || title.includes('kit')) {
+                            // Equipo de aventura para journal kit
                             return `url(https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&h=600&fit=crop&crop=center)`;
                           } else if (title.includes('tropical') || title.includes('beach') || title.includes('postcard')) {
+                            // Playa tropical para postales de playa
                             return `url(https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop&crop=center)`;
+                          } else if (title.includes('luxury') || title.includes('villa')) {
+                            // Villa de lujo
+                            return `url(https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop&crop=center)`;
+                          } else if (title.includes('cultural') || title.includes('experience')) {
+                            // Experiencia cultural
+                            return `url(https://images.unsplash.com/photo-1539650116574-75c0c6d90fc9?w=800&h=600&fit=crop&crop=center)`;
+                          } else if (title.includes('mountain') || title.includes('adventure')) {
+                            // Aventura de montaña
+                            return `url(https://images.unsplash.com/photo-1464822759844-d150badb5c38?w=800&h=600&fit=crop&crop=center)`;
+                          } else if (title.includes('safari') || title.includes('wildlife')) {
+                            // Safari aventura
+                            return `url(https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=800&h=600&fit=crop&crop=center)`;
                           } else {
-                            return `url(https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop&crop=center)`;
+                            // Aventura de equipo como fallback
+                            return `url(https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&h=600&fit=crop&crop=center)`;
                           }
                         })(),
                         backgroundSize: 'cover',
