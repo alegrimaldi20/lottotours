@@ -980,6 +980,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Purchase marketplace item with Kairos tokens
+  app.post("/api/marketplace/listings/:listingId/purchase", async (req, res) => {
+    try {
+      const { listingId } = req.params;
+      const { userId, purchasePrice, paymentMethod } = req.body;
+      
+      if (paymentMethod !== 'kairos_tokens') {
+        return res.status(400).json({ message: "Only Kairos token payments are supported" });
+      }
+
+      // Get user to check token balance
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Get listing to verify it exists and get price
+      const listings = await storage.getMarketplaceListings();
+      const listing = listings.find(l => l.id === listingId);
+      if (!listing) {
+        return res.status(404).json({ message: "Listing not found" });
+      }
+
+      // Check if user has enough Kairos tokens
+      const userTokens = user.kairosTokens || 0;
+      if (userTokens < purchasePrice) {
+        return res.status(400).json({ 
+          message: `Insufficient Kairos tokens. You have ${userTokens} but need ${purchasePrice}` 
+        });
+      }
+
+      // Deduct tokens from user
+      const updatedUser = await storage.updateUser(userId, {
+        kairosTokens: userTokens - purchasePrice
+      });
+
+      // Create purchase record
+      const purchase = await storage.createMarketplacePurchase({
+        userId,
+        listingId,
+        purchasePrice: purchasePrice,
+        paymentMethod: 'kairos_tokens',
+        status: 'completed',
+        transactionHash: `kairos_${Date.now()}_${userId}_${listingId}`
+      });
+
+      res.status(201).json({ 
+        purchase, 
+        newTokenBalance: updatedUser.kairosTokens,
+        message: "Purchase completed successfully with Kairos tokens"
+      });
+    } catch (error) {
+      console.error('Kairos purchase failed:', error);
+      res.status(500).json({ message: "Failed to complete purchase with Kairos tokens" });
+    }
+  });
+
   app.get("/api/marketplace/purchases", async (req, res) => {
     try {
       const { userId } = req.query;

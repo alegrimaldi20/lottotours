@@ -13,6 +13,7 @@ import { showSuccess, showError } from "@/utils/native-notifications";
 import { useToast } from "@/hooks/use-toast";
 
 import WalletConnector from "@/components/wallet-connector";
+import { KairosTokenBalance } from "@/components/KairosTokenBalance";
 import type { Lottery, User } from "@shared/schema";
 
 interface LotteryTicketCart {
@@ -243,25 +244,37 @@ export default function LotteryDetail() {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto p-4 space-y-8">
-        {/* Wallet Integration */}
+        {/* Token Balance & Wallet Integration */}
         <div className="flex justify-center">
-          <Card className="w-full max-w-md">
+          <Card className="w-full max-w-2xl">
             <CardContent className="pt-6">
-              <WalletConnector onWalletChange={(address) => {
-                console.log('Wallet connected:', address);
-              }} />
-              {user && (
-                <div className="mt-4 p-3 bg-slate-50 rounded-lg">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600">Available Tokens:</span>
-                    <span className="font-semibold text-blue-600">{user.kairosTokens}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm mt-1">
-                    <span className="text-slate-600">Ticket Cost:</span>
-                    <span className="font-semibold">{lottery?.ticketPrice || 0} tokens</span>
-                  </div>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Your Tokens</h3>
+                  <KairosTokenBalance variant="detailed" showConvertButton={true} />
+                  {user && lottery && (
+                    <div className="mt-4 p-3 bg-slate-50 rounded-lg">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-slate-600">Ticket Cost:</span>
+                        <span className="font-semibold">{lottery.ticketPrice} Kairos</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm mt-1">
+                        <span className="text-slate-600">Can Buy:</span>
+                        <span className="font-semibold text-green-600">
+                          {Math.floor((user.kairosTokens || 0) / lottery.ticketPrice)} tickets
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
+                
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Wallet Connection</h3>
+                  <WalletConnector onWalletChange={(address) => {
+                    console.log('Wallet connected:', address);
+                  }} />
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>

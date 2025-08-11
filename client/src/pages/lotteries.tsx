@@ -17,6 +17,7 @@ import NavigationDropdown from "@/components/navigation-dropdown";
 import ProfileDropdown from "@/components/profile-dropdown";
 import LanguageSelector from "@/components/language-selector";
 import TravelImageRenderer from "@/components/travel-image-renderer";
+import { KairosTokenBalance } from "@/components/KairosTokenBalance";
 import { useLanguage } from "@/lib/i18n";
 
 const SAMPLE_USER_ID = "sample-user";
@@ -243,33 +244,20 @@ export default function Lotteries() {
 
         {/* User Token Balance */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-yellow-100 rounded-lg">
-                <Coins className="h-6 w-6 text-yellow-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Viator Tokens</p>
-                <p className="text-2xl font-bold text-yellow-600">{user?.viatorTokens || "0.00"}</p>
-              </div>
-            </div>
+          <div className="flex items-center justify-between">
+            <KairosTokenBalance variant="detailed" showConvertButton={true} />
             
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <Target className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Kairos Tokens</p>
-                <p className="text-2xl font-bold text-purple-600">{user?.kairosTokens || 0}</p>
-                <p className="text-sm text-gray-500">Available for lottery entries</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-center">
+            <div className="flex gap-3">
               <Link href="/token-management">
-                <Button className="w-full" data-testid="buy-tokens-button">
-                  <Coins className="h-4 w-4 mr-2" />
-                  Buy More Tokens
+                <Button className="flex items-center gap-2" data-testid="buy-tokens-button">
+                  <Coins className="h-4 w-4" />
+                  Gestionar Tokens
+                </Button>
+              </Link>
+              <Link href="/token-shop">
+                <Button variant="outline" className="flex items-center gap-2" data-testid="token-shop-button">
+                  <DollarSign className="h-4 w-4" />
+                  Comprar Packs
                 </Button>
               </Link>
             </div>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/lib/i18n";
+import { KairosTokenBalance } from "@/components/KairosTokenBalance";
 import { 
   Menu, 
   Home, 
@@ -105,23 +106,9 @@ export default function MobileNavigation({ currentPath }: MobileNavigationProps)
             })}
           </nav>
 
-          {/* Mobile User Stats */}
+          {/* Mobile Token Balance */}
           <div className="mt-8 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
-            <h3 className="font-semibold text-slate-900 mb-2">Quick Stats</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-slate-600">Tokens</span>
-                <span className="font-medium">1,250</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600">Level</span>
-                <span className="font-medium">Adventure Explorer</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600">Missions</span>
-                <span className="font-medium">12 completed</span>
-              </div>
-            </div>
+            <KairosTokenBalance variant="detailed" showConvertButton={true} />
           </div>
         </DialogContent>
       </Dialog>

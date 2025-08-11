@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import type { User } from '@shared/schema';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Eye, Heart, MapPin, Calendar, DollarSign, Verified, Trophy, Star, Clock, Plus } from 'lucide-react';
 import { Link } from 'wouter';
+import { KairosTokenBalance } from "@/components/KairosTokenBalance";
 
 interface MarketplaceListing {
   id: string;
@@ -48,9 +52,16 @@ interface SellerProfile {
 }
 
 export default function MarketplacePage() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
+
+  // Fetch user data for token balance
+  const { data: user } = useQuery<User>({
+    queryKey: ["/api/users/sample-user"],
+  });
 
   const { data: listings = [], isLoading, error } = useQuery<MarketplaceListing[]>({
     queryKey: ['/api/marketplace/listings', selectedCategory],
@@ -69,6 +80,40 @@ export default function MarketplacePage() {
     retry: false,
   });
 
+  // Purchase mutation
+  const purchaseMutation = useMutation({
+    mutationFn: async ({ listingId, price }: { listingId: string; price: number }) => {
+      const response = await apiRequest(`/api/marketplace/listings/${listingId}/purchase`, {
+        method: 'POST',
+        body: { 
+          userId: 'sample-user',
+          purchasePrice: price,
+          paymentMethod: 'kairos_tokens'
+        }
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Purchase failed');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Purchase Successful!",
+        description: "Item purchased successfully with Kairos tokens",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/marketplace/listings'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/users/sample-user"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Purchase Failed",
+        description: error.message || "Unable to complete purchase",
+        variant: "destructive",
+      });
+    },
+  });
+
   const filteredListings = listings.filter((listing) => {
     const matchesCategory = selectedCategory === 'all' || listing.category === selectedCategory;
     const matchesSearch = listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -78,6 +123,36 @@ export default function MarketplacePage() {
 
   const formatPrice = (price: number) => {
     return `$USD ${(price / 100).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+  };
+
+  const formatKairosPrice = (price: number) => {
+    // Convert USD price to Kairos tokens (1 USD = 10 Kairos tokens approximately)
+    const kairosPrice = Math.ceil((price / 100) * 10);
+    return `${kairosPrice} Kairos`;
+  };
+
+  const handlePurchase = (listing: MarketplaceListing) => {
+    const kairosPrice = Math.ceil((listing.currentPrice / 100) * 10);
+    
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to make purchases",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if ((user.kairosTokens || 0) < kairosPrice) {
+      toast({
+        title: "Insufficient Tokens",
+        description: `You need ${kairosPrice} Kairos tokens but only have ${user.kairosTokens || 0}`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    purchaseMutation.mutate({ listingId: listing.id, price: kairosPrice });
   };
 
   const getCategoryIcon = (category: string) => {
@@ -111,7 +186,7 @@ export default function MarketplacePage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="mb-8 flex justify-between items-start">
+      <div className="mb-6 flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">VoyageLotto Marketplace</h1>
           <p className="text-gray-600">Discover authentic travel experiences and platform-verified collectibles</p>
@@ -122,6 +197,16 @@ export default function MarketplacePage() {
             Sell Item
           </Button>
         </Link>
+      </div>
+
+      {/* Token Balance Section */}
+      <div className="mb-6 bg-white rounded-lg border border-gray-200 p-4">
+        <div className="flex items-center justify-between">
+          <KairosTokenBalance variant="compact" showConvertButton={true} />
+          <div className="text-sm text-gray-600">
+            Use Kairos tokens to purchase marketplace items
+          </div>
+        </div>
       </div>
 
       {/* Search and Filter Controls */}
@@ -269,6 +354,7 @@ export default function MarketplacePage() {
                             <div>
                               <p className="text-sm text-gray-500">Price</p>
                               <p className="text-xl font-bold text-green-600">{formatPrice(listing.currentPrice)}</p>
+                              <p className="text-sm text-purple-600 font-medium">{formatKairosPrice(listing.currentPrice)}</p>
                             </div>
                           )}
                         </div>
@@ -292,8 +378,23 @@ export default function MarketplacePage() {
                             Place Bid
                           </Button>
                         ) : (
-                          <Button className="flex-1" data-testid={`button-buy-${listing.id}`}>
-                            Buy Now
+                          <Button 
+                            className="flex-1" 
+                            data-testid={`button-buy-${listing.id}`}
+                            onClick={() => handlePurchase(listing)}
+                            disabled={purchaseMutation.isPending}
+                          >
+                            {purchaseMutation.isPending ? (
+                              <div className="flex items-center gap-2">
+                                <div className="animate-spin h-4 w-4 border-2 border-current rounded-full border-t-transparent"></div>
+                                Comprando...
+                              </div>
+                            ) : (
+                              <>
+                                <Coins className="h-4 w-4 mr-2" />
+                                Buy with Kairos
+                              </>
+                            )}
                           </Button>
                         )}
                         <Button variant="outline" size="sm" data-testid={`button-details-${listing.id}`}>
