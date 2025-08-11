@@ -422,6 +422,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Debug endpoint to add fixed-price marketplace items
+  app.post("/api/marketplace/add-test-items", async (req, res) => {
+    try {
+      const testItems = [
+        {
+          id: "listing-101",
+          sellerId: "user-101",
+          title: "Tropical Beach Postcard Set",
+          description: "Beautiful collection of 12 tropical beach postcards from around the world",
+          category: "collectibles",
+          listingType: "fixed_price" as const,
+          startPrice: 800, // 8 tokens  
+          buyNowPrice: null,
+          currentPrice: 800,
+          reservePrice: null,
+          sourceType: "physical_item",
+          sourceId: "postcard-set-001",
+          verificationHash: "test-hash-101",
+          status: "active" as const,
+          startTime: new Date().toISOString(),
+          endTime: null,
+          images: ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop"],
+        },
+        {
+          id: "listing-102", 
+          sellerId: "user-102",
+          title: "Travel Journal Kit",
+          description: "Premium leather travel journal with world map and travel stickers",
+          category: "travel_accessories",
+          listingType: "fixed_price" as const,
+          startPrice: 1200, // 12 tokens
+          buyNowPrice: null,
+          currentPrice: 1200,
+          reservePrice: null,
+          sourceType: "physical_item",
+          sourceId: "journal-kit-001",
+          verificationHash: "test-hash-102",
+          status: "active" as const,
+          startTime: new Date().toISOString(),
+          endTime: null,
+          images: ["https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=600&fit=crop"],
+        },
+        {
+          id: "listing-103",
+          sellerId: "user-103", 
+          title: "Digital City Guide Pack",
+          description: "Complete digital guide pack for 5 major European cities",
+          category: "digital_content",
+          listingType: "fixed_price" as const,
+          startPrice: 1500, // 15 tokens
+          buyNowPrice: null,
+          currentPrice: 1500,
+          reservePrice: null,
+          sourceType: "digital_content",
+          sourceId: "city-guide-pack-001",
+          verificationHash: "test-hash-103",
+          status: "active" as const,
+          startTime: new Date().toISOString(),
+          endTime: null,
+          images: ["https://images.unsplash.com/photo-1520637836862-4d197d17c36a?w=800&h=600&fit=crop"],
+        }
+      ];
+
+      // Insert items using the storage interface
+      for (const item of testItems) {
+        const { id, ...insertItem } = item;
+        await storage.createMarketplaceListing({
+          sellerId: insertItem.sellerId,
+          title: insertItem.title, 
+          description: insertItem.description,
+          category: insertItem.category,
+          listingType: insertItem.listingType,
+          startPrice: insertItem.startPrice,
+          buyNowPrice: insertItem.buyNowPrice,
+          reservePrice: insertItem.reservePrice,
+          sourceType: insertItem.sourceType,
+          sourceId: insertItem.sourceId,
+          status: insertItem.status,
+          startTime: new Date(insertItem.startTime),
+          endTime: insertItem.endTime ? new Date(insertItem.endTime) : null,
+          images: insertItem.images,
+        });
+      }
+
+      res.json({ message: "Test items added successfully", count: testItems.length });
+    } catch (error) {
+      console.error("Error adding test items:", error);
+      res.status(500).json({ message: "Failed to add test items" });
+    }
+  });
+
   // Create payment intent for token purchase
   app.post("/api/create-token-payment-intent", async (req, res) => {
     try {

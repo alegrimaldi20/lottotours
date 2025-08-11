@@ -222,13 +222,28 @@ export default function MarketplacePage() {
       {/* Toast Notifications */}
       <InlineToaster toasts={toasts} onRemove={removeToast} />
       
-      {/* Debug Toast Button */}
-      <div className="mb-4">
+      {/* Debug Buttons */}
+      <div className="mb-4 flex gap-3">
         <Button 
           onClick={() => toast({ title: "Prueba Toast", description: "El sistema de notificaciones funciona", variant: "default" })}
           className="bg-purple-600 hover:bg-purple-700 text-white"
         >
           Probar Notificación
+        </Button>
+        <Button 
+          onClick={async () => {
+            try {
+              const response = await fetch('/api/marketplace/add-test-items', { method: 'POST' });
+              const data = await response.json();
+              toast({ title: "Productos Agregados", description: `${data.count} productos de precio fijo agregados`, variant: "default" });
+              queryClient.invalidateQueries({ queryKey: ['/api/marketplace/listings'] });
+            } catch (error) {
+              toast({ title: "Error", description: "No se pudieron agregar los productos", variant: "destructive" });
+            }
+          }}
+          className="bg-green-600 hover:bg-green-700 text-white"
+        >
+          Agregar Productos de Prueba
         </Button>
       </div>
 
