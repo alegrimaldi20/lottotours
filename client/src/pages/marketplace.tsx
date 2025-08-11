@@ -192,6 +192,7 @@ export default function MarketplacePage() {
   const getListingImage = (listing: MarketplaceListing) => {
     // If listing has images, use the first one
     if (listing.images && listing.images.length > 0) {
+      console.log(`📷 Using listing image:`, listing.images[0]);
       return listing.images[0];
     }
     
@@ -199,6 +200,8 @@ export default function MarketplacePage() {
     const title = listing.title.toLowerCase();
     const category = listing.category.toLowerCase();
     const description = listing.description.toLowerCase();
+    
+    console.log(`🔍 Mapping image for: "${listing.title}" | Category: "${category}" | Description: "${description.substring(0, 50)}..."`);
     
     // Travel experiences mapping
     if (category.includes('travel') || title.includes('experience')) {
@@ -434,9 +437,13 @@ export default function MarketplacePage() {
                       src={getListingImage(listing)}
                       alt={listing.title}
                       className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                      onLoad={(e) => {
+                        console.log(`✅ Image loaded successfully:`, getListingImage(listing), 'for listing:', listing.title);
+                      }}
                       onError={(e) => {
                         const target = e.currentTarget;
-                        // If generated image fails, show category placeholder
+                        console.log(`❌ Image failed to load:`, target.src, 'for listing:', listing.title);
+                        // If image fails, show category placeholder
                         target.style.display = 'none';
                         const placeholder = target.nextElementSibling as HTMLElement;
                         if (placeholder) placeholder.style.display = 'flex';
