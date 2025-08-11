@@ -21,61 +21,72 @@ export default function LotteryNumberSelector({
   const [animatingNumbers, setAnimatingNumbers] = useState<Set<number>>(new Set());
   const [isQuickPicking, setIsQuickPicking] = useState(false);
 
-  const handleNumberClick = (number: number) => {
-    // Add animation effect
-    setAnimatingNumbers(prev => new Set(prev).add(number));
-    setTimeout(() => {
-      setAnimatingNumbers(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(number);
-        return newSet;
-      });
-    }, 500);
+  // Notify parent component when selection changes
+  useEffect(() => {
+    onNumbersSelected(selected);
+  }, [selected, onNumbersSelected]);
 
-    if (selected.includes(number)) {
-      setSelected(selected.filter(n => n !== number));
-    } else if (selected.length < maxNumbers) {
-      setSelected([...selected, number].sort((a, b) => a - b));
+  const handleNumberClick = (number: number) => {
+    try {
+      // Add animation effect
+      setAnimatingNumbers(prev => new Set(prev).add(number));
+      setTimeout(() => {
+        setAnimatingNumbers(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(number);
+          return newSet;
+        });
+      }, 500);
+
+      let newSelected: number[];
+      if (selected.includes(number)) {
+        newSelected = selected.filter(n => n !== number);
+      } else if (selected.length < maxNumbers) {
+        newSelected = [...selected, number].sort((a, b) => a - b);
+      } else {
+        return; // Don't allow more than maxNumbers
+      }
+      
+      setSelected(newSelected);
+    } catch (error) {
+      console.error('Error in handleNumberClick:', error);
     }
   };
 
   const generateRandomNumbers = () => {
-    setIsQuickPicking(true);
-    setSelected([]);
-    
-    const randomNumbers: number[] = [];
-    while (randomNumbers.length < maxNumbers) {
-      const randomNum = Math.floor(Math.random() * (numberRange.max - numberRange.min + 1)) + numberRange.min;
-      if (!randomNumbers.includes(randomNum)) {
-        randomNumbers.push(randomNum);
+    try {
+      setIsQuickPicking(true);
+      setSelected([]);
+      
+      const randomNumbers: number[] = [];
+      while (randomNumbers.length < maxNumbers) {
+        const randomNum = Math.floor(Math.random() * (numberRange.max - numberRange.min + 1)) + numberRange.min;
+        if (!randomNumbers.includes(randomNum)) {
+          randomNumbers.push(randomNum);
+        }
       }
-    }
-    
-    const sortedNumbers = randomNumbers.sort((a, b) => a - b);
-    
-    // Animate the selection of random numbers
-    sortedNumbers.forEach((num, index) => {
+      
+      const sortedNumbers = randomNumbers.sort((a, b) => a - b);
+      
+      // Set all numbers at once instead of animating each individually to avoid conflicts
       setTimeout(() => {
-        setAnimatingNumbers(prev => new Set(prev).add(num));
-        setSelected(prev => [...prev, num].sort((a, b) => a - b));
-        
-        setTimeout(() => {
-          setAnimatingNumbers(prev => {
-            const newSet = new Set(prev);
-            newSet.delete(num);
-            return newSet;
-          });
-        }, 300);
-      }, index * 150);
-    });
-    
-    setTimeout(() => {
+        setSelected(sortedNumbers);
+        setIsQuickPicking(false);
+      }, 300);
+      
+    } catch (error) {
+      console.error('Error in generateRandomNumbers:', error);
       setIsQuickPicking(false);
-    }, sortedNumbers.length * 150 + 300);
+    }
   };
 
   const clearSelection = () => {
-    setSelected([]);
+    try {
+      setSelected([]);
+      setAnimatingNumbers(new Set());
+    } catch (error) {
+      console.error('Error in clearSelection:', error);
+    }
   };
 
   // Generate number grid
@@ -246,9 +257,14 @@ export default function LotteryNumberSelector({
                 size="lg" 
                 className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white px-12 py-4 text-xl font-bold rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 border-0"
                 onClick={() => {
-                  if (onNumbersSelected && selected.length === maxNumbers) {
-                    onNumbersSelected(selected);
-                    setSelected([]);
+                  try {
+                    if (onNumbersSelected && selected.length === maxNumbers) {
+                      onNumbersSelected([...selected]); // Create a copy to avoid reference issues
+                      setSelected([]);
+                      setAnimatingNumbers(new Set()); // Clear animations
+                    }
+                  } catch (error) {
+                    console.error('Error adding ticket to cart:', error);
                   }
                 }}
               >
