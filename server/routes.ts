@@ -711,8 +711,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/raivan-conversions", async (req, res) => {
     try {
       const { userId, raivanAmount, kairosAmount } = req.body;
-      // For now, just simulate a successful conversion
-      res.json({
+      
+      // Validate conversion rate (18 Raivan = 1 Kairos)
+      const expectedKairos = Math.floor(raivanAmount / 18);
+      if (kairosAmount !== expectedKairos) {
+        return res.status(400).json({ message: "Invalid conversion rate" });
+      }
+
+      // Get current user data
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Check if user has enough Raivan tokens
+      if (user.raivanTokens < raivanAmount) {
+        return res.status(400).json({ message: "Insufficient Raivan tokens" });
+      }
+
+      // Update user tokens: subtract Raivan, add Kairos
+      const updatedUser = await storage.updateUser(userId, {
+        raivanTokens: user.raivanTokens - raivanAmount,
+        kairosTokens: user.kairosTokens + kairosAmount
+      });
+
+      // Create conversion record
+      const conversion = {
         id: "conversion-" + Date.now(),
         userId,
         raivanAmount,
@@ -720,8 +744,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         conversionRate: "18.0",
         status: "completed",
         createdAt: new Date().toISOString()
-      });
+      };
+
+      res.json(conversion);
     } catch (error) {
+      console.error("Raivan conversion error:", error);
       res.status(500).json({ message: "Failed to convert Raivan tokens" });
     }
   });
