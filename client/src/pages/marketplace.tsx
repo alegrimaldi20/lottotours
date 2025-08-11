@@ -15,14 +15,16 @@ import { KairosTokenBalance } from "@/components/KairosTokenBalance";
 import { InlineToaster } from "@/components/inline-toast";
 import { useLanguage } from '@/lib/i18n';
 
-// Import generated images from local assets
-import luxuryVilla from '../assets/marketplace/Luxury_vacation_rental_villa_6d9b8368.png';
-import adventureGear from '../assets/marketplace/Adventure_travel_gear_set_e978c561.png';
-import europeanCity from '../assets/marketplace/European_city_travel_experience_08adb5dc.png';
-import culturalExperience from '../assets/marketplace/Cultural_immersion_experience_23b3f64e.png';
-import tropicalBeach from '../assets/marketplace/Tropical_beach_resort_experience_eaee2f31.png';
-import safariAdventure from '../assets/marketplace/Wildlife_safari_adventure_d6ece08d.png';
-import mountainAdventure from '../assets/marketplace/Mountain_adventure_experience_5b656ace.png';
+// Use direct image URLs for marketplace images
+const imageUrls = {
+  luxuryVilla: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop&crop=center',
+  adventureGear: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&h=600&fit=crop&crop=center',
+  europeanCity: 'https://images.unsplash.com/photo-1549144511-f099e773c147?w=800&h=600&fit=crop&crop=center',
+  culturalExperience: 'https://images.unsplash.com/photo-1539650116574-75c0c6d90fc9?w=800&h=600&fit=crop&crop=center',
+  tropicalBeach: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop&crop=center',
+  safariAdventure: 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=800&h=600&fit=crop&crop=center',
+  mountainAdventure: 'https://images.unsplash.com/photo-1464822759844-d150badb5c38?w=800&h=600&fit=crop&crop=center'
+};
 
 interface MarketplaceListing {
   id: string;
@@ -193,7 +195,7 @@ export default function MarketplacePage() {
       return listing.images[0];
     }
     
-    // Map categories and titles to appropriate generated images
+    // Map categories and titles to appropriate images
     const title = listing.title.toLowerCase();
     const category = listing.category.toLowerCase();
     const description = listing.description.toLowerCase();
@@ -201,41 +203,41 @@ export default function MarketplacePage() {
     // Travel experiences mapping
     if (category.includes('travel') || title.includes('experience')) {
       if (title.includes('luxury') || title.includes('villa') || title.includes('vip')) {
-        return luxuryVilla;
+        return imageUrls.luxuryVilla;
       } else if (title.includes('europe') || title.includes('city') || description.includes('european')) {
-        return europeanCity;
+        return imageUrls.europeanCity;
       } else if (title.includes('beach') || title.includes('tropical') || description.includes('beach')) {
-        return tropicalBeach;
+        return imageUrls.tropicalBeach;
       } else if (title.includes('safari') || title.includes('wildlife') || description.includes('safari')) {
-        return safariAdventure;
+        return imageUrls.safariAdventure;
       } else if (title.includes('mountain') || title.includes('adventure') || description.includes('mountain')) {
-        return mountainAdventure;
+        return imageUrls.mountainAdventure;
       } else if (title.includes('cultural') || title.includes('culture') || description.includes('cultural')) {
-        return culturalExperience;
+        return imageUrls.culturalExperience;
       } else {
-        return tropicalBeach; // Default for travel experiences
+        return imageUrls.tropicalBeach; // Default for travel experiences
       }
     }
     
     // Adventure gear and products
     if (title.includes('gear') || title.includes('equipment') || category.includes('product')) {
-      return adventureGear;
+      return imageUrls.adventureGear;
     }
     
     // Digital collectibles
     if (category.includes('digital') || category.includes('collectible')) {
-      return culturalExperience; // Use cultural experience for digital items
+      return imageUrls.culturalExperience; // Use cultural experience for digital items
     }
     
     // Default fallback based on listing content
     if (description.includes('luxury') || description.includes('premium')) {
-      return luxuryVilla;
+      return imageUrls.luxuryVilla;
     } else if (description.includes('adventure') || description.includes('gear')) {
-      return adventureGear;
+      return imageUrls.adventureGear;
     } else if (description.includes('europe') || description.includes('city')) {
-      return europeanCity;
+      return imageUrls.europeanCity;
     } else {
-      return tropicalBeach; // Final fallback
+      return imageUrls.tropicalBeach; // Final fallback
     }
   };
 
