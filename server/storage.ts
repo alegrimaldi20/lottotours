@@ -588,6 +588,22 @@ export class DatabaseStorage implements IStorage {
           status: "active",
           image: "morocco",
           lotteryCode: "LT2025-103",
+        },
+        {
+          id: "lottery-vip-ultimate-world",
+          title: "VIP Ultimate World Experience",
+          description: "The most exclusive travel experience available - a luxury around-the-world journey with private jets, Michelin-starred dining, and VIP access to world wonders",
+          theme: "vip",
+          prizeTitle: "VIP Ultimate World Journey",
+          prizeDescription: "30 days private jet world tour visiting 12 countries, staying at the world's most exclusive resorts, private guides, VIP access to UNESCO sites, Michelin-starred restaurants, and luxury experiences",
+          prizeValue: 5000000, // $50,000 USD - premium VIP world tour
+          ticketPrice: 100, // High-stakes VIP entry
+          maxTickets: 300, // Limited exclusive tickets
+          soldTickets: 45,
+          drawDate: new Date(Date.now() + 35 * 24 * 60 * 60 * 1000),
+          status: "active",
+          image: "vip",
+          lotteryCode: "LT2025-VIP",
         }
       ]);
 

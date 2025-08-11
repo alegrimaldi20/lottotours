@@ -176,6 +176,13 @@ export default function Lotteries() {
       icon: '🏜️',
       destination: 'cultural'
     };
+    if (lotteryId.includes('vip')) return {
+      bg: 'from-yellow-50 via-orange-50 to-pink-50',
+      border: 'border-yellow-400 border-2 shadow-lg',
+      text: 'text-yellow-800',
+      icon: '👑',
+      destination: 'luxury'
+    };
     return {
       bg: 'from-purple-50 to-pink-50',
       border: 'border-purple-200',
