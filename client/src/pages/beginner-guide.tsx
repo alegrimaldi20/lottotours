@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -105,6 +106,7 @@ const platformBenefits = [
 export default function BeginnerGuidePage() {
   const [activeStep, setActiveStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [, setLocation] = useLocation();
 
   const markStepCompleted = (stepIndex: number) => {
     if (!completedSteps.includes(stepIndex)) {
@@ -355,6 +357,7 @@ export default function BeginnerGuidePage() {
                 size="lg" 
                 className="bg-white text-purple-600 hover:bg-gray-100"
                 data-testid="button-start-journey"
+                onClick={() => setLocation('/dashboard')}
               >
                 <Play className="w-5 h-5 mr-2" />
                 Comenzar Ahora
@@ -364,6 +367,7 @@ export default function BeginnerGuidePage() {
                 variant="outline" 
                 className="border-white text-white hover:bg-white hover:text-purple-600"
                 data-testid="button-explore-lotteries"
+                onClick={() => setLocation('/lotteries')}
               >
                 <Map className="w-5 h-5 mr-2" />
                 Explorar Loterías
