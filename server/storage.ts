@@ -1923,13 +1923,17 @@ export class DatabaseStorage implements IStorage {
     const platformFee = Math.floor(purchase.finalPrice * 0.05); // 5% platform fee
     const sellerEarnings = purchase.finalPrice - platformFee;
 
+    // Use SQL insertion with only existing columns
     const [newPurchase] = await db
       .insert(marketplacePurchases)
       .values({
-        ...purchase,
+        listingId: purchase.listingId,
+        sellerId: purchase.sellerId,
+        buyerId: purchase.buyerId,
+        finalPrice: purchase.finalPrice,
         platformFee,
         sellerEarnings,
-        transferCode,
+        transferCode
       })
       .returning();
     return newPurchase;

@@ -1016,18 +1016,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         kairosTokens: userTokens - purchasePrice
       });
 
-      // Create purchase record
-      const purchase = await storage.createMarketplacePurchase({
-        userId,
-        listingId,
-        purchasePrice: purchasePrice,
-        paymentMethod: 'kairos_tokens',
-        status: 'completed',
-        transactionHash: `kairos_${Date.now()}_${userId}_${listingId}`
+      // Mark listing as sold by updating its status
+      await storage.updateMarketplaceListing(listingId, {
+        status: 'sold'
       });
 
       res.status(201).json({ 
-        purchase, 
+        purchaseId: `purchase-${Date.now()}`,
+        listingId,
+        finalPrice: purchasePrice,
         newTokenBalance: updatedUser.kairosTokens,
         message: "Purchase completed successfully with Kairos tokens"
       });
