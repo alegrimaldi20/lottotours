@@ -328,7 +328,7 @@ export default function CountryOperations() {
               <Button 
                 variant="ghost"
                 size="sm"
-                onClick={() => setLocation('/dashboard')}
+                onClick={() => window.location.href = '/dashboard'}
                 className="text-slate-600 hover:text-blue-600 transition-colors mr-4" 
                 data-testid="nav-dashboard"
               >

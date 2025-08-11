@@ -205,7 +205,7 @@ export default function MarketplacePage() {
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={() => setLocation('/dashboard')}
+            onClick={() => window.location.href = '/dashboard'}
             className="mt-1"
             data-testid="button-back-dashboard"
           >
