@@ -111,8 +111,6 @@ export default function MarketplacePage() {
   const handlePurchase = (listing: MarketplaceListing) => {
     console.log('🛍️ Purchase button clicked for listing:', listing.id);
     const kairosPrice = Math.ceil(listing.currentPrice / 100);
-    console.log('Calculated Kairos price:', kairosPrice);
-    console.log('User tokens:', user?.kairosTokens);
     
     if (!user) {
       toast({
@@ -134,64 +132,66 @@ export default function MarketplacePage() {
 
     setPurchasingId(listing.id);
     
-    console.log('Making direct fetch request...');
+    // Safety timeout to unlock button after 10 seconds
+    const safetyTimeout = setTimeout(() => {
+      console.log('Safety timeout: unlocking button');
+      setPurchasingId(null);
+    }, 10000);
+    
+    const cleanup = () => {
+      clearTimeout(safetyTimeout);
+      setPurchasingId(null);
+    };
+    
+    console.log('Making purchase request...');
     fetch(`/api/marketplace/listings/${listing.id}/purchase`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         userId: 'sample-user',
         purchasePrice: kairosPrice,
         paymentMethod: 'kairos_tokens'
       })
     })
-    .then(response => {
-      console.log('Response status:', response.status);
+    .then(async response => {
+      console.log('Response received:', response.status);
       
       if (response.ok) {
-        return response.json().then(result => {
-          console.log('Purchase successful:', result);
-          
-          // Show success toast
-          toast({
-            title: "¡Compra Exitosa!",
-            description: "Artículo comprado exitosamente con tokens Kairos",
-            variant: "default",
-          });
-          
-          // Refresh data
-          queryClient.invalidateQueries({ queryKey: ['/api/marketplace/listings'] });
-          queryClient.invalidateQueries({ queryKey: ["/api/users/sample-user"] });
+        const result = await response.json();
+        console.log('Purchase successful');
+        
+        toast({
+          title: "¡Compra Exitosa!",
+          description: "Artículo comprado exitosamente",
+          variant: "default",
         });
+        
+        // Refresh data
+        queryClient.invalidateQueries({ queryKey: ['/api/marketplace/listings'] });
+        queryClient.invalidateQueries({ queryKey: ["/api/users/sample-user"] });
+        
+        cleanup();
       } else {
-        return response.json().then(errorData => {
-          console.log('Error:', errorData);
-          toast({
-            title: "Error en Compra",
-            description: errorData.message || "No se pudo completar la compra",
-            variant: "destructive",
-          });
-        }).catch(() => {
-          toast({
-            title: "Error en Compra",
-            description: "No se pudo completar la compra",
-            variant: "destructive",
-          });
+        const errorData = await response.json().catch(() => ({}));
+        console.log('Purchase failed:', errorData);
+        
+        toast({
+          title: "Error en Compra",
+          description: errorData.message || "No se pudo completar la compra",
+          variant: "destructive",
         });
+        
+        cleanup();
       }
     })
     .catch(error => {
       console.error('Purchase error:', error);
       toast({
-        title: "Error en Compra",
+        title: "Error en Compra", 
         description: "No se pudo completar la compra",
         variant: "destructive",
       });
-    })
-    .finally(() => {
-      console.log('Cleaning up purchasing state...');
-      setPurchasingId(null);
+      cleanup();
     });
   };
 
