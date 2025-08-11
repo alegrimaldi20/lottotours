@@ -88,11 +88,11 @@ export default function ViatorTokenManagement() {
     mutationFn: async (raivanAmount: number) => {
       return await apiRequest("/api/raivan-conversions", {
         method: "POST",
-        body: JSON.stringify({
+        body: {
           userId: "sample-user",
           raivanAmount,
           kairosAmount: Math.floor(raivanAmount / conversionRate),
-        }),
+        },
       });
     },
     onSuccess: () => {
@@ -118,11 +118,11 @@ export default function ViatorTokenManagement() {
     mutationFn: async ({ packId, paymentMethod }: { packId: string; paymentMethod: 'viator' | 'usd' }) => {
       return await apiRequest("/api/viator-token-packs/purchase", {
         method: "POST",
-        body: JSON.stringify({
+        body: {
           userId: "sample-user",
           packId,
           paymentMethod,
-        }),
+        },
       });
     },
     onSuccess: () => {
