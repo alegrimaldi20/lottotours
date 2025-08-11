@@ -84,6 +84,7 @@ export default function MarketplacePage() {
   // Purchase mutation
   const purchaseMutation = useMutation({
     mutationFn: async ({ listingId, price }: { listingId: string; price: number }) => {
+      console.log('Purchase mutation starting...', { listingId, price });
       const response = await apiRequest(`/api/marketplace/listings/${listingId}/purchase`, {
         method: 'POST',
         body: { 
@@ -92,25 +93,31 @@ export default function MarketplacePage() {
           paymentMethod: 'kairos_tokens'
         }
       });
+      console.log('Response received:', response.status, response.ok);
       if (!response.ok) {
         const errorData = await response.json();
+        console.log('Error data:', errorData);
         throw new Error(errorData.message || 'Purchase failed');
       }
-      return response.json();
+      const result = await response.json();
+      console.log('Purchase result:', result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Purchase onSuccess called with data:', data);
       toast({
-        title: "Purchase Successful!",
-        description: "Item purchased successfully with Kairos tokens",
+        title: "¡Compra Exitosa!",
+        description: "Artículo comprado exitosamente con tokens Kairos",
         variant: "default",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/marketplace/listings'] });
       queryClient.invalidateQueries({ queryKey: ["/api/users/sample-user"] });
     },
     onError: (error: any) => {
+      console.log('Purchase onError called with error:', error);
       toast({
-        title: "Purchase Failed",
-        description: error.message || "Unable to complete purchase",
+        title: "Error en Compra",
+        description: error.message || "No se pudo completar la compra",
         variant: "destructive",
       });
     },
@@ -214,6 +221,16 @@ export default function MarketplacePage() {
 
       {/* Toast Notifications */}
       <InlineToaster toasts={toasts} onRemove={removeToast} />
+      
+      {/* Debug Toast Button */}
+      <div className="mb-4">
+        <Button 
+          onClick={() => toast({ title: "Prueba Toast", description: "El sistema de notificaciones funciona", variant: "default" })}
+          className="bg-purple-600 hover:bg-purple-700 text-white"
+        >
+          Probar Notificación
+        </Button>
+      </div>
 
       {/* Token Balance Section */}
       <div className="mb-6 bg-white rounded-lg border border-gray-200 p-4">
