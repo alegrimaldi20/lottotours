@@ -23,7 +23,8 @@ import {
   Fingerprint,
   Globe,
   Coins,
-  ChevronDown
+  ChevronDown,
+  Ticket
 } from "lucide-react";
 
 interface NavigationItem {
@@ -37,6 +38,7 @@ interface NavigationItem {
 const navigationItems: NavigationItem[] = [
   { href: "/dashboard", labelKey: "dashboard", icon: Home, description: "Main Dashboard" },
   { href: "/lotteries", labelKey: "lotteries", icon: Gamepad2, description: "Travel Lotteries" },
+  { href: "/ticket-history", labelKey: "ticketHistory", icon: Ticket, description: "My Lottery Tickets" },
   { href: "/marketplace", labelKey: "marketplace", icon: ShoppingBag, description: "Token Marketplace" },
   { href: "/missions", labelKey: "missions", icon: MapPin, description: "Travel Missions" },
   { href: "/token-management", labelKey: "tokenManagement", icon: Coins, badge: "Viator", description: "Token Management" },

@@ -6,6 +6,7 @@ export interface Translations {
   // Navigation
   dashboard: string;
   lotteries: string;
+  ticketHistory: string;
   marketplace: string;
   missions: string;
   tokenManagement: string;
@@ -107,6 +108,7 @@ const translations: Record<Language, Translations> = {
     // Navigation
     dashboard: 'Dashboard',
     lotteries: 'Lotteries',
+    ticketHistory: 'My Tickets',
     marketplace: 'Marketplace',
     missions: 'Missions',
     tokenManagement: 'Token Management',
@@ -206,6 +208,7 @@ const translations: Record<Language, Translations> = {
     // Navigation
     dashboard: 'Panel Principal',
     lotteries: 'Loterías',
+    ticketHistory: 'Mis Boletos',
     marketplace: 'Mercado',
     missions: 'Misiones',
     tokenManagement: 'Gestión de Tokens',
@@ -305,6 +308,7 @@ const translations: Record<Language, Translations> = {
     // Navigation
     dashboard: 'Painel',
     lotteries: 'Loterias',
+    ticketHistory: 'Meus Bilhetes',
     marketplace: 'Mercado',
     missions: 'Missões',
     tokenManagement: 'Gestão de Tokens',

@@ -32,6 +32,7 @@ import ViatorTokenManagement from "./pages/ViatorTokenManagement";
 import ExplorePage from "./pages/explore";
 import BeginnerGuidePage from "./pages/beginner-guide";
 import PartnersPage from "./pages/partners";
+import TicketHistory from "./pages/ticket-history";
 import NotFound from "@/pages/not-found";
 
 export const ToastContext = createContext<{
@@ -74,6 +75,7 @@ function Router() {
       <Route path="/explore" component={ExplorePage} />
       <Route path="/beginner-guide" component={BeginnerGuidePage} />
       <Route path="/partners" component={PartnersPage} />
+      <Route path="/ticket-history" component={TicketHistory} />
       <Route component={NotFound} />
     </Switch>
   );

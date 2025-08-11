@@ -422,6 +422,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Lottery Tickets routes - get tickets by user
+  app.get("/api/lottery-tickets/user/:userId", async (req, res) => {
+    try {
+      const userTickets = await storage.getUserLotteryTickets(req.params.userId);
+      res.json(userTickets);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user lottery tickets" });
+    }
+  });
+
   // Debug endpoint to add fixed-price marketplace items
   app.post("/api/marketplace/add-test-items", async (req, res) => {
     try {
