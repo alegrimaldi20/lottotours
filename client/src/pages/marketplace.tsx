@@ -123,6 +123,11 @@ export default function MarketplacePage() {
     return isActive && matchesCategory && matchesSearch;
   });
 
+  console.log('Total listings:', listings.length);
+  console.log('Filtered listings:', filteredListings.length);
+  console.log('Selected category:', selectedCategory);
+  console.log('User data:', user);
+
   const formatPrice = (price: number) => {
     return `$USD ${(price / 100).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
   };
@@ -134,7 +139,10 @@ export default function MarketplacePage() {
   };
 
   const handlePurchase = (listing: MarketplaceListing) => {
+    console.log('Purchase button clicked for listing:', listing.id);
     const kairosPrice = Math.ceil((listing.currentPrice / 100) * 10);
+    console.log('Calculated Kairos price:', kairosPrice);
+    console.log('User tokens:', user?.kairosTokens);
     
     if (!user) {
       toast({
@@ -154,6 +162,7 @@ export default function MarketplacePage() {
       return;
     }
 
+    console.log('Initiating purchase mutation...');
     purchaseMutation.mutate({ listingId: listing.id, price: kairosPrice });
   };
 
