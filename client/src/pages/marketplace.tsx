@@ -201,47 +201,52 @@ export default function MarketplacePage() {
     const category = listing.category.toLowerCase();
     const description = listing.description.toLowerCase();
     
-    console.log(`🔍 Mapping image for: "${listing.title}" | Category: "${category}" | Description: "${description.substring(0, 50)}..."`);
+    console.log(`🔍 Mapping image for: "${listing.title}" | Category: "${category}"`);
     
-    // Travel experiences mapping
-    if (category.includes('travel') || title.includes('experience')) {
-      if (title.includes('luxury') || title.includes('villa') || title.includes('vip')) {
-        return imageUrls.luxuryVilla;
-      } else if (title.includes('europe') || title.includes('city') || description.includes('european')) {
-        return imageUrls.europeanCity;
-      } else if (title.includes('beach') || title.includes('tropical') || description.includes('beach')) {
-        return imageUrls.tropicalBeach;
-      } else if (title.includes('safari') || title.includes('wildlife') || description.includes('safari')) {
-        return imageUrls.safariAdventure;
-      } else if (title.includes('mountain') || title.includes('adventure') || description.includes('mountain')) {
-        return imageUrls.mountainAdventure;
-      } else if (title.includes('cultural') || title.includes('culture') || description.includes('cultural')) {
-        return imageUrls.culturalExperience;
-      } else {
-        return imageUrls.tropicalBeach; // Default for travel experiences
-      }
-    }
-    
-    // Adventure gear and products
-    if (title.includes('gear') || title.includes('equipment') || category.includes('product')) {
-      return imageUrls.adventureGear;
-    }
-    
-    // Digital collectibles
-    if (category.includes('digital') || category.includes('collectible')) {
-      return imageUrls.culturalExperience; // Use cultural experience for digital items
-    }
-    
-    // Default fallback based on listing content
-    if (description.includes('luxury') || description.includes('premium')) {
-      return imageUrls.luxuryVilla;
-    } else if (description.includes('adventure') || description.includes('gear')) {
-      return imageUrls.adventureGear;
-    } else if (description.includes('europe') || description.includes('city')) {
+    // Specific mapping by title keywords
+    if (title.includes('city') || title.includes('guide')) {
+      console.log(`📍 Matched city/guide → europeanCity`);
       return imageUrls.europeanCity;
-    } else {
-      return imageUrls.tropicalBeach; // Final fallback
     }
+    
+    if (title.includes('journal') || title.includes('kit')) {
+      console.log(`📔 Matched journal/kit → adventureGear`);
+      return imageUrls.adventureGear;
+    }
+    
+    if (title.includes('tropical') || title.includes('beach') || title.includes('postcard')) {
+      console.log(`🏖️ Matched tropical/beach → tropicalBeach`);
+      return imageUrls.tropicalBeach;
+    }
+    
+    if (title.includes('luxury') || title.includes('villa') || title.includes('vip')) {
+      console.log(`🏰 Matched luxury → luxuryVilla`);
+      return imageUrls.luxuryVilla;
+    }
+    
+    if (title.includes('safari') || title.includes('wildlife')) {
+      console.log(`🦁 Matched safari → safariAdventure`);
+      return imageUrls.safariAdventure;
+    }
+    
+    if (title.includes('mountain') || title.includes('adventure')) {
+      console.log(`🏔️ Matched mountain → mountainAdventure`);
+      return imageUrls.mountainAdventure;
+    }
+    
+    if (title.includes('cultural') || title.includes('culture')) {
+      console.log(`🎨 Matched cultural → culturalExperience`);
+      return imageUrls.culturalExperience;
+    }
+    
+    // Category-based fallbacks
+    if (category.includes('digital')) {
+      console.log(`💻 Digital category → culturalExperience`);
+      return imageUrls.culturalExperience;
+    }
+    
+    console.log(`🌴 Default fallback → tropicalBeach`);
+    return imageUrls.tropicalBeach;
   };
 
   const getCategoryBadgeColor = (category: string) => {
@@ -434,19 +439,21 @@ export default function MarketplacePage() {
                   {/* Image Gallery */}
                   <div className="relative h-48 bg-gradient-to-br from-blue-50 to-purple-50 overflow-hidden">
                     <img
-                      src={getListingImage(listing)}
+                      src={(() => {
+                        const imageUrl = getListingImage(listing);
+                        console.log(`🖼️ Final image URL for "${listing.title}":`, imageUrl);
+                        return imageUrl;
+                      })()}
                       alt={listing.title}
                       className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                      style={{ display: 'block' }}
                       onLoad={(e) => {
-                        console.log(`✅ Image loaded successfully:`, getListingImage(listing), 'for listing:', listing.title);
+                        console.log(`✅ Image loaded successfully for "${listing.title}"`);
                       }}
                       onError={(e) => {
                         const target = e.currentTarget;
-                        console.log(`❌ Image failed to load:`, target.src, 'for listing:', listing.title);
-                        // If image fails, show category placeholder
-                        target.style.display = 'none';
-                        const placeholder = target.nextElementSibling as HTMLElement;
-                        if (placeholder) placeholder.style.display = 'flex';
+                        console.log(`❌ Image failed to load for "${listing.title}". Trying fallback...`);
+                        target.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop&crop=center';
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center" style={{ display: 'none' }}>
