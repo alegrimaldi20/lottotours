@@ -116,15 +116,21 @@ export default function MarketplacePage() {
       }
     },
     onSuccess: (data) => {
-      console.log('Purchase onSuccess called with data:', data);
+      console.log('🎉 SUCCESS! Purchase onSuccess called with data:', data);
       setPurchasingId(null);
-      toast({
+      // Force toast immediately
+      const successToast = {
         title: "¡Compra Exitosa!",
         description: "Artículo comprado exitosamente con tokens Kairos",
-        variant: "default",
-      });
+        variant: "default" as const,
+      };
+      console.log('About to show toast:', successToast);
+      toast(successToast);
+      
+      // Invalidate queries
       queryClient.invalidateQueries({ queryKey: ['/api/marketplace/listings'] });
       queryClient.invalidateQueries({ queryKey: ["/api/users/sample-user"] });
+      console.log('Queries invalidated');
     },
     onError: (error: any) => {
       console.log('Purchase onError called with error:', error);
@@ -161,11 +167,19 @@ export default function MarketplacePage() {
     return `${kairosPrice} Kairos`;
   };
 
-  const handlePurchase = (listing: MarketplaceListing) => {
-    console.log('Purchase button clicked for listing:', listing.id);
+  const handlePurchase = async (listing: MarketplaceListing) => {
+    console.log('🛍️ Purchase button clicked for listing:', listing.id);
     const kairosPrice = Math.ceil(listing.currentPrice / 100);
     console.log('Calculated Kairos price:', kairosPrice);
     console.log('User tokens:', user?.kairosTokens);
+    
+    // Test toast first
+    console.log('Testing toast...');
+    toast({
+      title: "Test Toast",
+      description: "This is a test toast",
+      variant: "default",
+    });
     
     if (!user) {
       toast({
@@ -187,7 +201,13 @@ export default function MarketplacePage() {
 
     console.log('Initiating purchase mutation...');
     setPurchasingId(listing.id);
-    purchaseMutation.mutate({ listingId: listing.id, price: kairosPrice });
+    
+    try {
+      await purchaseMutation.mutateAsync({ listingId: listing.id, price: kairosPrice });
+      console.log('✅ Mutation completed successfully');
+    } catch (error) {
+      console.error('❌ Mutation failed:', error);
+    }
   };
 
   const getCategoryIcon = (category: string) => {
