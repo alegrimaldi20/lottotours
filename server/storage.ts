@@ -1177,7 +1177,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserLotteryTickets(userId: string): Promise<LotteryTicket[]> {
-    return await db.select().from(lotteryTickets).where(eq(lotteryTickets.userId, userId));
+    console.log(`Querying lottery tickets for user: ${userId}`);
+    try {
+      const tickets = await db.select().from(lotteryTickets).where(eq(lotteryTickets.userId, userId));
+      console.log(`Database query successful, found ${tickets.length} tickets`);
+      return tickets;
+    } catch (error) {
+      console.error("Database error in getUserLotteryTickets:", error);
+      throw error;
+    }
   }
 
   async drawLottery(lotteryId: string, drawExecutorId?: string): Promise<{lottery: Lottery, draw: LotteryDraw}> {

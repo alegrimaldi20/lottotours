@@ -425,10 +425,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Lottery Tickets routes - get tickets by user
   app.get("/api/lottery-tickets/user/:userId", async (req, res) => {
     try {
+      console.log(`Fetching tickets for user: ${req.params.userId}`);
       const userTickets = await storage.getUserLotteryTickets(req.params.userId);
+      console.log(`Found ${userTickets.length} tickets for user`);
       res.json(userTickets);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch user lottery tickets" });
+      console.error("Error fetching user lottery tickets:", error);
+      res.status(500).json({ message: "Failed to fetch user lottery tickets", error: error instanceof Error ? error.message : String(error) });
     }
   });
 
