@@ -75,7 +75,8 @@ export default function LotteryDetail() {
       let completedTickets = 0;
       const errors: string[] = [];
       
-      for (const [index, ticket] of ticketCart.entries()) {
+      for (let index = 0; index < ticketCart.length; index++) {
+        const ticket = ticketCart[index];
         try {
           console.log(`Purchasing ticket ${index + 1}/${ticketCart.length} for lottery: ${lottery.id}`);
           const response = await fetch(`/api/lotteries/${lottery.id}/purchase`, {

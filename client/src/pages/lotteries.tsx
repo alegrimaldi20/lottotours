@@ -400,7 +400,12 @@ export default function Lotteries() {
                       <Button 
                         className={`w-full ${!userCanAfford ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'}`}
                         disabled={!userCanAfford || isProcessing}
-                        onClick={() => handleBuyTicket(lottery)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          console.log(`Quick buy button clicked for lottery: ${lottery.id}`, { userCanAfford, isProcessing, kairosTokens: user?.kairosTokens });
+                          handleBuyTicket(lottery);
+                        }}
                         data-testid={`quick-buy-${lottery.id}`}
                         variant="outline"
                       >
