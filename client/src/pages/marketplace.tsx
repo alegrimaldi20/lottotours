@@ -108,7 +108,7 @@ export default function MarketplacePage() {
     return `${kairosPrice} Kairos`;
   };
 
-  const handlePurchase = async (listing: MarketplaceListing) => {
+  const handlePurchase = (listing: MarketplaceListing) => {
     console.log('🛍️ Purchase button clicked for listing:', listing.id);
     const kairosPrice = Math.ceil(listing.currentPrice / 100);
     console.log('Calculated Kairos price:', kairosPrice);
@@ -134,56 +134,65 @@ export default function MarketplacePage() {
 
     setPurchasingId(listing.id);
     
-    try {
-      console.log('Making direct fetch request...');
-      const response = await fetch(`/api/marketplace/listings/${listing.id}/purchase`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          userId: 'sample-user',
-          purchasePrice: kairosPrice,
-          paymentMethod: 'kairos_tokens'
-        })
-      });
-      
+    console.log('Making direct fetch request...');
+    fetch(`/api/marketplace/listings/${listing.id}/purchase`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        userId: 'sample-user',
+        purchasePrice: kairosPrice,
+        paymentMethod: 'kairos_tokens'
+      })
+    })
+    .then(response => {
       console.log('Response status:', response.status);
       
       if (response.ok) {
-        const result = await response.json();
-        console.log('Purchase successful:', result);
-        
-        // Show success toast
-        toast({
-          title: "¡Compra Exitosa!",
-          description: "Artículo comprado exitosamente con tokens Kairos",
-          variant: "default",
+        return response.json().then(result => {
+          console.log('Purchase successful:', result);
+          
+          // Show success toast
+          toast({
+            title: "¡Compra Exitosa!",
+            description: "Artículo comprado exitosamente con tokens Kairos",
+            variant: "default",
+          });
+          
+          // Refresh data
+          queryClient.invalidateQueries({ queryKey: ['/api/marketplace/listings'] });
+          queryClient.invalidateQueries({ queryKey: ["/api/users/sample-user"] });
         });
-        
-        // Refresh data
-        queryClient.invalidateQueries({ queryKey: ['/api/marketplace/listings'] });
-        queryClient.invalidateQueries({ queryKey: ["/api/users/sample-user"] });
-        
       } else {
-        const errorData = await response.json().catch(() => ({ message: 'Purchase failed' }));
-        console.log('Error:', errorData);
-        toast({
-          title: "Error en Compra",
-          description: errorData.message || "No se pudo completar la compra",
-          variant: "destructive",
+        return response.json().then(errorData => {
+          console.log('Error:', errorData);
+          toast({
+            title: "Error en Compra",
+            description: errorData.message || "No se pudo completar la compra",
+            variant: "destructive",
+          });
+        }).catch(() => {
+          toast({
+            title: "Error en Compra",
+            description: "No se pudo completar la compra",
+            variant: "destructive",
+          });
         });
       }
-    } catch (error) {
+    })
+    .catch(error => {
       console.error('Purchase error:', error);
       toast({
         title: "Error en Compra",
         description: "No se pudo completar la compra",
         variant: "destructive",
       });
-    } finally {
+    })
+    .finally(() => {
+      console.log('Cleaning up purchasing state...');
       setPurchasingId(null);
-    }
+    });
   };
 
   const getCategoryIcon = (category: string) => {
