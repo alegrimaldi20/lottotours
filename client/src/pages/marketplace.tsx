@@ -108,91 +108,59 @@ export default function MarketplacePage() {
     return `${kairosPrice} Kairos`;
   };
 
-  const handlePurchase = (listing: MarketplaceListing) => {
-    console.log('🛍️ Purchase button clicked for listing:', listing.id);
+  const handlePurchase = async (listing: MarketplaceListing) => {
     const kairosPrice = Math.ceil(listing.currentPrice / 100);
     
-    if (!user) {
+    if (!user || (user.kairosTokens || 0) < kairosPrice) {
       toast({
-        title: "Login Required",
-        description: "Please log in to make purchases",
+        title: "Error",
+        description: !user ? "Login requerido" : "Tokens insuficientes",
         variant: "destructive",
       });
       return;
     }
 
-    if ((user.kairosTokens || 0) < kairosPrice) {
-      toast({
-        title: "Insufficient Tokens",
-        description: `You need ${kairosPrice} Kairos tokens but only have ${user.kairosTokens || 0}`,
-        variant: "destructive",
-      });
-      return;
-    }
-
+    // Set loading state
     setPurchasingId(listing.id);
     
-    // Safety timeout to unlock button after 10 seconds
-    const safetyTimeout = setTimeout(() => {
-      console.log('Safety timeout: unlocking button');
-      setPurchasingId(null);
-    }, 10000);
-    
-    const cleanup = () => {
-      clearTimeout(safetyTimeout);
-      setPurchasingId(null);
-    };
-    
-    console.log('Making purchase request...');
-    fetch(`/api/marketplace/listings/${listing.id}/purchase`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        userId: 'sample-user',
-        purchasePrice: kairosPrice,
-        paymentMethod: 'kairos_tokens'
-      })
-    })
-    .then(async response => {
-      console.log('Response received:', response.status);
+    try {
+      const response = await fetch(`/api/marketplace/listings/${listing.id}/purchase`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          userId: 'sample-user',
+          purchasePrice: kairosPrice,
+          paymentMethod: 'kairos_tokens'
+        })
+      });
       
       if (response.ok) {
-        const result = await response.json();
-        console.log('Purchase successful');
-        
         toast({
           title: "¡Compra Exitosa!",
           description: "Artículo comprado exitosamente",
           variant: "default",
         });
         
-        // Refresh data
         queryClient.invalidateQueries({ queryKey: ['/api/marketplace/listings'] });
         queryClient.invalidateQueries({ queryKey: ["/api/users/sample-user"] });
-        
-        cleanup();
       } else {
         const errorData = await response.json().catch(() => ({}));
-        console.log('Purchase failed:', errorData);
-        
         toast({
           title: "Error en Compra",
-          description: errorData.message || "No se pudo completar la compra",
+          description: errorData.message || "Error al procesar compra",
           variant: "destructive",
         });
-        
-        cleanup();
       }
-    })
-    .catch(error => {
-      console.error('Purchase error:', error);
+    } catch (error) {
       toast({
-        title: "Error en Compra", 
-        description: "No se pudo completar la compra",
+        title: "Error",
+        description: "Error de conexión",
         variant: "destructive",
       });
-      cleanup();
-    });
+    }
+    
+    // Always clear loading state
+    setPurchasingId(null);
   };
 
   const getCategoryIcon = (category: string) => {
