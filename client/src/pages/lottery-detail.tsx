@@ -342,9 +342,8 @@ export default function LotteryDetail() {
         {/* Number Selection */}
         <LotteryNumberSelector
           onNumbersSelected={(numbers: number[]) => {
-            if (numbers.length === 6) {
-              handleAddToCart(numbers, false);
-            }
+            // Only add to cart when explicitly called from the "Add to Cart" button
+            handleAddToCart(numbers, false);
           }}
           maxNumbers={6}
           numberRange={{ min: 1, max: 49 }}

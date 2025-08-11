@@ -21,10 +21,7 @@ export default function LotteryNumberSelector({
   const [animatingNumbers, setAnimatingNumbers] = useState<Set<number>>(new Set());
   const [isQuickPicking, setIsQuickPicking] = useState(false);
 
-  // Notify parent component when selection changes
-  useEffect(() => {
-    onNumbersSelected(selected);
-  }, [selected, onNumbersSelected]);
+  // Remove automatic notification - only notify when explicitly adding to cart
 
   const handleNumberClick = (number: number) => {
     try {
@@ -259,6 +256,7 @@ export default function LotteryNumberSelector({
                 onClick={() => {
                   try {
                     if (onNumbersSelected && selected.length === maxNumbers) {
+                      console.log('Adding ticket with numbers:', selected);
                       onNumbersSelected([...selected]); // Create a copy to avoid reference issues
                       setSelected([]);
                       setAnimatingNumbers(new Set()); // Clear animations
