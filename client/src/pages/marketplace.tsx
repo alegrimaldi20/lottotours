@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Eye, Heart, MapPin, Calendar, DollarSign, Verified, Trophy, Star, Clock, Plus, Coins } from 'lucide-react';
 import { Link } from 'wouter';
 import { KairosTokenBalance } from "@/components/KairosTokenBalance";
+import { InlineToaster } from "@/components/inline-toast";
 
 interface MarketplaceListing {
   id: string;
@@ -52,7 +53,7 @@ interface SellerProfile {
 }
 
 export default function MarketplacePage() {
-  const { toast } = useLocaleSafeToast();
+  const { toast, toasts, removeToast } = useLocaleSafeToast();
   const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -101,6 +102,7 @@ export default function MarketplacePage() {
       toast({
         title: "Purchase Successful!",
         description: "Item purchased successfully with Kairos tokens",
+        variant: "default",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/marketplace/listings'] });
       queryClient.invalidateQueries({ queryKey: ["/api/users/sample-user"] });
@@ -209,6 +211,9 @@ export default function MarketplacePage() {
           </Button>
         </Link>
       </div>
+
+      {/* Toast Notifications */}
+      <InlineToaster toasts={toasts} onRemove={removeToast} />
 
       {/* Token Balance Section */}
       <div className="mb-6 bg-white rounded-lg border border-gray-200 p-4">
