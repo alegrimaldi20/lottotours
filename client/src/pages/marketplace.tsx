@@ -13,6 +13,7 @@ import { Eye, Heart, MapPin, Calendar, DollarSign, Verified, Trophy, Star, Clock
 import { Link, useLocation } from 'wouter';
 import { KairosTokenBalance } from "@/components/KairosTokenBalance";
 import { InlineToaster } from "@/components/inline-toast";
+import { useLanguage } from '@/lib/i18n';
 
 interface MarketplaceListing {
   id: string;
@@ -55,6 +56,7 @@ interface SellerProfile {
 export default function MarketplacePage() {
   const [, setLocation] = useLocation();
   const { toast, toasts, removeToast } = useLocaleSafeToast();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -208,7 +210,7 @@ export default function MarketplacePage() {
             data-testid="button-back-dashboard"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Dashboard
+            {t('dashboard')}
           </Button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">VoyageLotto Marketplace</h1>

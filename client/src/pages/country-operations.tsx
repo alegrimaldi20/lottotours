@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
+import { useLanguage } from '@/lib/i18n';
 import { 
   Globe, Users, Building2, MapPin, TrendingUp, Award,
   DollarSign, Target, Zap, Filter, Search, MoreVertical,
@@ -249,6 +250,7 @@ const sampleTerritories = [
 
 export default function CountryOperations() {
   const [, setLocation] = useLocation();
+  const { t } = useLanguage();
   const [selectedRegion, setSelectedRegion] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
@@ -330,7 +332,7 @@ export default function CountryOperations() {
                 className="text-slate-600 hover:text-blue-600 transition-colors mr-4" 
                 data-testid="nav-dashboard"
               >
-                ← Dashboard
+                ← {t('dashboard')}
               </Button>
               <div className="flex items-center gap-3">
                 <Globe className="h-8 w-8 text-blue-600" />
