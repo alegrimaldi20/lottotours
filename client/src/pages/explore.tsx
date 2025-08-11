@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -83,6 +84,7 @@ const popularCountries = [
 
 export default function ExplorePage() {
   const [selectedContinent, setSelectedContinent] = useState<string | null>(null);
+  const [, setLocation] = useLocation();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50 p-6">
@@ -240,6 +242,7 @@ export default function ExplorePage() {
               size="lg" 
               className="bg-white text-purple-600 hover:bg-gray-100"
               data-testid="button-view-lotteries"
+              onClick={() => setLocation('/lotteries')}
             >
               Ver Loterías Activas
             </Button>
@@ -248,6 +251,7 @@ export default function ExplorePage() {
               variant="outline" 
               className="border-white text-white hover:bg-white hover:text-purple-600"
               data-testid="button-browse-marketplace"
+              onClick={() => setLocation('/marketplace')}
             >
               Explorar Marketplace
             </Button>
