@@ -58,6 +58,7 @@ export default function MarketplacePage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
+  const [purchasingId, setPurchasingId] = useState<string | null>(null);
 
   // Fetch user data for token balance
   const { data: user } = useQuery<User>({
@@ -105,6 +106,7 @@ export default function MarketplacePage() {
     },
     onSuccess: (data) => {
       console.log('Purchase onSuccess called with data:', data);
+      setPurchasingId(null);
       toast({
         title: "¡Compra Exitosa!",
         description: "Artículo comprado exitosamente con tokens Kairos",
@@ -115,6 +117,7 @@ export default function MarketplacePage() {
     },
     onError: (error: any) => {
       console.log('Purchase onError called with error:', error);
+      setPurchasingId(null);
       toast({
         title: "Error en Compra",
         description: error.message || "No se pudo completar la compra",
@@ -172,6 +175,7 @@ export default function MarketplacePage() {
     }
 
     console.log('Initiating purchase mutation...');
+    setPurchasingId(listing.id);
     purchaseMutation.mutate({ listingId: listing.id, price: kairosPrice });
   };
 
@@ -481,9 +485,9 @@ export default function MarketplacePage() {
                             className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700" 
                             data-testid={`button-buy-${listing.id}`}
                             onClick={() => handlePurchase(listing)}
-                            disabled={purchaseMutation.isPending}
+                            disabled={purchasingId === listing.id}
                           >
-                            {purchaseMutation.isPending ? (
+                            {purchasingId === listing.id ? (
                               <div className="flex items-center gap-2">
                                 <div className="animate-spin h-4 w-4 border-2 border-current rounded-full border-t-transparent"></div>
                                 Comprando...
