@@ -75,8 +75,9 @@ export default function LotteryDetail() {
       let completedTickets = 0;
       const errors: string[] = [];
       
-      for (const ticket of ticketCart) {
+      for (const [index, ticket] of ticketCart.entries()) {
         try {
+          console.log(`Purchasing ticket ${index + 1}/${ticketCart.length} for lottery: ${lottery.id}`);
           const response = await fetch(`/api/lotteries/${lottery.id}/purchase`, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
@@ -86,18 +87,26 @@ export default function LotteryDetail() {
             })
           });
           
+          console.log(`Ticket ${index + 1} response status: ${response.status}`);
+          
           if (response.ok) {
             const result = await response.json();
             completedTickets++;
-            console.log(`Ticket purchased successfully:`, result);
+            console.log(`Ticket ${index + 1} purchased successfully:`, result);
           } else {
-            const errorData = await response.json();
-            errors.push(`Error: ${errorData.message || 'Unknown error'}`);
-            console.error(`Ticket purchase failed:`, errorData);
+            const errorText = await response.text();
+            let errorData;
+            try {
+              errorData = JSON.parse(errorText);
+            } catch {
+              errorData = { message: errorText };
+            }
+            errors.push(`Ticket ${index + 1}: ${errorData.message || 'Unknown error'}`);
+            console.error(`Ticket ${index + 1} purchase failed:`, errorData);
           }
         } catch (error) {
-          errors.push(`Connection error`);
-          console.error(`Network error:`, error);
+          errors.push(`Ticket ${index + 1}: Connection error`);
+          console.error(`Ticket ${index + 1} network error:`, error);
         }
       }
       

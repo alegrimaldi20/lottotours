@@ -75,6 +75,7 @@ export default function Lotteries() {
     
     try {
       // Use the correct endpoint for purchasing tickets
+      console.log(`Attempting to purchase ticket for lottery: ${lottery.id}`);
       const response = await fetch(`/api/lotteries/${lottery.id}/purchase`, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
@@ -84,10 +85,12 @@ export default function Lotteries() {
         })
       });
       
+      console.log(`Purchase response status: ${response.status}`);
       setIsProcessing(false);
       
       if (response.ok) {
         const ticket = await response.json();
+        console.log(`Ticket purchased successfully:`, ticket);
         toast({
           title: "¡Ticket Comprado!",
           description: `Números: ${selectedNumbers.join(", ")} - Ticket #${ticket.ticketNumber}`,
@@ -98,7 +101,14 @@ export default function Lotteries() {
         queryClient.invalidateQueries({ queryKey: ["/api/users", SAMPLE_USER_ID] });
         queryClient.invalidateQueries({ queryKey: ["/api/lottery-tickets/user", SAMPLE_USER_ID] });
       } else {
-        const errorData = await response.json();
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { message: errorText };
+        }
+        console.error(`Purchase failed with status ${response.status}:`, errorData);
         toast({
           title: "Error en compra",
           description: errorData.message || "No se pudo comprar el ticket",
@@ -107,7 +117,7 @@ export default function Lotteries() {
       }
     } catch (error) {
       setIsProcessing(false);
-      console.error("Error purchasing ticket:", error);
+      console.error("Network error purchasing ticket:", error);
       toast({
         title: "Error",
         description: "Error de conexión",
