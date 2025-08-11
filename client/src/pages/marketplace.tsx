@@ -15,14 +15,14 @@ import { KairosTokenBalance } from "@/components/KairosTokenBalance";
 import { InlineToaster } from "@/components/inline-toast";
 import { useLanguage } from '@/lib/i18n';
 
-// Import generated images
-import luxuryVilla from '@assets/generated_images/Luxury_vacation_rental_villa_6d9b8368.png';
-import adventureGear from '@assets/generated_images/Adventure_travel_gear_set_e978c561.png';
-import europeanCity from '@assets/generated_images/European_city_travel_experience_08adb5dc.png';
-import culturalExperience from '@assets/generated_images/Cultural_immersion_experience_23b3f64e.png';
-import tropicalBeach from '@assets/generated_images/Tropical_beach_resort_experience_eaee2f31.png';
-import safariAdventure from '@assets/generated_images/Wildlife_safari_adventure_d6ece08d.png';
-import mountainAdventure from '@assets/generated_images/Mountain_adventure_experience_5b656ace.png';
+// Import generated images from local assets
+import luxuryVilla from '../assets/marketplace/Luxury_vacation_rental_villa_6d9b8368.png';
+import adventureGear from '../assets/marketplace/Adventure_travel_gear_set_e978c561.png';
+import europeanCity from '../assets/marketplace/European_city_travel_experience_08adb5dc.png';
+import culturalExperience from '../assets/marketplace/Cultural_immersion_experience_23b3f64e.png';
+import tropicalBeach from '../assets/marketplace/Tropical_beach_resort_experience_eaee2f31.png';
+import safariAdventure from '../assets/marketplace/Wildlife_safari_adventure_d6ece08d.png';
+import mountainAdventure from '../assets/marketplace/Mountain_adventure_experience_5b656ace.png';
 
 interface MarketplaceListing {
   id: string;
