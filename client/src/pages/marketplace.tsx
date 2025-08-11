@@ -58,7 +58,7 @@ export default function MarketplacePage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
-  const [loadingButtons, setLoadingButtons] = useState<Set<string>>(new Set());
+  const [purchasingId, setPurchasingId] = useState<string | null>(null);
 
   // Fetch user data for token balance
   const { data: user } = useQuery<User>({
@@ -108,18 +108,6 @@ export default function MarketplacePage() {
     return `${kairosPrice} Kairos`;
   };
 
-  const addLoadingButton = (id: string) => {
-    setLoadingButtons(prev => new Set(Array.from(prev).concat(id)));
-  };
-
-  const removeLoadingButton = (id: string) => {
-    setLoadingButtons(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(id);
-      return newSet;
-    });
-  };
-
   const handlePurchase = (listing: MarketplaceListing) => {
     const kairosPrice = Math.ceil(listing.currentPrice / 100);
     
@@ -132,8 +120,10 @@ export default function MarketplacePage() {
       return;
     }
 
-    addLoadingButton(listing.id);
+    // Immediately set loading state for this specific button
+    setPurchasingId(listing.id);
 
+    // Make the purchase request
     fetch(`/api/marketplace/listings/${listing.id}/purchase`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -144,7 +134,8 @@ export default function MarketplacePage() {
       })
     })
     .then(response => {
-      removeLoadingButton(listing.id);
+      // Always clear loading state first
+      setPurchasingId(null);
       
       if (response.ok) {
         toast({
@@ -153,28 +144,20 @@ export default function MarketplacePage() {
           variant: "default",
         });
         
+        // Refresh data after successful purchase
         queryClient.invalidateQueries({ queryKey: ['/api/marketplace/listings'] });
         queryClient.invalidateQueries({ queryKey: ["/api/users/sample-user"] });
       } else {
-        response.json()
-          .then(errorData => {
-            toast({
-              title: "Error en Compra", 
-              description: errorData.message || "Error al procesar compra",
-              variant: "destructive",
-            });
-          })
-          .catch(() => {
-            toast({
-              title: "Error",
-              description: "Error al procesar compra",
-              variant: "destructive",
-            });
-          });
+        toast({
+          title: "Error en Compra", 
+          description: "Error al procesar compra",
+          variant: "destructive",
+        });
       }
     })
-    .catch(error => {
-      removeLoadingButton(listing.id);
+    .catch(() => {
+      // Always clear loading state on error too
+      setPurchasingId(null);
       toast({
         title: "Error",
         description: "Error de conexión",
@@ -489,9 +472,9 @@ export default function MarketplacePage() {
                             className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700" 
                             data-testid={`button-buy-${listing.id}`}
                             onClick={() => handlePurchase(listing)}
-                            disabled={loadingButtons.has(listing.id)}
+                            disabled={purchasingId === listing.id}
                           >
-                            {loadingButtons.has(listing.id) ? (
+                            {purchasingId === listing.id ? (
                               <div className="flex items-center gap-2">
                                 <div className="animate-spin h-4 w-4 border-2 border-current rounded-full border-t-transparent"></div>
                                 Comprando...
