@@ -86,23 +86,34 @@ export default function MarketplacePage() {
   const purchaseMutation = useMutation({
     mutationFn: async ({ listingId, price }: { listingId: string; price: number }) => {
       console.log('Purchase mutation starting...', { listingId, price });
-      const response = await apiRequest(`/api/marketplace/listings/${listingId}/purchase`, {
-        method: 'POST',
-        body: { 
-          userId: 'sample-user',
-          purchasePrice: price,
-          paymentMethod: 'kairos_tokens'
+      try {
+        const response = await fetch(`/api/marketplace/listings/${listingId}/purchase`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            userId: 'sample-user',
+            purchasePrice: price,
+            paymentMethod: 'kairos_tokens'
+          })
+        });
+        
+        console.log('Response received:', response.status, response.ok);
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ message: 'Purchase failed' }));
+          console.log('Error data:', errorData);
+          throw new Error(errorData.message || 'Purchase failed');
         }
-      });
-      console.log('Response received:', response.status, response.ok);
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.log('Error data:', errorData);
-        throw new Error(errorData.message || 'Purchase failed');
+        
+        const result = await response.json();
+        console.log('Purchase result:', result);
+        return result;
+      } catch (error) {
+        console.error('Purchase mutation error:', error);
+        throw error;
       }
-      const result = await response.json();
-      console.log('Purchase result:', result);
-      return result;
     },
     onSuccess: (data) => {
       console.log('Purchase onSuccess called with data:', data);
