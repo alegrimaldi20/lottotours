@@ -16,13 +16,13 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen gradient-dark">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 glass-dark backdrop-blur-md border-b border-white/10">
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-cyan-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <div className="text-2xl font-bold text-gradient-primary flex items-center gap-2" data-testid="logo">
+              <div className="text-2xl font-bold text-gradient-ltt flex items-center gap-2" data-testid="logo">
                 <div className="w-8 h-8">
                   <TravelImageRenderer type="cultural" className="w-full h-full" />
                 </div>
@@ -62,11 +62,11 @@ export default function Landing() {
       <section className="relative py-20 lg:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 float" data-testid="hero-title">
+            <h1 className="text-4xl md:text-6xl font-bold text-explore-blue mb-6" data-testid="hero-title">
               Turn Your Dreams Into
-              <span className="text-gradient-primary shimmer"> Adventures</span>
+              <span className="text-gradient-ltt"> Adventures</span>
             </h1>
-            <p className="text-xl md:text-2xl text-white/80 mb-8 max-w-3xl mx-auto" data-testid="hero-subtitle">
+            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto" data-testid="hero-subtitle">
               Complete missions, win lotteries, and earn tokens to unlock real travel experiences. 
               Your next adventure starts with a single click!
             </p>

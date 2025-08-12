@@ -4,53 +4,43 @@
 
 @layer base {
   :root {
-    /* Modern Glamorous Color Palette - Dark Luxury Theme */
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 346 87% 43%;
-    --primary-foreground: 355 7% 97%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 346 87% 43%;
-    --radius: 0.75rem;
+    /* MI PRIMER MODELO LTT - Colores Azul Profundo + Cian Vibrante */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 210 100% 50%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 210 100% 50%;
+    --radius: 0.5rem;
 
-    /* Luxury Premium Colors */
-    --gold: 45 100% 60%;
-    --electric-blue: 210 100% 56%;
-    --neon-purple: 280 100% 70%;
-    --cyber-pink: 330 100% 70%;
-    --platinum: 220 9% 78%;
-    --deep-purple: 260 70% 35%;
-    --crystal-cyan: 180 100% 70%;
-    --sunset-orange: 25 100% 65%;
+    /* MI PRIMER MODELO LTT - Paleta Glamurosa */
+    --deep-blue: 210 100% 20%;
+    --vibrant-cyan: 180 100% 50%;
+    --golden-luxury: 45 93% 47%;
+    --ocean-pulse: 202 83% 53%;
+    --travel-mint: 172 66% 50%;
+    --explore-blue: 213 94% 68%;
+    --sunset-coral: 14 91% 60%;
+    --adventure-purple: 262 83% 58%;
 
-    /* Travel Luxury Theme */
-    --luxury-gold: 45 100% 60%;
-    --royal-purple: 260 70% 35%;
-    --electric-cyan: 180 100% 70%;
-    --sunset-coral: 25 100% 65%;
-    --platinum-silver: 220 9% 78%;
-    --cosmic-blue: 210 100% 56%;
-    --neon-pink: 330 100% 70%;
-    --emerald-glow: 150 100% 50%;
-
-    /* Gradient Backgrounds */
-    --gradient-primary: linear-gradient(135deg, hsl(330, 100%, 70%) 0%, hsl(260, 70%, 35%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(180, 100%, 70%) 0%, hsl(210, 100%, 56%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(45, 100%, 60%) 0%, hsl(25, 100%, 65%) 100%);
-    --gradient-dark: linear-gradient(135deg, hsl(240, 10%, 3.9%) 0%, hsl(240, 3.7%, 15.9%) 100%);
+    /* Gradientes Glamurosos - Basados en Azul Profundo + Cian */
+    --gradient-primary: linear-gradient(135deg, hsl(210, 100%, 20%) 0%, hsl(180, 100%, 50%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(180, 100%, 50%) 0%, hsl(213, 94%, 68%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(45, 93%, 47%) 0%, hsl(14, 91%, 60%) 100%);
+    --gradient-purple: linear-gradient(135deg, hsl(262, 83%, 58%) 0%, hsl(210, 100%, 20%) 100%);
   }
 
   body {
@@ -187,44 +177,52 @@
   }
 }
 
-/* Legacy Color Support for Existing Components */
+/* MI PRIMER MODELO LTT - Aplicación Glamurosa de Colores */
 .bg-orange-500 {
-  background: linear-gradient(135deg, hsl(330, 100%, 70%) 0%, hsl(260, 70%, 35%) 100%) !important;
+  background: linear-gradient(135deg, hsl(210, 100%, 20%) 0%, hsl(180, 100%, 50%) 100%) !important;
 }
 
 .bg-pink-500 {
-  background: linear-gradient(135deg, hsl(330, 100%, 70%) 0%, hsl(260, 70%, 35%) 100%) !important;
+  background: linear-gradient(135deg, hsl(180, 100%, 50%) 0%, hsl(213, 94%, 68%) 100%) !important;
 }
 
 .text-orange-600 {
-  color: hsl(330, 100%, 70%) !important;
+  color: hsl(180, 100%, 50%) !important;
 }
 
 .text-pink-600 {
-  color: hsl(330, 100%, 70%) !important;
+  color: hsl(210, 100%, 20%) !important;
 }
 
 .border-orange-200 {
-  border-color: hsl(330, 100%, 70%, 0.3) !important;
+  border-color: hsl(180, 100%, 50%, 0.3) !important;
 }
 
 .border-pink-200 {
-  border-color: hsl(330, 100%, 70%, 0.3) !important;
+  border-color: hsl(210, 100%, 20%, 0.3) !important;
 }
 
-/* Button Overrides */
+/* Botones Glamurizados con Colores MI PRIMER MODELO LTT */
 .from-orange-500 {
-  --tw-gradient-from: hsl(330, 100%, 70%) !important;
+  --tw-gradient-from: hsl(210, 100%, 20%) !important;
 }
 
 .to-pink-500 {
-  --tw-gradient-to: hsl(260, 70%, 35%) !important;
+  --tw-gradient-to: hsl(180, 100%, 50%) !important;
 }
 
 .hover\:from-orange-600:hover {
-  --tw-gradient-from: hsl(330, 100%, 80%) !important;
+  --tw-gradient-from: hsl(210, 100%, 30%) !important;
 }
 
 .hover\:to-pink-600:hover {
-  --tw-gradient-to: hsl(260, 70%, 45%) !important;
+  --tw-gradient-to: hsl(180, 100%, 60%) !important;
+}
+
+/* Texto con Gradientes LTT */
+.text-gradient-ltt {
+  background: linear-gradient(135deg, hsl(210, 100%, 20%) 0%, hsl(180, 100%, 50%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

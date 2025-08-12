@@ -536,16 +536,16 @@ export default function LotteriesRestructured() {
   }
 
   return (
-    <div className="min-h-screen gradient-dark">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-gradient-primary mb-4 shimmer">
+          <h1 className="text-5xl font-bold text-gradient-ltt mb-4">
             🌍 Loterías de Viajes TravelLotto
           </h1>
-          <p className="text-2xl text-white/90 mb-2">
+          <p className="text-2xl text-muted-foreground mb-2">
             Cada boleto es una posibilidad. Cada destino es real.
           </p>
-          <p className="text-lg text-white/70 mb-6">
+          <p className="text-lg text-muted-foreground mb-6">
             ✨ <em>"Participa en loterías temáticas y desbloquea la oportunidad de viajar por el mundo"</em>
           </p>
           {user && (
