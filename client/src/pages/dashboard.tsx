@@ -17,6 +17,7 @@ import MobileNavigation from "@/components/mobile-navigation";
 import NavigationDropdown from "@/components/navigation-dropdown";
 import ProfileDropdown from "@/components/profile-dropdown";
 import LanguageSelector from "@/components/language-selector";
+import LotteryNavigationWidget from "@/components/lottery-navigation-widget";
 import { useLanguage } from "@/lib/i18n";
 
 const SAMPLE_USER_ID = "sample-user";
@@ -112,6 +113,51 @@ export default function Dashboard() {
           </p>
         </div>
 
+        {/* Quick Access to Active Lotteries */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold text-slate-900">🎯 Loterías Activas</h2>
+            <Link href="/lotteries">
+              <Button variant="outline" className="text-orange-600 border-orange-200 hover:bg-orange-50" data-testid="view-all-lotteries">
+                Ver Todas <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            {lotteries.slice(0, 3).map((lottery) => (
+              <Card key={lottery.id} className="hover:shadow-lg transition-shadow border-2 hover:border-orange-200">
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start">
+                    <Badge className="bg-orange-500 text-white">{lottery.lotteryCode}</Badge>
+                    <span className="text-sm text-muted-foreground">{lottery.ticketPrice} Kairos</span>
+                  </div>
+                  <CardTitle className="text-lg">{lottery.title}</CardTitle>
+                  <CardDescription className="text-sm">{lottery.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Valor del premio:</span>
+                      <span className="font-semibold text-orange-600">${(lottery.prizeValue / 100).toLocaleString()} USD</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Boletos vendidos:</span>
+                      <span className="text-sm">{lottery.soldTickets} / {lottery.maxTickets}</span>
+                    </div>
+                    <Progress value={(lottery.soldTickets / lottery.maxTickets) * 100} className="h-2" />
+                    <Link href="/lotteries">
+                      <Button size="sm" className="w-full mt-3 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600">
+                        Participar Ahora
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
         {/* Token Balance Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           {/* Viator Tokens */}
@@ -203,7 +249,10 @@ export default function Dashboard() {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Lottery Widget */}
+              <LotteryNavigationWidget showInDashboard={true} />
+              
               {/* Quick Actions */}
               <Card>
                 <CardHeader>
@@ -214,17 +263,15 @@ export default function Dashboard() {
                   <CardDescription>Jump into your next adventure</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button 
-                    className="w-full justify-between" 
-                    data-testid="quick-action-lotteries"
-                    onClick={() => {
-                      console.log("Navigating to lotteries from dashboard...");
-                      window.location.replace('/lotteries');
-                    }}
-                  >
-                    Explore Lotteries
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
+                  <Link href="/lotteries">
+                    <Button 
+                      className="w-full justify-between bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600" 
+                      data-testid="quick-action-lotteries"
+                    >
+                      🌍 Loterías de Viajes
+                      <Trophy className="h-4 w-4" />
+                    </Button>
+                  </Link>
                   <Link href="/token-management">
                     <Button variant="outline" className="w-full justify-between" data-testid="quick-action-tokens">
                       Manage Tokens
@@ -311,9 +358,10 @@ export default function Dashboard() {
                         <span>{new Date(lottery.drawDate).toLocaleDateString()}</span>
                       </div>
                     </div>
-                    <Link href={`/lottery/${lottery.id}`}>
-                      <Button className="w-full mt-4" size="sm" data-testid={`lottery-${lottery.id}`}>
-                        View Details
+                    <Link href="/lotteries">
+                      <Button className="w-full mt-4 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600" size="sm" data-testid={`lottery-${lottery.id}`}>
+                        <Trophy className="mr-2 h-4 w-4" />
+                        Participar Ahora
                       </Button>
                     </Link>
                   </CardContent>
@@ -321,15 +369,14 @@ export default function Dashboard() {
               ))}
             </div>
             
-            {lotteries.length > 6 && (
-              <div className="text-center">
-                <Link href="/lotteries">
-                  <Button variant="outline" data-testid="view-all-lotteries">
-                    View All Lotteries
-                  </Button>
-                </Link>
-              </div>
-            )}
+            <div className="text-center">
+              <Link href="/lotteries">
+                <Button size="lg" className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600" data-testid="view-all-lotteries">
+                  <Trophy className="mr-2 h-5 w-5" />
+                  Ver Todas las Loterías
+                </Button>
+              </Link>
+            </div>
           </TabsContent>
 
           {/* Token Packs Tab */}
