@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { useLocaleSafeToast } from "@/hooks/use-locale-safe-toast";
-import { Calendar, Clock, MapPin, Users, Star, Ticket, Sparkles, Shuffle } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Star, Ticket, Sparkles, Shuffle, Gift, Trophy, Target, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Import generated travel images
@@ -136,6 +136,181 @@ const lotteryDetails: Record<string, {
   }
 };
 
+// Componente de cuenta regresiva
+const CountdownTimer = ({ drawDate }: { drawDate: string }) => {
+  const [timeLeft, setTimeLeft] = useState<{
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+  }>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date().getTime();
+      const targetDate = new Date(drawDate).getTime();
+      const difference = targetDate - now;
+
+      if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+        setTimeLeft({ days, hours, minutes, seconds });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [drawDate]);
+
+  return (
+    <div className="bg-gradient-to-r from-orange-500 to-pink-500 rounded-lg p-4 text-white">
+      <div className="text-center">
+        <p className="text-sm font-medium mb-2">⏰ Próximo sorteo en:</p>
+        <div className="grid grid-cols-4 gap-2 text-center">
+          <div className="bg-white/20 rounded p-2">
+            <div className="text-xl font-bold">{timeLeft.days}</div>
+            <div className="text-xs">Días</div>
+          </div>
+          <div className="bg-white/20 rounded p-2">
+            <div className="text-xl font-bold">{timeLeft.hours}</div>
+            <div className="text-xs">Hrs</div>
+          </div>
+          <div className="bg-white/20 rounded p-2">
+            <div className="text-xl font-bold">{timeLeft.minutes}</div>
+            <div className="text-xs">Min</div>
+          </div>
+          <div className="bg-white/20 rounded p-2">
+            <div className="text-xl font-bold">{timeLeft.seconds}</div>
+            <div className="text-xs">Seg</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Componente de cofre sorpresa
+const SurpriseChest = ({ isOpen, onOpen }: { isOpen: boolean; onOpen: () => void }) => {
+  return (
+    <div className="text-center p-4 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-lg border-2 border-yellow-300">
+      <div className="text-4xl mb-2 animate-pulse">
+        {isOpen ? "🎁" : "📦"}
+      </div>
+      <p className="text-sm font-medium text-yellow-800 mb-2">
+        {isOpen ? "¡Cofre abierto!" : "Cofre Sorpresa"}
+      </p>
+      {!isOpen ? (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={onOpen}
+          className="bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-600"
+        >
+          Abrir
+        </Button>
+      ) : (
+        <div className="space-y-1">
+          <Badge variant="secondary" className="bg-green-100 text-green-800">
+            +50 XP Bonus
+          </Badge>
+          <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+            NFT Destino
+          </Badge>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Componente de historial de ganadores
+const WinnersHistory = () => {
+  const mockWinners = [
+    { name: "María C.", country: "🇪🇸 España", lottery: "Bali Adventure", date: "15 Dic 2024" },
+    { name: "Carlos M.", country: "🇲🇽 México", lottery: "Patagonia Trek", date: "8 Dic 2024" },
+    { name: "Ana L.", country: "🇦🇷 Argentina", lottery: "Morocco Magic", date: "1 Dic 2024" },
+  ];
+
+  return (
+    <div className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border">
+      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <Trophy className="h-5 w-5 text-yellow-600" />
+        Ganadores Recientes
+      </h3>
+      <div className="space-y-3">
+        {mockWinners.map((winner, index) => (
+          <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-orange-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                {winner.name.charAt(0)}
+              </div>
+              <div>
+                <p className="font-medium text-sm">{winner.name}</p>
+                <p className="text-xs text-muted-foreground">{winner.country}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-sm font-medium text-green-600">{winner.lottery}</p>
+              <p className="text-xs text-muted-foreground">{winner.date}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Componente de misiones temáticas
+const ThematicMissions = ({ lotteryTheme }: { lotteryTheme: string }) => {
+  const missionsByTheme: Record<string, { title: string; reward: string; icon: string }[]> = {
+    "bali": [
+      { title: "Aprende sobre templos balineses", reward: "+25% chances", icon: "🛕" },
+      { title: "Descubre la cultura local", reward: "+1 Boleto gratis", icon: "🎭" }
+    ],
+    "patagonia": [
+      { title: "Completa desafío de montaña", reward: "+30% chances", icon: "🏔️" },
+      { title: "Fotografía vida silvestre", reward: "+1 Boleto gratis", icon: "📸" }
+    ],
+    "morocco": [
+      { title: "Explora mercados tradicionales", reward: "+25% chances", icon: "🏺" },
+      { title: "Aprende sobre cultura bereber", reward: "+1 Boleto gratis", icon: "🐪" }
+    ],
+    "vip": [
+      { title: "Completa experiencia VIP", reward: "+50% chances", icon: "✨" },
+      { title: "Colecciona NFTs premium", reward: "+2 Boletos gratis", icon: "💎" }
+    ]
+  };
+
+  const missions = missionsByTheme[lotteryTheme] || [];
+
+  if (missions.length === 0) return null;
+
+  return (
+    <div className="bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg p-4 border-2 border-purple-200">
+      <h4 className="font-semibold mb-3 flex items-center gap-2 text-purple-800">
+        <Target className="h-4 w-4" />
+        Misiones Temáticas
+      </h4>
+      <div className="space-y-2">
+        {missions.map((mission, index) => (
+          <div key={index} className="flex items-center justify-between p-2 bg-white/70 rounded">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">{mission.icon}</span>
+              <span className="text-sm font-medium">{mission.title}</span>
+            </div>
+            <Badge variant="secondary" className="bg-purple-200 text-purple-800 text-xs">
+              {mission.reward}
+            </Badge>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // Componente de selección de números
 const NumberSelector = ({ 
   selectedNumbers, 
@@ -212,6 +387,7 @@ export default function LotteriesRestructured() {
   const [selectedLottery, setSelectedLottery] = useState<string | null>(null);
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [openChests, setOpenChests] = useState<Set<string>>(new Set());
   const { toast } = useLocaleSafeToast();
   const queryClient = useQueryClient();
 
@@ -281,6 +457,11 @@ export default function LotteriesRestructured() {
 
   const handleClearNumbers = () => {
     setSelectedNumbers([]);
+  };
+
+  const handleOpenChest = (lotteryId: string) => {
+    setOpenChests(prev => new Set(Array.from(prev).concat(lotteryId)));
+    toast({ title: "¡Cofre abierto!", description: "Has ganado XP bonus y un NFT del destino" });
   };
 
   const handlePurchase = async (lotteryId: string, isAutoGenerated: boolean = false) => {
@@ -355,193 +536,233 @@ export default function LotteriesRestructured() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent">
-          Loterías de Viajes TravelLotto
-        </h1>
-        <p className="text-xl text-muted-foreground mt-2">
-          Gana increíbles experiencias de viaje con nuestras loterías exclusivas
-        </p>
-        {user && (
-          <div className="flex justify-center gap-4 mt-4">
-            <Badge variant="secondary" className="text-sm px-3 py-1">
-              <Sparkles className="h-4 w-4 mr-1" />
-              {user.kairosTokens} Tokens Kairos
-            </Badge>
-            <Badge variant="outline" className="text-sm px-3 py-1">
-              {user.raivanTokens} Tokens Raivan
-            </Badge>
-          </div>
-        )}
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent mb-4">
+            🌍 Loterías de Viajes TravelLotto
+          </h1>
+          <p className="text-2xl text-muted-foreground mb-2">
+            Cada boleto es una posibilidad. Cada destino es real.
+          </p>
+          <p className="text-lg text-muted-foreground mb-6">
+            ✨ <em>"Participa en loterías temáticas y desbloquea la oportunidad de viajar por el mundo"</em>
+          </p>
+          {user && (
+            <div className="flex justify-center gap-6 mt-6">
+              <Badge variant="secondary" className="text-lg px-4 py-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white">
+                <Sparkles className="h-5 w-5 mr-2" />
+                {user.kairosTokens} Tokens Kairos
+              </Badge>
+              <Badge variant="outline" className="text-lg px-4 py-2 border-2">
+                <Zap className="h-5 w-5 mr-2" />
+                {user.raivanTokens} Tokens Raivan
+              </Badge>
+            </div>
+          )}
+        </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        {lotteries?.map((lottery) => {
-          const details = lotteryDetails[lottery.id];
-          const imageUrl = lotteryImages[lottery.id];
-          const progress = (lottery.soldTickets / lottery.maxTickets) * 100;
-          
-          return (
-            <Card key={lottery.id} className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="relative h-64">
-                <img
-                  src={imageUrl}
-                  alt={lottery.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-4 left-4">
-                  <Badge className="bg-orange-500 text-white">
-                    {lottery.lotteryCode}
-                  </Badge>
-                </div>
-                <div className="absolute top-4 right-4">
-                  <Badge variant="secondary" className="bg-white/90 text-gray-900">
-                    <Ticket className="h-4 w-4 mr-1" />
-                    {lottery.ticketPrice} Kairos
-                  </Badge>
-                </div>
-              </div>
+        {/* Historial de ganadores */}
+        <div className="mb-8">
+          <WinnersHistory />
+        </div>
 
-              <CardHeader>
-                <CardTitle className="text-2xl">{lottery.title}</CardTitle>
-                <CardDescription className="text-lg">
-                  {lottery.description}
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-orange-500" />
-                    <span>Sorteo: {formatDate(lottery.drawDate)}</span>
+        <div className="grid gap-8 lg:grid-cols-2">
+          {lotteries?.map((lottery) => {
+            const details = lotteryDetails[lottery.id];
+            const imageUrl = lotteryImages[lottery.id];
+            const progress = (lottery.soldTickets / lottery.maxTickets) * 100;
+            const lotteryTheme = lottery.id.split("-")[1]; // Extract theme from ID
+            const isChestOpen = openChests.has(lottery.id);
+            
+            return (
+              <Card key={lottery.id} className="overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] border-2 border-gray-200 hover:border-orange-300">
+                <div className="relative h-64">
+                  <img
+                    src={imageUrl}
+                    alt={lottery.title}
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+                  <div className="absolute top-4 left-4">
+                    <Badge className="bg-orange-500 text-white text-sm px-3 py-1">
+                      {lottery.lotteryCode}
+                    </Badge>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-orange-500" />
-                    <span>Duración: {details?.duration}</span>
+                  <div className="absolute top-4 right-4">
+                    <Badge variant="secondary" className="bg-white/90 text-gray-900 text-sm px-3 py-1">
+                      <Ticket className="h-4 w-4 mr-1" />
+                      {lottery.ticketPrice} Kairos
+                    </Badge>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-orange-500" />
-                    <span>Dificultad: {details?.difficulty}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-orange-500" />
-                    <span>Mejor época: {details?.bestTime}</span>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h2 className="text-white text-xl font-bold mb-1">{lottery.title}</h2>
+                    <p className="text-white/90 text-sm">✈️ Este destino puede ser tuyo</p>
                   </div>
                 </div>
 
-                <Separator />
+                <CardContent className="space-y-6 p-6">
+                  {/* Cuenta regresiva */}
+                  <CountdownTimer drawDate={lottery.drawDate} />
 
-                <div>
-                  <h4 className="font-semibold mb-2 text-lg">Premio: {lottery.prizeTitle}</h4>
-                  <p className="text-muted-foreground mb-3">{lottery.prizeDescription}</p>
-                  <p className="text-2xl font-bold text-orange-600">
-                    Valor: {formatPrice(lottery.prizeValue)}
-                  </p>
-                </div>
+                  {/* Descripción del premio */}
+                  <div className="text-center">
+                    <h3 className="text-xl font-bold mb-2">{lottery.prizeTitle}</h3>
+                    <p className="text-muted-foreground mb-3">{lottery.prizeDescription}</p>
+                    <p className="text-3xl font-bold text-orange-600">
+                      Valor: {formatPrice(lottery.prizeValue)}
+                    </p>
+                  </div>
 
-                {details && (
-                  <div className="space-y-4">
-                    <div>
-                      <h5 className="font-semibold mb-2">¿Qué incluye?</h5>
-                      <ul className="text-sm text-muted-foreground space-y-1">
-                        {details.includes.slice(0, 3).map((item, index) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <span className="text-orange-500">•</span>
-                            {item}
-                          </li>
-                        ))}
-                        {details.includes.length > 3 && (
-                          <li className="text-orange-500 font-medium">
-                            +{details.includes.length - 3} beneficios más...
-                          </li>
-                        )}
-                      </ul>
+                  <Separator />
+
+                  {/* Información del destino */}
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-orange-500" />
+                      <span>Sorteo: {formatDate(lottery.drawDate)}</span>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-orange-500" />
+                      <span>Duración: {details?.duration}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Star className="h-4 w-4 text-orange-500" />
+                      <span>Dificultad: {details?.difficulty}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-orange-500" />
+                      <span>Mejor época: {details?.bestTime}</span>
+                    </div>
+                  </div>
 
-                    <div>
-                      <h5 className="font-semibold mb-2">Highlights del viaje</h5>
-                      <div className="flex flex-wrap gap-2">
-                        {details.highlights.slice(0, 3).map((highlight, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {highlight}
-                          </Badge>
-                        ))}
+                  <Separator />
+
+                  {/* Misiones temáticas */}
+                  <ThematicMissions lotteryTheme={lotteryTheme} />
+
+                  <Separator />
+
+                  {/* Cofre sorpresa */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <SurpriseChest 
+                      isOpen={isChestOpen} 
+                      onOpen={() => handleOpenChest(lottery.id)} 
+                    />
+                    <div className="text-center p-4 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg border-2 border-blue-200">
+                      <div className="text-3xl mb-2">🎯</div>
+                      <p className="text-sm font-medium text-blue-800 mb-1">Probabilidades</p>
+                      <p className="text-lg font-bold text-blue-600">
+                        1 en {lottery.maxTickets}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {details && (
+                    <div className="space-y-4">
+                      <div>
+                        <h5 className="font-semibold mb-2">¿Qué incluye?</h5>
+                        <ul className="text-sm text-muted-foreground space-y-1">
+                          {details.includes.slice(0, 3).map((item, index) => (
+                            <li key={index} className="flex items-start gap-2">
+                              <span className="text-orange-500">•</span>
+                              {item}
+                            </li>
+                          ))}
+                          {details.includes.length > 3 && (
+                            <li className="text-orange-500 font-medium">
+                              +{details.includes.length - 3} beneficios más...
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+
+                      <div>
+                        <h5 className="font-semibold mb-2">Highlights del viaje</h5>
+                        <div className="flex flex-wrap gap-2">
+                          {details.highlights.slice(0, 3).map((highlight, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {highlight}
+                            </Badge>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-
-                <Separator />
-
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Boletos vendidos</span>
-                    <span className="text-sm text-muted-foreground">
-                      {lottery.soldTickets} / {lottery.maxTickets}
-                    </span>
-                  </div>
-                  <Progress value={progress} className="h-2" />
-                </div>
-
-                <div className="space-y-3">
-                  {selectedLottery === lottery.id ? (
-                    <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
-                      <NumberSelector
-                        selectedNumbers={selectedNumbers}
-                        onNumberToggle={handleNumberToggle}
-                        onQuickPick={handleQuickPick}
-                        onClear={handleClearNumbers}
-                      />
-                      
-                      <div className="flex gap-3">
-                        <Button
-                          onClick={() => handlePurchase(lottery.id, false)}
-                          disabled={selectedNumbers.length !== 6 || isLoading}
-                          className="flex-1"
-                          data-testid={`button-purchase-manual-${lottery.id}`}
-                        >
-                          Comprar Boleto Manual
-                        </Button>
-                        <Button
-                          onClick={() => handlePurchase(lottery.id, true)}
-                          disabled={isLoading}
-                          variant="outline"
-                          className="flex-1"
-                          data-testid={`button-purchase-auto-${lottery.id}`}
-                        >
-                          Comprar Boleto Automático
-                        </Button>
-                      </div>
-                      
-                      <Button
-                        variant="ghost"
-                        onClick={() => {
-                          setSelectedLottery(null);
-                          setSelectedNumbers([]);
-                        }}
-                        className="w-full"
-                        data-testid={`button-cancel-${lottery.id}`}
-                      >
-                        Cancelar
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button
-                      onClick={() => setSelectedLottery(lottery.id)}
-                      size="lg"
-                      className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600"
-                      data-testid={`button-select-lottery-${lottery.id}`}
-                    >
-                      <Ticket className="h-5 w-5 mr-2" />
-                      Participar en esta Lotería
-                    </Button>
                   )}
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+
+                  <Separator />
+
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Boletos vendidos</span>
+                      <span className="text-sm text-muted-foreground">
+                        {lottery.soldTickets} / {lottery.maxTickets}
+                      </span>
+                    </div>
+                    <Progress value={progress} className="h-2" />
+                  </div>
+
+                  <div className="space-y-3">
+                    {selectedLottery === lottery.id ? (
+                      <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+                        <NumberSelector
+                          selectedNumbers={selectedNumbers}
+                          onNumberToggle={handleNumberToggle}
+                          onQuickPick={handleQuickPick}
+                          onClear={handleClearNumbers}
+                        />
+                        
+                        <div className="flex gap-3">
+                          <Button
+                            onClick={() => handlePurchase(lottery.id, false)}
+                            disabled={selectedNumbers.length !== 6 || isLoading}
+                            className="flex-1"
+                            data-testid={`button-purchase-manual-${lottery.id}`}
+                          >
+                            Comprar Boleto Manual
+                          </Button>
+                          <Button
+                            onClick={() => handlePurchase(lottery.id, true)}
+                            disabled={isLoading}
+                            variant="outline"
+                            className="flex-1"
+                            data-testid={`button-purchase-auto-${lottery.id}`}
+                          >
+                            Comprar Boleto Automático
+                          </Button>
+                        </div>
+                        
+                        <Button
+                          variant="ghost"
+                          onClick={() => {
+                            setSelectedLottery(null);
+                            setSelectedNumbers([]);
+                          }}
+                          className="w-full"
+                          data-testid={`button-cancel-${lottery.id}`}
+                        >
+                          Cancelar
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        onClick={() => setSelectedLottery(lottery.id)}
+                        size="lg"
+                        className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600"
+                        data-testid={`button-select-lottery-${lottery.id}`}
+                      >
+                        <Ticket className="h-5 w-5 mr-2" />
+                        Participar en esta Lotería
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

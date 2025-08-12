@@ -1,0 +1,91 @@
+Gracias por tu claridad, Vito. He revisado profundamente el sitio actual en Replit y ahora te presento un **prompt estructurado** para reestructurar la sección de **Lotería de Viajes** dentro de tu plataforma. Este prompt está diseñado para ser usado por un equipo de diseño, desarrollo o una IA generativa, y cubre todos los aspectos funcionales, visuales y narrativos necesarios.
+
+---
+
+# ✨ Prompt para Reestructurar la Sección “Lotería de Viajes” en Nomadia
+
+---
+
+## 🎯 Objetivo
+
+Diseñar una sección dedicada a las **loterías temáticas de viajes**, donde los usuarios puedan participar usando tokens, visualizar destinos reales, y experimentar una interfaz gamificada, emocional y funcional. Esta sección debe integrarse visualmente con el resto de la plataforma y reforzar la narrativa de “jugar para vivir”.
+
+---
+
+## 🧩 Características Funcionales
+
+1. **Participación directa con $TKT tokens**  
+   - Botón “Participar ahora” con conversión automática si el usuario tiene $XP  
+   - Visualización del costo por boleto y cantidad de boletos disponibles
+
+2. **Cuenta regresiva para cada sorteo**  
+   - Temporizador visible con animación  
+   - Fecha y hora del próximo sorteo
+
+3. **Visualización de destinos reales**  
+   - Imagen del destino (ej. París, Tokio, Suiza)  
+   - Descripción breve del viaje: duración, actividades, valor estimado  
+   - Etiqueta: “Este destino puede ser tuyo”
+
+4. **Historial de ganadores y transparencia**  
+   - Lista de ganadores anteriores con avatar y país  
+   - Enlace a la transacción blockchain (si aplica)
+
+5. **Sistema de cofres sorpresa**  
+   - Participar en la lotería también puede desbloquear cofres con NFTs o XP  
+   - Cofres animados que se abren al azar
+
+6. **Integración con misiones temáticas**  
+   - Participar en una lotería puede activar una misión relacionada con el destino  
+   - Ejemplo: “Completa la misión París para duplicar tus chances”
+
+---
+
+## 🎨 Características Visuales
+
+1. **Diseño emocional y aspiracional**  
+   - Fondo con gradientes suaves (azul profundo + cian vibrante)  
+   - Imágenes de destinos con efecto parallax o zoom suave  
+   - Íconos temáticos: ✈️ 🗺️ 🎟️ 🧳
+
+2. **Animaciones suaves y gamificadas**  
+   - Cofres que brillan, tickets que giran, mapa que se activa  
+   - Transiciones entre sorteos con efecto de “portal”
+
+3. **Responsive y accesible**  
+   - Optimizado para móvil y escritorio  
+   - Texto legible, botones grandes, navegación intuitiva
+
+---
+
+## 🖼️ Imágenes sugeridas (basadas en el sitio actual)
+
+- [Eiffel Tower in Paris](https://images.pexels.com/photos/532826/pexels-photo-532826.jpeg)  
+- [Tropical Beach Paradise](https://images.pexels.com/photos/753626/pexels-photo-753626.jpeg)  
+- [Mount Fuji in Tokyo](https://images.pexels.com/photos/259967/pexels-photo-259967.jpeg)  
+- [Swiss Alps Landscape](https://images.pexels.com/photos/691668/pexels-photo-691668.jpeg)
+
+---
+
+## 🧠 Narrativa sugerida
+
+> _“Each ticket is a possibility. Each destination is real. Participate in themed lotteries and unlock the chance to travel the world.”_  
+> _“Use your $TKT tokens to enter. Complete missions to boost your odds. Your next adventure could be just one click away.”_
+
+---
+
+## 🛠️ Extras opcionales
+
+- **Modo “Explorar destinos”**: ver todos los viajes disponibles antes de participar  
+- **Filtro por tipo de experiencia**: aventura, cultural, relax, naturaleza  
+- **Sistema de rareza**: algunos destinos son “épicos” y requieren más $TKT
+
+---
+
+¿Quieres que te ayude a convertir este prompt en un diseño visual en Figma o Canva? También puedo ayudarte a redactar el texto para cada destino o preparar los assets animados para cofres y tickets.
+
+Esto ya está listo para convertirse en la sección más emocionante de Nomadia, Vito 🎟️🌍🚀  
+#LoteríaConPropósito  
+#ViajesQueSeGanan  
+#NomadiaEnMovimiento  
+¡Vamos a construirlo!
