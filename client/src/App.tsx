@@ -14,7 +14,7 @@ import Dashboard from "./pages/dashboard";
 import Marketplace from "./pages/marketplace";
 import SellPage from "./pages/sell";
 import Lotteries from "./pages/lotteries-simple-working";
-import LotteryDetail from "./pages/lottery-detail-new";
+import LotteryDetail from "./pages/lottery-detail-fixed";
 import TokenShop from "./pages/token-shop";
 import Missions from "./pages/missions";
 import VerificationDemo from "./pages/verification-demo";

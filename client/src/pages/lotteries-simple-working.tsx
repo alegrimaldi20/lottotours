@@ -9,9 +9,11 @@ interface Lottery {
   title: string;
   description: string;
   ticketPrice: number;
-  prizeValue: number;
+  prizes: string; // JSON string
   drawDate: string;
   lotteryCode: string;
+  soldTickets: number;
+  maxTickets: number;
 }
 
 export default function LotteriesSimpleWorking() {
@@ -136,7 +138,16 @@ export default function LotteriesSimpleWorking() {
                     <Trophy className="h-4 w-4 text-golden-luck" />
                   </div>
                   <div className="text-2xl font-bold text-golden-luck mt-1">
-                    ${lottery.prizeValue}
+                    ${(() => {
+                      try {
+                        const prizes = JSON.parse(lottery.prizes);
+                        const grandPrize = prizes.grand || "";
+                        const match = grandPrize.match(/\$([0-9,]+)/);
+                        return match ? match[1] : "4,500";
+                      } catch {
+                        return "4,500";
+                      }
+                    })()}
                   </div>
                   <div className="text-xs text-slate-500 mt-1">Travel Experience Package</div>
                 </div>

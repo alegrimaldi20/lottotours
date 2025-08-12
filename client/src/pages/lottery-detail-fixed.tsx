@@ -15,7 +15,7 @@ import {
 
 const SAMPLE_USER_ID = "sample-user";
 
-export default function LotteryDetailNew() {
+export default function LotteryDetailFixed() {
   const [match, params] = useRoute("/lottery/:id");
   const lotteryId = params?.id;
   const { toast } = useToast();
@@ -84,6 +84,26 @@ export default function LotteryDetailNew() {
     }
   };
 
+  const parsePrizes = (prizesString: string) => {
+    try {
+      const prizes = JSON.parse(prizesString);
+      return prizes.grand || "Travel Experience";
+    } catch {
+      return "Travel Experience Package";
+    }
+  };
+
+  const getPrizeValue = (prizesString: string) => {
+    try {
+      const prizes = JSON.parse(prizesString);
+      const grandPrize = prizes.grand || "";
+      const match = grandPrize.match(/\$([0-9,]+)/);
+      return match ? match[1] : "4,500";
+    } catch {
+      return "4,500";
+    }
+  };
+
   if (!match || lotteryLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
@@ -110,6 +130,8 @@ export default function LotteryDetailNew() {
 
   const canPurchase = user && user.kairosTokens >= lottery.ticketPrice * ticketQuantity && selectedNumbers.length === 6;
   const timeRemaining = Math.floor(Math.random() * 48) + 1; // Mock time remaining
+  const prizeValue = getPrizeValue(lottery.prizes);
+  const prizeDescription = parsePrizes(lottery.prizes);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -162,16 +184,16 @@ export default function LotteryDetailNew() {
                 <div className="bg-gradient-to-r from-golden-luck/10 to-orange-400/10 rounded-lg p-6 border border-golden-luck/20 text-center">
                   <h3 className="text-sm font-medium text-slate-700 mb-2">GRAND PRIZE</h3>
                   <div className="text-4xl font-bold text-golden-luck mb-2">
-                    ${typeof lottery.prizeValue === 'number' ? lottery.prizeValue.toLocaleString() : lottery.prizeValue}
+                    ${prizeValue}
                   </div>
-                  <p className="text-slate-600">Complete Travel Experience Package</p>
+                  <p className="text-slate-600">{prizeDescription}</p>
                 </div>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                   <div className="text-center">
                     <Calendar className="h-8 w-8 text-explore-blue mx-auto mb-2" />
                     <p className="text-sm font-medium text-slate-700">Draw Date</p>
-                    <p className="text-sm text-slate-600">{String(lottery.drawDate)}</p>
+                    <p className="text-sm text-slate-600">{new Date(lottery.drawDate).toLocaleDateString()}</p>
                   </div>
                   <div className="text-center">
                     <Clock className="h-8 w-8 text-travel-mint mx-auto mb-2" />
@@ -181,12 +203,12 @@ export default function LotteryDetailNew() {
                   <div className="text-center">
                     <Users className="h-8 w-8 text-ocean-pulse mx-auto mb-2" />
                     <p className="text-sm font-medium text-slate-700">Participants</p>
-                    <p className="text-sm text-slate-600">{Math.floor(Math.random() * 200) + 100}</p>
+                    <p className="text-sm text-slate-600">{lottery.soldTickets || 0}</p>
                   </div>
                   <div className="text-center">
                     <Star className="h-8 w-8 text-golden-luck mx-auto mb-2" />
-                    <p className="text-sm font-medium text-slate-700">Your Odds</p>
-                    <p className="text-sm text-slate-600">1 in {Math.floor(Math.random() * 500) + 100}</p>
+                    <p className="text-sm font-medium text-slate-700">Max Tickets</p>
+                    <p className="text-sm text-slate-600">{lottery.maxTickets}</p>
                   </div>
                 </div>
               </CardContent>
