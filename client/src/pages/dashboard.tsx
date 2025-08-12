@@ -217,7 +217,10 @@ export default function Dashboard() {
                   <Button 
                     className="w-full justify-between" 
                     data-testid="quick-action-lotteries"
-                    onClick={() => window.location.href = '/lotteries'}
+                    onClick={() => {
+                      console.log("Navigating to lotteries from dashboard...");
+                      window.location.replace('/lotteries');
+                    }}
                   >
                     Explore Lotteries
                     <ArrowRight className="h-4 w-4" />

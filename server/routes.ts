@@ -22,6 +22,10 @@ if (process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.length > 20) 
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Force redirect for lottery navigation issues
+  app.get('/lottery-redirect', (req, res) => {
+    res.redirect(302, '/lotteries');
+  });
   // Users routes
   app.get("/api/users", async (req, res) => {
     try {

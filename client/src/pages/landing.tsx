@@ -305,7 +305,10 @@ export default function Landing() {
               size="lg" 
               className="bg-golden-luck hover:bg-golden-luck/90 text-white px-8 py-4 text-lg shadow-xl"
               data-testid="button-lotteries-now"
-              onClick={() => window.location.href = '/lotteries'}
+              onClick={() => {
+                console.log("Navigating to lotteries...");
+                window.location.replace('/lotteries');
+              }}
             >
               <Trophy className="mr-2 h-5 w-5" />
               Enter Lotteries Now
