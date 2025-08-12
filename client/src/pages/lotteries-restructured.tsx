@@ -536,16 +536,16 @@ export default function LotteriesRestructured() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
+    <div className="min-h-screen gradient-dark">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-5xl font-bold text-gradient-primary mb-4 shimmer">
             🌍 Loterías de Viajes TravelLotto
           </h1>
-          <p className="text-2xl text-muted-foreground mb-2">
+          <p className="text-2xl text-white/90 mb-2">
             Cada boleto es una posibilidad. Cada destino es real.
           </p>
-          <p className="text-lg text-muted-foreground mb-6">
+          <p className="text-lg text-white/70 mb-6">
             ✨ <em>"Participa en loterías temáticas y desbloquea la oportunidad de viajar por el mundo"</em>
           </p>
           {user && (
@@ -576,7 +576,7 @@ export default function LotteriesRestructured() {
             const isChestOpen = openChests.has(lottery.id);
             
             return (
-              <Card key={lottery.id} className="overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] border-2 border-gray-200 hover:border-orange-300">
+              <Card key={lottery.id} className="overflow-hidden glass-dark hover:glow-primary transition-all duration-300 hover:scale-[1.02] border-2 border-white/20 hover:border-white/40">
                 <div className="relative h-64">
                   <img
                     src={imageUrl}
@@ -603,12 +603,12 @@ export default function LotteriesRestructured() {
 
                 <CardContent className="space-y-6 p-6">
                   {/* Fecha del sorteo */}
-                  <div className="text-center p-4 bg-gradient-to-r from-orange-100 to-pink-100 rounded-lg border-2 border-orange-200">
-                    <div className="flex items-center justify-center gap-2 text-orange-700 mb-2">
+                  <div className="text-center p-4 gradient-primary rounded-lg border-2 border-white/20 glow-primary">
+                    <div className="flex items-center justify-center gap-2 text-white mb-2">
                       <Calendar className="h-5 w-5" />
                       <span className="font-semibold">Fecha del Sorteo</span>
                     </div>
-                    <p className="text-lg font-bold text-orange-800">
+                    <p className="text-lg font-bold text-white">
                       {formatDate(lottery.drawDate)}
                     </p>
                   </div>
@@ -620,7 +620,7 @@ export default function LotteriesRestructured() {
                   <div className="text-center">
                     <h3 className="text-xl font-bold mb-2">{lottery.prizeTitle}</h3>
                     <p className="text-muted-foreground mb-3">{lottery.prizeDescription}</p>
-                    <p className="text-3xl font-bold text-orange-600">
+                    <p className="text-3xl font-bold text-gradient-gold">
                       Valor: {formatPrice(lottery.prizeValue)}
                     </p>
                   </div>

@@ -2,343 +2,229 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* New Travel Platform Color Palette */
-  --background: hsl(220, 14%, 96%); /* Light Gray Silk Surface #F3F4F6 */
-  --foreground: hsl(230, 70%, 32%); /* Deep Blue Explore Blue #1E3A8A */
-  --muted: hsl(220, 14%, 96%); /* Light Gray #F3F4F6 */
-  --muted-foreground: hsl(230, 35%, 45%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(230, 70%, 32%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(230, 70%, 32%);
-  --border: hsl(220, 14%, 91%);
-  --input: hsl(220, 14%, 91%);
-  
-  /* Updated brand colors with VoyageLotto palette */
-  --primary: hsl(262, 83%, 58%); /* Voyager Purple */
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(25, 95%, 53%); /* Voyager Orange */
-  --secondary-foreground: hsl(0, 0%, 100%);
-  --accent: hsl(174, 72%, 56%); /* Voyager Teal */
-  --accent-foreground: hsl(0, 0%, 100%);
-  
-  /* State colors */
-  --destructive: hsl(0, 84%, 60%);
-  --destructive-foreground: hsl(210, 40%, 98%);
-  --ring: hsl(221, 83%, 53%);
-  --radius: 0.75rem;
-  
-  /* VoyageLotto Color Palette - Fusion of LynKey + Tripster */
-  --voyager-purple: hsl(262, 83%, 58%); /* Rich Purple (LynKey inspired) */
-  --voyager-orange: hsl(25, 95%, 53%); /* Vibrant Orange (Tripster inspired) */
-  --voyager-teal: hsl(174, 72%, 56%); /* Teal/Turquoise (LynKey luxury) */
-  --voyager-pink: hsl(340, 75%, 55%); /* Coral Pink */
-  --voyager-gold: hsl(45, 93%, 58%); /* Premium Gold */
-  --voyager-coral: hsl(14, 78%, 62%); /* Warm Coral */
-  
-  /* Legacy mapping */
-  --explore-blue: hsl(262, 83%, 58%); /* Now Purple */
-  --ocean-pulse: hsl(174, 72%, 56%); /* Now Teal */
-  --golden-luck: hsl(45, 93%, 58%); /* Enhanced Gold */
-  --travel-mint: hsl(174, 72%, 56%); /* Teal */
-  --silk-surface: hsl(220, 14%, 96%); /* Light Gray #F3F4F6 */
-  --success-green: hsl(158, 64%, 52%);
-  --warning-amber: hsl(45, 93%, 57%);
-  --error-red: hsl(0, 84%, 60%);
-  --info-blue: hsl(230, 70%, 32%);
-  
-  /* Travel destination colors - updated palette */
-  --bali-orange: hsl(45, 93%, 57%); /* Golden Luck */
-  --patagonia-blue: hsl(230, 70%, 32%); /* Explore Blue */
-  --morocco-terracotta: hsl(186, 96%, 53%); /* Ocean Pulse */
-  --adventure-emerald: hsl(158, 64%, 52%); /* Travel Mint */
-  --exploration-indigo: hsl(230, 70%, 32%); /* Explore Blue */
-  
-  /* Legacy color mappings for compatibility */
-  --slate-50: hsl(220, 14%, 98%);
-  --slate-100: hsl(220, 14%, 96%);
-  --slate-200: hsl(220, 14%, 90%);
-  --slate-300: hsl(220, 14%, 82%);
-  --slate-600: hsl(230, 35%, 45%);
-  --slate-700: hsl(230, 45%, 25%);
-  --slate-900: hsl(230, 70%, 15%);
-  
-  /* Lottery specific colors */
-  --lottery-gold: hsl(45, 93%, 57%);
-  --lottery-purple: hsl(186, 96%, 53%);
-  --text-gradient-gold: hsl(45, 93%, 57%);
-}
-
-.dark {
-  /* Dark mode - vibrant neon casino/travel theme */
-  --background: hsl(240, 85%, 5%);
-  --foreground: hsl(280, 100%, 95%);
-  --muted: hsl(240, 60%, 12%);
-  --muted-foreground: hsl(280, 40%, 75%);
-  --popover: hsl(240, 80%, 8%);
-  --popover-foreground: hsl(280, 100%, 95%);
-  --card: hsl(240, 70%, 8%);
-  --card-foreground: hsl(280, 100%, 95%);
-  --border: hsl(280, 60%, 20%);
-  --input: hsl(280, 60%, 15%);
-  
-  /* Dark primary colors - neon effect */
-  --primary: hsl(38, 100%, 60%);
-  --primary-foreground: hsl(240, 85%, 5%);
-  --secondary: hsl(280, 100%, 70%);
-  --secondary-foreground: hsl(240, 85%, 5%);
-  --accent: hsl(195, 100%, 65%);
-  --accent-foreground: hsl(240, 85%, 5%);
-  
-  --destructive: hsl(0, 100%, 65%);
-  --destructive-foreground: hsl(0, 0%, 100%);
-  --ring: hsl(38, 100%, 60%);
-  
-  /* Dark mode custom colors */
-  --lottery-gold: hsl(38, 100%, 60%);
-  --lottery-orange: hsl(25, 100%, 65%);
-  --lottery-purple: hsl(280, 100%, 75%);
-  --lottery-pink: hsl(320, 100%, 80%);
-  --adventure-teal: hsl(195, 100%, 65%);
-  --adventure-cyan: hsl(180, 100%, 70%);
-  --travel-coral: hsl(15, 100%, 75%);
-  --travel-emerald: hsl(150, 100%, 65%);
-}
-
 @layer base {
-  * {
-    @apply border-border;
+  :root {
+    /* Modern Glamorous Color Palette - Dark Luxury Theme */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 346 87% 43%;
+    --primary-foreground: 355 7% 97%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 346 87% 43%;
+    --radius: 0.75rem;
+
+    /* Luxury Premium Colors */
+    --gold: 45 100% 60%;
+    --electric-blue: 210 100% 56%;
+    --neon-purple: 280 100% 70%;
+    --cyber-pink: 330 100% 70%;
+    --platinum: 220 9% 78%;
+    --deep-purple: 260 70% 35%;
+    --crystal-cyan: 180 100% 70%;
+    --sunset-orange: 25 100% 65%;
+
+    /* Travel Luxury Theme */
+    --luxury-gold: 45 100% 60%;
+    --royal-purple: 260 70% 35%;
+    --electric-cyan: 180 100% 70%;
+    --sunset-coral: 25 100% 65%;
+    --platinum-silver: 220 9% 78%;
+    --cosmic-blue: 210 100% 56%;
+    --neon-pink: 330 100% 70%;
+    --emerald-glow: 150 100% 50%;
+
+    /* Gradient Backgrounds */
+    --gradient-primary: linear-gradient(135deg, hsl(330, 100%, 70%) 0%, hsl(260, 70%, 35%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(180, 100%, 70%) 0%, hsl(210, 100%, 56%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(45, 100%, 60%) 0%, hsl(25, 100%, 65%) 100%);
+    --gradient-dark: linear-gradient(135deg, hsl(240, 10%, 3.9%) 0%, hsl(240, 3.7%, 15.9%) 100%);
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom Glamorous Styles */
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(330, 100%, 70%) 0%, hsl(260, 70%, 35%) 100%);
+  }
+
+  .gradient-secondary {
+    background: linear-gradient(135deg, hsl(180, 100%, 70%) 0%, hsl(210, 100%, 56%) 100%);
+  }
+
+  .gradient-accent {
+    background: linear-gradient(135deg, hsl(45, 100%, 60%) 0%, hsl(25, 100%, 65%) 100%);
+  }
+
+  .gradient-dark {
+    background: linear-gradient(135deg, hsl(240, 10%, 3.9%) 0%, hsl(240, 3.7%, 15.9%) 100%);
+  }
+
+  .text-gradient-primary {
+    background: linear-gradient(135deg, hsl(330, 100%, 70%) 0%, hsl(260, 70%, 35%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-secondary {
+    background: linear-gradient(135deg, hsl(180, 100%, 70%) 0%, hsl(210, 100%, 56%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(135deg, hsl(45, 100%, 60%) 0%, hsl(25, 100%, 65%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Glassmorphism Effects */
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .glass-dark {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Neon Glow Effects */
+  .glow-primary {
+    box-shadow: 0 0 20px hsl(330, 100%, 70%);
+  }
+
+  .glow-secondary {
+    box-shadow: 0 0 20px hsl(180, 100%, 70%);
+  }
+
+  .glow-accent {
+    box-shadow: 0 0 20px hsl(45, 100%, 60%);
+  }
+
+  /* Modern Animations */
+  @keyframes shimmer {
+    0% {
+      background-position: -468px 0;
+    }
+    100% {
+      background-position: 468px 0;
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .shimmer {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(to right, 
+      rgba(255, 255, 255, 0.1) 0%, 
+      rgba(255, 255, 255, 0.3) 50%, 
+      rgba(255, 255, 255, 0.1) 100%);
+    background-size: 468px 100%;
+  }
+
+  .float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Custom Scroll Bar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, hsl(330, 100%, 70%) 0%, hsl(260, 70%, 35%) 100%);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, hsl(330, 100%, 80%) 0%, hsl(260, 70%, 45%) 100%);
   }
 }
 
-@layer utilities {
-  /* Updated gradients with new palette */
-  .gradient-travel {
-    background: linear-gradient(135deg, hsl(230, 70%, 32%) 0%, hsl(186, 96%, 53%) 100%);
-  }
-  
-  .gradient-viator {
-    background: linear-gradient(135deg, hsl(45, 93%, 57%) 0%, hsl(186, 96%, 53%) 100%);
-  }
-  
-  .gradient-success {
-    background: linear-gradient(135deg, hsl(158, 64%, 52%) 0%, hsl(186, 96%, 53%) 100%);
-  }
-  
-  /* Background utilities */
-  .bg-explore-blue { background-color: hsl(230, 70%, 32%); }
-  .bg-ocean-pulse { background-color: hsl(186, 96%, 53%); }
-  .bg-golden-luck { background-color: hsl(45, 93%, 57%); }
-  .bg-travel-mint { background-color: hsl(158, 64%, 52%); }
-  .bg-silk-surface { background-color: hsl(220, 14%, 96%); }
-  
-  /* Text utilities */
-  .text-explore-blue { color: hsl(230, 70%, 32%); }
-  .text-ocean-pulse { color: hsl(186, 96%, 53%); }
-  .text-golden-luck { color: hsl(45, 93%, 57%); }
-  .text-travel-mint { color: hsl(158, 64%, 52%); }
-  
-  /* Border utilities */
-  .border-explore-blue { border-color: hsl(230, 70%, 32%); }
-  .border-ocean-pulse { border-color: hsl(186, 96%, 53%); }
-  .border-golden-luck { border-color: hsl(45, 93%, 57%); }
-  .border-travel-mint { border-color: hsl(158, 64%, 52%); }
-  
-  /* Button utilities */
-  .btn-lottery { 
-    background: linear-gradient(135deg, hsl(230, 70%, 32%) 0%, hsl(186, 96%, 53%) 100%);
-    color: white;
-    border: none;
-  }
-  
-  .btn-adventure {
-    border-color: hsl(45, 93%, 57%);
-    color: hsl(45, 93%, 57%);
-  }
-  
-  .btn-adventure:hover {
-    background-color: hsl(45, 93%, 57%);
-    color: white;
-  }
-  
-  .gradient-adventure {
-    background: linear-gradient(135deg, hsl(200, 98%, 39%) 0%, hsl(173, 58%, 39%) 100%);
-  }
-  
-  /* Token-specific backgrounds */
-  .bg-viator {
-    background-color: hsl(43, 96%, 56%);
-  }
-  
-  .bg-kairos {
-    background-color: hsl(262, 83%, 58%);
-  }
-  
-  .bg-raivan {
-    background-color: hsl(173, 58%, 39%);
-  }
-  
-  /* Text colors */
-  .text-viator {
-    color: hsl(43, 96%, 56%);
-  }
-  
-  .text-kairos {
-    color: hsl(262, 83%, 58%);
-  }
-  
-  .text-raivan {
-    color: hsl(173, 58%, 39%);
-  }
-  
-  /* Legacy utilities for compatibility */
-  .bg-slate-50 {
-    color: var(--slate-700);
-  }
-  
-  .text-slate-900 {
-    color: var(--slate-900);
-  }
-  
-  .border-slate-200 {
-    border-color: var(--slate-200);
-  }
-  
-  .border-slate-300 {
-    border-color: var(--slate-300);
-  }
-  
-  .bg-explore-blue {
-    background-color: var(--explore-blue);
-  }
-  
-  .bg-ocean-pulse {
-    background-color: var(--ocean-pulse);
-  }
-  
-  .bg-golden-luck {
-    background-color: var(--golden-luck);
-  }
-  
-  .bg-travel-mint {
-    background-color: var(--travel-mint);
-  }
-  
-  .text-explore-blue {
-    color: var(--explore-blue);
-  }
-  
-  .text-ocean-pulse {
-    color: var(--ocean-pulse);
-  }
-  
-  .text-golden-luck {
-    color: var(--golden-luck);
-  }
-  
-  .text-travel-mint {
-    color: var(--travel-mint);
-  }
-  
-  /* Enhanced lottery & travel gradients */
-  .gradient-travel {
-    background: linear-gradient(135deg, var(--lottery-gold), var(--lottery-orange), var(--travel-coral));
-  }
-  
-  .gradient-lottery {
-    background: linear-gradient(135deg, var(--lottery-purple), var(--lottery-pink), var(--lottery-gold));
-  }
-  
-  .gradient-adventure {
-    background: linear-gradient(135deg, var(--adventure-teal), var(--adventure-cyan), var(--travel-emerald));
-  }
-  
-  .gradient-sunset {
-    background: linear-gradient(135deg, var(--sunrise-yellow), var(--lottery-orange), var(--sunset-red));
-  }
-  
-  .gradient-casino {
-    background: linear-gradient(135deg, var(--lottery-gold), var(--lottery-purple), var(--lottery-pink));
-  }
-  
-  /* Vibrant card backgrounds */
-  .bg-lottery-card {
-    background: linear-gradient(135deg, var(--lottery-gold), var(--lottery-orange));
-  }
-  
-  .bg-adventure-card {
-    background: linear-gradient(135deg, var(--adventure-teal), var(--travel-emerald));
-  }
-  
-  .bg-travel-card {
-    background: linear-gradient(135deg, var(--travel-coral), var(--lottery-pink));
-  }
-  
-  /* Neon glow effects */
-  .glow-gold {
-    box-shadow: 0 0 20px var(--lottery-gold), 0 0 40px var(--lottery-gold), 0 0 60px var(--lottery-gold);
-  }
-  
-  .glow-purple {
-    box-shadow: 0 0 20px var(--lottery-purple), 0 0 40px var(--lottery-purple);
-  }
-  
-  .glow-teal {
-    box-shadow: 0 0 20px var(--adventure-teal), 0 0 40px var(--adventure-teal);
-  }
-  
-  /* Enhanced button styles */
-  .btn-lottery {
-    background: linear-gradient(135deg, var(--lottery-gold), var(--lottery-orange));
-    color: var(--foreground);
-    font-weight: 600;
-    border: none;
-    transition: all 0.3s ease;
-  }
-  
-  .btn-lottery:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(255, 165, 0, 0.3);
-  }
-  
-  .btn-adventure {
-    background: linear-gradient(135deg, var(--adventure-teal), var(--adventure-cyan));
-    color: white;
-    font-weight: 600;
-    border: none;
-    transition: all 0.3s ease;
-  }
-  
-  .btn-adventure:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 191, 255, 0.3);
-  }
-  
-  /* Dynamic text effects */
-  .text-gradient-gold {
-    background: linear-gradient(135deg, var(--lottery-gold), var(--lottery-orange));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  
-  .text-gradient-adventure {
-    background: linear-gradient(135deg, var(--adventure-teal), var(--travel-emerald));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  
-  .text-gradient-lottery {
-    background: linear-gradient(135deg, var(--lottery-purple), var(--lottery-pink));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+/* Legacy Color Support for Existing Components */
+.bg-orange-500 {
+  background: linear-gradient(135deg, hsl(330, 100%, 70%) 0%, hsl(260, 70%, 35%) 100%) !important;
+}
+
+.bg-pink-500 {
+  background: linear-gradient(135deg, hsl(330, 100%, 70%) 0%, hsl(260, 70%, 35%) 100%) !important;
+}
+
+.text-orange-600 {
+  color: hsl(330, 100%, 70%) !important;
+}
+
+.text-pink-600 {
+  color: hsl(330, 100%, 70%) !important;
+}
+
+.border-orange-200 {
+  border-color: hsl(330, 100%, 70%, 0.3) !important;
+}
+
+.border-pink-200 {
+  border-color: hsl(330, 100%, 70%, 0.3) !important;
+}
+
+/* Button Overrides */
+.from-orange-500 {
+  --tw-gradient-from: hsl(330, 100%, 70%) !important;
+}
+
+.to-pink-500 {
+  --tw-gradient-to: hsl(260, 70%, 35%) !important;
+}
+
+.hover\:from-orange-600:hover {
+  --tw-gradient-from: hsl(330, 100%, 80%) !important;
+}
+
+.hover\:to-pink-600:hover {
+  --tw-gradient-to: hsl(260, 70%, 45%) !important;
 }
