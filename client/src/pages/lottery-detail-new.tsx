@@ -171,7 +171,7 @@ export default function LotteryDetailNew() {
                   <div className="text-center">
                     <Calendar className="h-8 w-8 text-explore-blue mx-auto mb-2" />
                     <p className="text-sm font-medium text-slate-700">Draw Date</p>
-                    <p className="text-sm text-slate-600">{lottery.drawDate}</p>
+                    <p className="text-sm text-slate-600">{String(lottery.drawDate)}</p>
                   </div>
                   <div className="text-center">
                     <Clock className="h-8 w-8 text-travel-mint mx-auto mb-2" />
