@@ -18,11 +18,11 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-cyan-200">
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-lottery-purple/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <div className="text-2xl font-bold text-gradient-ltt flex items-center gap-2" data-testid="logo">
+              <div className="text-2xl font-bold text-explore-blue flex items-center gap-2" data-testid="logo">
                 <div className="w-8 h-8">
                   <TravelImageRenderer type="cultural" className="w-full h-full" />
                 </div>
@@ -30,21 +30,21 @@ export default function Landing() {
               </div>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
-              <Link href="/explore" className="text-white/80 hover:text-gradient-secondary transition-colors" data-testid="nav-explore">
+              <Link href="/explore" className="text-muted-foreground hover:text-golden-luck transition-colors" data-testid="nav-explore">
                 Explorar
               </Link>
-              <Link href="/beginner-guide" className="text-white/80 hover:text-gradient-gold transition-colors" data-testid="nav-guide">
+              <Link href="/beginner-guide" className="text-muted-foreground hover:text-golden-luck transition-colors" data-testid="nav-guide">
                 Guía
               </Link>
-              <Link href="/partners" className="text-white/80 hover:text-gradient-secondary transition-colors" data-testid="nav-partners">
+              <Link href="/partners" className="text-muted-foreground hover:text-golden-luck transition-colors" data-testid="nav-partners">
                 Socios
               </Link>
-              <Link href="/lotteries" className="text-white/80 hover:text-gradient-primary transition-colors" data-testid="nav-lotteries">
+              <Link href="/lotteries" className="text-muted-foreground hover:text-golden-luck transition-colors" data-testid="nav-lotteries">
                 Loterías
               </Link>
               <LanguageSelector variant="ghost" size="sm" />
               <Link href="/beginner-guide">
-                <Button className="gradient-primary hover:glow-primary shadow-lg text-white font-semibold" data-testid="button-get-started">
+                <Button className="btn-lottery shadow-lg" data-testid="button-get-started">
                   Comenzar
                 </Button>
               </Link>
@@ -64,7 +64,7 @@ export default function Landing() {
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-explore-blue mb-6" data-testid="hero-title">
               Turn Your Dreams Into
-              <span className="text-gradient-ltt"> Adventures</span>
+              <span className="text-golden-luck"> Adventures</span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto" data-testid="hero-subtitle">
               Complete missions, win lotteries, and earn tokens to unlock real travel experiences. 
@@ -74,7 +74,7 @@ export default function Landing() {
               <Link href="/lotteries">
                 <Button 
                   size="lg" 
-                  className="gradient-primary hover:glow-primary text-white font-semibold px-8 py-6 text-lg shadow-xl"
+                  className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white px-8 py-4 text-lg shadow-xl"
                   data-testid="button-lottery-main"
                 >
                   <Trophy className="mr-2 h-5 w-5" />
@@ -84,7 +84,7 @@ export default function Landing() {
               <Link href="/beginner-guide">
                 <Button 
                   size="lg" 
-                  className="gradient-secondary hover:glow-secondary text-white font-semibold px-8 py-6 text-lg shadow-xl"
+                  className="bg-gradient-to-r from-purple-600 via-orange-500 to-teal-500 hover:from-purple-700 hover:via-orange-600 hover:to-teal-600 text-white px-8 py-4 text-lg shadow-xl"
                   data-testid="button-start-exploring"
                 >
                   <Sparkles className="mr-2 h-5 w-5" />
@@ -95,7 +95,7 @@ export default function Landing() {
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="glass border-2 border-white/30 text-white hover:glow-accent px-8 py-6 text-lg font-semibold"
+                  className="border-2 border-purple-500 text-purple-600 hover:bg-purple-50 px-8 py-4 text-lg shadow-xl"
                   data-testid="button-explore-destinations"
                 >
                   <MapPin className="mr-2 h-5 w-5" />
@@ -105,7 +105,7 @@ export default function Landing() {
             </div>
             
             {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 glass rounded-2xl p-8 shadow-2xl max-w-4xl mx-auto pulse-glow">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 bg-white rounded-2xl p-8 shadow-lg max-w-4xl mx-auto">
               <div className="text-center" data-testid="stat-adventures">
                 <div className="text-3xl font-bold text-golden-luck">1000+</div>
                 <div className="text-muted-foreground">Adventures Won</div>
