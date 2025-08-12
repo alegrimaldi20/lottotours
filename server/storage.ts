@@ -131,7 +131,6 @@ export class DatabaseStorage implements IStorage {
           status: "active",
           winnerId: null,
           createdAt: new Date(),
-          isActive: true,
         },
         {
           id: "lottery-patagonia-expedition", 
@@ -150,7 +149,6 @@ export class DatabaseStorage implements IStorage {
           status: "active",
           winnerId: null,
           createdAt: new Date(),
-          isActive: true,
         },
         {
           id: "lottery-vip-ultimate-world",
@@ -169,7 +167,6 @@ export class DatabaseStorage implements IStorage {
           status: "active",
           winnerId: null,
           createdAt: new Date(),
-          isActive: true,
         }
       ]);
 
@@ -229,7 +226,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getActiveLotteries(): Promise<Lottery[]> {
-    return await db.select().from(lotteries).where(eq(lotteries.isActive, true));
+    try {
+      return await db.select().from(lotteries);
+    } catch (error) {
+      console.error("Error fetching lotteries:", error);
+      // Return empty array if there's a database error
+      return [];
+    }
   }
 
   async getLottery(id: string): Promise<Lottery | undefined> {
