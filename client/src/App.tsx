@@ -13,7 +13,7 @@ import Landing from "./pages/landing";
 import Dashboard from "./pages/dashboard";
 import Marketplace from "./pages/marketplace";
 import SellPage from "./pages/sell";
-import Lotteries from "./pages/lotteries";
+import Lotteries from "./pages/test-lotteries";
 import LotteryDetail from "./pages/lottery-detail";
 import TokenShop from "./pages/token-shop";
 import Missions from "./pages/missions";
