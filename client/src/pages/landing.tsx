@@ -300,16 +300,28 @@ export default function Landing() {
           <p className="text-xl mb-8 text-blue-100" data-testid="cta-subtitle">
             Join thousands of explorers who are turning their dreams into reality
           </p>
-          <Link href="/dashboard">
-            <Button 
-              size="lg" 
-              className="bg-white text-explore-blue hover:bg-slate-100 px-8 py-4 text-lg"
-              data-testid="button-join-now"
-            >
-              <Users className="mr-2 h-5 w-5" />
-              Join the Adventure
-            </Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/lotteries">
+              <Button 
+                size="lg" 
+                className="bg-golden-luck hover:bg-golden-luck/90 text-white px-8 py-4 text-lg shadow-xl"
+                data-testid="button-lotteries-now"
+              >
+                <Trophy className="mr-2 h-5 w-5" />
+                Enter Lotteries Now
+              </Button>
+            </Link>
+            <Link href="/dashboard">
+              <Button 
+                size="lg" 
+                className="bg-white text-explore-blue hover:bg-slate-100 px-8 py-4 text-lg"
+                data-testid="button-join-now"
+              >
+                <Users className="mr-2 h-5 w-5" />
+                Join the Adventure
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
