@@ -8,6 +8,7 @@ import { useLocaleSafeToast } from "@/hooks/use-locale-safe-toast";
 import { LanguageProvider } from "@/lib/i18n";
 import { createContext, type ReactNode, useEffect } from "react";
 import { setupErrorSuppression } from "@/utils/error-suppression";
+import FloatingNavigation from "@/components/floating-navigation";
 
 import Landing from "./pages/landing";
 import Dashboard from "./pages/dashboard";
@@ -95,6 +96,7 @@ function App() {
           <ErrorBoundary>
             <ToastProvider>
               <Router />
+              <FloatingNavigation />
               <InlineToaster toasts={toasts} onRemove={removeToast} />
             </ToastProvider>
           </ErrorBoundary>
