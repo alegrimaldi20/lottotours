@@ -84,24 +84,26 @@ export default function MobileNavigation({ currentPath }: MobileNavigationProps)
               const Icon = item.icon;
               
               return (
-                <Link key={item.href} href={item.href}>
-                  <Button
-                    variant={isActive ? "secondary" : "ghost"}
-                    className={`w-full justify-start gap-3 h-12 ${
-                      isActive ? "bg-blue-50 text-explore-blue" : ""
-                    }`}
-                    onClick={closeMenu}
-                    data-testid={`mobile-nav-${item.href.replace("/", "")}`}
-                  >
-                    <Icon className="h-5 w-5" />
-                    <span className="font-medium">{t(item.labelKey)}</span>
-                    {item.badge && (
-                      <Badge variant="secondary" className="ml-auto text-xs">
-                        {item.badge}
-                      </Badge>
-                    )}
-                  </Button>
-                </Link>
+                <Button
+                  key={item.href}
+                  variant={isActive ? "secondary" : "ghost"}
+                  className={`w-full justify-start gap-3 h-12 ${
+                    isActive ? "bg-blue-50 text-explore-blue" : ""
+                  }`}
+                  onClick={() => {
+                    closeMenu();
+                    window.location.href = item.href;
+                  }}
+                  data-testid={`mobile-nav-${item.href.replace("/", "")}`}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span className="font-medium">{t(item.labelKey)}</span>
+                  {item.badge && (
+                    <Badge variant="secondary" className="ml-auto text-xs">
+                      {item.badge}
+                    </Badge>
+                  )}
+                </Button>
               );
             })}
           </nav>

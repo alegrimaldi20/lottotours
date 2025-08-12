@@ -301,16 +301,15 @@ export default function Landing() {
             Join thousands of explorers who are turning their dreams into reality
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/lotteries">
-              <Button 
-                size="lg" 
-                className="bg-golden-luck hover:bg-golden-luck/90 text-white px-8 py-4 text-lg shadow-xl"
-                data-testid="button-lotteries-now"
-              >
-                <Trophy className="mr-2 h-5 w-5" />
-                Enter Lotteries Now
-              </Button>
-            </Link>
+            <Button 
+              size="lg" 
+              className="bg-golden-luck hover:bg-golden-luck/90 text-white px-8 py-4 text-lg shadow-xl"
+              data-testid="button-lotteries-now"
+              onClick={() => window.location.href = '/lotteries'}
+            >
+              <Trophy className="mr-2 h-5 w-5" />
+              Enter Lotteries Now
+            </Button>
             <Link href="/dashboard">
               <Button 
                 size="lg" 

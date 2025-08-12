@@ -214,12 +214,14 @@ export default function Dashboard() {
                   <CardDescription>Jump into your next adventure</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Link href="/lotteries">
-                    <Button className="w-full justify-between" data-testid="quick-action-lotteries">
-                      Explore Lotteries
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </Link>
+                  <Button 
+                    className="w-full justify-between" 
+                    data-testid="quick-action-lotteries"
+                    onClick={() => window.location.href = '/lotteries'}
+                  >
+                    Explore Lotteries
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
                   <Link href="/token-management">
                     <Button variant="outline" className="w-full justify-between" data-testid="quick-action-tokens">
                       Manage Tokens
