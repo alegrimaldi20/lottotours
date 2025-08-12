@@ -602,6 +602,17 @@ export default function LotteriesRestructured() {
                 </div>
 
                 <CardContent className="space-y-6 p-6">
+                  {/* Fecha del sorteo */}
+                  <div className="text-center p-4 bg-gradient-to-r from-orange-100 to-pink-100 rounded-lg border-2 border-orange-200">
+                    <div className="flex items-center justify-center gap-2 text-orange-700 mb-2">
+                      <Calendar className="h-5 w-5" />
+                      <span className="font-semibold">Fecha del Sorteo</span>
+                    </div>
+                    <p className="text-lg font-bold text-orange-800">
+                      {formatDate(lottery.drawDate)}
+                    </p>
+                  </div>
+
                   {/* Cuenta regresiva */}
                   <CountdownTimer drawDate={lottery.drawDate} />
 
@@ -612,28 +623,6 @@ export default function LotteriesRestructured() {
                     <p className="text-3xl font-bold text-orange-600">
                       Valor: {formatPrice(lottery.prizeValue)}
                     </p>
-                  </div>
-
-                  <Separator />
-
-                  {/* Información del destino */}
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-orange-500" />
-                      <span>Sorteo: {formatDate(lottery.drawDate)}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-orange-500" />
-                      <span>Duración: {details?.duration}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Star className="h-4 w-4 text-orange-500" />
-                      <span>Dificultad: {details?.difficulty}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-orange-500" />
-                      <span>Mejor época: {details?.bestTime}</span>
-                    </div>
                   </div>
 
                   <Separator />
