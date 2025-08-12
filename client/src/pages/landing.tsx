@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import TravelImageRenderer from "@/components/travel-image-renderer";
 import Footer from "@/components/footer";
 import LanguageSelector from "@/components/language-selector";
-import QuickNavigation from "@/components/quick-navigation";
+
 
 export default function Landing() {
   const scrollToSection = (sectionId: string) => {
@@ -427,12 +427,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Quick Navigation Section */}
-      <section className="py-20 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <QuickNavigation />
-        </div>
-      </section>
+
 
       <Footer />
     </div>
