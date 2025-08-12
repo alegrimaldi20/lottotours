@@ -6,15 +6,7 @@ import { marketplaceListings } from "@shared/schema";
 import Stripe from "stripe";
 import { 
   insertUserSchema, 
-  insertLotteryTicketSchema, 
-  insertPrizeRedemptionSchema,
-  insertRaivanConversionSchema,
-  insertMarketplaceListingSchema,
-  insertMarketplaceBidSchema,
-  insertMarketplacePurchaseSchema,
-  insertMarketplaceWatcherSchema,
-  insertSellerProfileSchema,
-  insertMarketplaceDisputeSchema
+  insertLotteryTicketSchema
 } from "@shared/schema";
 import { z } from "zod";
 
