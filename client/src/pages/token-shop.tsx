@@ -6,15 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Star, Coins, ShoppingCart, CreditCard, Zap } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import type { TokenPack } from "@shared/schema";
 
-// Initialize Stripe
-if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
-  throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
-}
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+
 
 interface CheckoutFormProps {
   tokenPack: TokenPack;
@@ -186,14 +181,6 @@ export default function TokenShop() {
               </Button>
             </Link>
           </div>
-          
-          <Elements stripe={stripePromise} options={{ clientSecret }}>
-            <CheckoutForm
-              tokenPack={selectedPack}
-              onSuccess={handlePaymentSuccess}
-              onCancel={handlePaymentCancel}
-            />
-          </Elements>
         </div>
       </div>
     );
